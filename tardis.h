@@ -6,4 +6,7 @@
 #include <stdlib.h>
 #include <zlib.h>
 
+#include "common.h"
+#include "cmdline.h"
+
 #endif
