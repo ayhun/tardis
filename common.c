@@ -19,4 +19,9 @@ void init_params(parameters **params){
 
 void print_params(parameters *params){
   printf("bamFile: %s\n", params->bamFile);
+  printf("refGenome: %s\n", params->refGenome);
+  printf("reps: %s\n", params->reps);
+  printf("dups: %s\n", params->dups);
+  printf("gaps: %s\n", params->gaps);
+  printf("mei: %s\n", params->mei);
 }
