@@ -108,33 +108,38 @@ int parseCommandLine (int argc, char **argv, parameters *params){
 
   /* check if --input is invoked */
   if (params->bamFile == NULL){
+    fprintf(stderr, "[TARDIS CMDLINE ERROR] Please enter input BAM file through the --input option.\n");
     return 0;
   }
 
   /* check if --ref   is invoked */
   if (params->refGenome == NULL){
+    fprintf(stderr, "[TARDIS CMDLINE ERROR] Please enter reference genome file (FASTA) through the --ref option.\n");
     return 0;
   }
 
   /* check if --gaps  is invoked */
   if (params->gaps == NULL){
+    fprintf(stderr, "[TARDIS CMDLINE ERROR] Please enter the assembly gaps file (BED) through the --gaps option.\n");
     return 0;
   }
 
   /* check if --reps  is invoked */
   if (params->reps == NULL){
+    fprintf(stderr, "[TARDIS CMDLINE ERROR] Please enter the repeats file (RepeaMasker) through the --reps option.\n");
     return 0;
   }
 
   /* check if --dups  is invoked */
   if (params->dups == NULL){
+    fprintf(stderr, "[TARDIS CMDLINE ERROR] Please enter the segmental duplications file (BED) through the --gaps option.\n");
     return 0;
   }
 
   /* check if --mei   is invoked -- this can be optional */
   
-  if (params->mei == NULL){
-    return 0;
+  if (params->mei == NULL){  
+    //return 0;
   }
 
 

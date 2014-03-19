@@ -19,5 +19,7 @@ typedef struct _params{
 
 void init_params(parameters **);
 void print_params(parameters *);
+void print_error(char *);
+FILE *gfOpen(char *, char *);
 
 #endif
