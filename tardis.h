@@ -11,7 +11,7 @@
 
 #include "common.h"
 #include "cmdline.h"
-#include "bam.h"
+#include "processbam.h"
 
 
 #endif

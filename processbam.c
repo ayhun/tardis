@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bam.h"
+#include "processbam.h"
 
 #define SAMPLEFRAG 1000000 /*sample this many concordants to calculate avg/std*/
 

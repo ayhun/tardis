@@ -1,5 +1,5 @@
-#ifndef __BAM
-#define __BAM
+#ifndef __PROCESSBAM
+#define __PROCESSBAM
 
 typedef struct _bamInfo{
   FILE *bam; /* file pointer to the BAM file; as set in parameters->bamFile */

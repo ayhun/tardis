@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -c -O2 -g
 LDFLAGS = -lz -lm
-SOURCES = tardis.c cmdline.c common.c bam.c
+SOURCES = tardis.c cmdline.c common.c processbam.c
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = tardis
 
