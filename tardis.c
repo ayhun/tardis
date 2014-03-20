@@ -20,7 +20,24 @@ int main(int argc, char **argv){
 
   inBam = (bamInfo *) malloc(sizeof(bamInfo));
   
-  inBam->bam = gfOpen(params->bamFile, "r");
   loadBAM(inBam);
+
+  /*
+    BAM is loaded, min/max/avg/std are calculated.
+    Now, extract FASTQs of discordants, OEAs, and orphans
+  */
   
+  /*  to be implemented.  We need to decide on the FASTQ name convention.
+    createFastqs(inBam);
+  */
+
+  /* 
+     remap with mrFAST
+  */
+  
+  /*  to be implemented.
+      pass config (mrfast path) and FASTQ names. 
+      params->threads will be used for multithreading option of mrFAST
+      remap(params, ...); 
+   */
 }

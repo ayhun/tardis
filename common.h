@@ -14,6 +14,8 @@ typedef struct _params{
   char runVH; /* boolean stand-in to run VariationHunter */
   char runNS; /* boolean stand-in to run NovelSeq */
   char runSR; /* boolean stand-in to run SPLITREAD */
+  int  threads; /* number of threads to use for parallel mrFAST, and maybe
+		   future parallelization of TARDIS */
 } parameters;
 
 

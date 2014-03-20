@@ -16,6 +16,7 @@ void init_params(parameters **params){
   (*params)->runVH = 0; 
   (*params)->runNS = 0;
   (*params)->runSR = 0;
+  (*params)->threads = 1;
 }
 
 void print_params(parameters *params){

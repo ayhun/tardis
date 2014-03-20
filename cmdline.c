@@ -20,6 +20,7 @@ int parseCommandLine (int argc, char **argv, parameters *params){
       {"dups"   , required_argument,   0, 'd'},
       {"reps"   , required_argument,   0, 'r'},      
       {"mei"    , required_argument,   0, 'm'},
+      {"threads", required_argument,   0, 't'},
       {"help"   , no_argument,         0, 'h'},
       {"version", no_argument,         0, 'v'},
       {"vh"     , no_argument, &runVH,     1 },
@@ -68,6 +69,10 @@ int parseCommandLine (int argc, char **argv, parameters *params){
 	case 'm':
 	  params->mei = (char *) malloc ((strlen(optarg)+1) * sizeof(char));
 	  strncpy(params->mei, optarg, strlen(optarg));
+	  break;
+	  
+	case 't':
+	  params->threads = atoi(optarg);
 	  break;
 	  
 	case 'h':
@@ -140,6 +145,13 @@ int parseCommandLine (int argc, char **argv, parameters *params){
   
   if (params->mei == NULL){  
     //return 0;
+  }
+
+  /* check if threads>0 */
+  
+  if (params->threads <= 0){
+    fprintf(stderr, "[TARDIS CMDLINE WARNING] Invalid number of threads was entered (%d). Resetted to 1.\n", params->threads);
+    params->threads = 1;
   }
 
 
