@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS = -c -O2 -g
+CFLAGS = -c -O2 -g -I htslib
 LDFLAGS = -lz -lm
-SOURCES = tardis.c cmdline.c common.c processbam.c
+SOURCES = tardis.c cmdline.c common.c processbam.c 
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = tardis
 
@@ -17,4 +17,7 @@ $(EXECUTABLE): $(OBJECTS)
 clean: 
 	rm -f $(EXECUTABLE) *.o *~
 
+libs:
+	make clean -C htslib
+	make -C htslib
 	
