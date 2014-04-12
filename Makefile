@@ -1,13 +1,13 @@
 CC=gcc
 CFLAGS = -c -O2 -g -I htslib
-LDFLAGS = -lz -lm
+LDFLAGS = htslib/libhts.a  -lz -lm -lpthread
 SOURCES = tardis.c cmdline.c common.c processbam.c 
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = tardis
 
 all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o
-		
+
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
 
