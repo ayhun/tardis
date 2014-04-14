@@ -166,8 +166,8 @@ void print_read( bamInfo* inBam, int index)
 	printf( "\n");
 }
 
-/* Calculate the median, average, and standard deviation for the fragment size
- samples which satisfy the given criteria */
+/*	Calculate the median, average, and standard deviation for the fragment size
+	samples which satisfy the given criteria */
 void calculate_statistics( bamInfo* inBam)
 {
 	int i = 0;
