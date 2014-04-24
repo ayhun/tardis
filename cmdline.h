@@ -1,7 +1,7 @@
 #ifndef __COMMANDLINE
 #define __COMMANDLINE
 
-int parseCommandLine (int, char **, parameters *);
-void printHelp(void);
+int parse_command_line( int, char**, parameters*);
+void print_help( void);
 
 #endif

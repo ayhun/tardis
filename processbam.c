@@ -4,23 +4,25 @@
 #include <math.h>
 #include <inttypes.h>
 
-/* htslib headers */
-#include <htslib/sam.h>
-#include <htslib/hts.h>
-
 /* tardis headers */
 #include "processbam.h"
 
-/* Sample this many concordants to calculate avg/median/std */
+/* Sample this many fragments to calculate avg/median/std */
 #define SAMPLEFRAG 1000000 
 
-void loadBAM( bamInfo* inBam, char* path)
+void load_bam( bam_info* in_bam, char* path)
 {
 	/* Variables */
 	htsFile* bam_file;
 	bam_hdr_t* bam_header;
 	bam1_core_t bam_alignment_core;
 	bam1_t*	bam_alignment;
+	int* fragment_size;
+	int* second_pass_fragments;
+	int fragments_sampled;
+	int second_test_pass;
+	int fragment_size_total;
+	float variance;
 	int return_value;
 	int i;
 
@@ -37,59 +39,82 @@ void loadBAM( bamInfo* inBam, char* path)
 	bam_header = bam_hdr_read( ( bam_file->fp).bgzf);
 
 	/* Store the number of reference sequences */
-	inBam->numChrom = bam_header->n_targets;
+	in_bam->num_chrom = bam_header->n_targets;
 
-	/* For all reference sequences, store their names and lengths */
-	for( i = 0; i < bam_header->n_targets; i++)
+	/* Allocate memory for reference sequence lengths */
+	in_bam->chrom_lengths = ( int*) malloc( in_bam->num_chrom * sizeof( int));
+
+	in_bam->chrom_names = ( char**) malloc( in_bam->num_chrom * sizeof( char*));
+	
+	/* Store chromosome lengths, allocate memory for reference sequence names,
+	 and store the names as well */
+	for( i = 0; i < in_bam->num_chrom; i++)
 	{
-		inBam->chromNames[i] = ( bam_header->target_name)[i];
-		inBam->chromLengths[i] = ( bam_header->target_len)[i];
+		( in_bam->chrom_lengths)[i] = ( bam_header->target_len)[i];
+
+		( in_bam->chrom_names)[i] = ( char*) malloc( ( in_bam->chrom_lengths)[i] * sizeof( char));
+		strcpy( ( in_bam->chrom_names)[i], ( bam_header->target_name)[i]);
 	}
-
-	/* Get BAM header text */
-	char* header_text = bam_header->text;
-
+	
 	/* Extract the Sample Name from the header text */
-	get_sample_name( inBam, header_text);
+	get_sample_name( in_bam, bam_header->text);
 
-	/* For all alignments, store the core information */
+	/* For SAMPLEFRAG number of alignments, store the template length field */
+	fragment_size = ( int*) malloc( SAMPLEFRAG * sizeof( int));
+
+	/* Initial read */	
 	bam_alignment = bam_init1();
 	return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
-	i = 0;
-	while( return_value != -1)
+
+	/* The remaining reads */
+	fragments_sampled = 0;
+	while( return_value != -1 && fragments_sampled != SAMPLEFRAG)
 	{
 		bam_alignment_core = bam_alignment->core;
 
-		inBam->pos[i] = bam_alignment_core.pos + 1;
-		inBam->bin[i] = bam_alignment_core.bin;
-		inBam->qual[i] = bam_alignment_core.qual;
-		inBam->length_read_name[i] = bam_alignment_core.l_qname;
-		inBam->flag[i] =  bam_alignment_core.flag;
-		inBam->pos_mate_read[i] = bam_alignment_core.mpos + 1;
-		inBam->is_reverse[i] = bam_is_rev( bam_alignment);
-		inBam->is_mate_reverse[i] = bam_is_mrev( bam_alignment);
-		inBam->read_name[i] = bam_get_qname( bam_alignment);
-
-		/* CIGAR string is stored by htslib as 4 bits representing the type
-		 of operation and 28 bits representing the length of the operation */
-		uint32_t* cigar_array = bam_get_cigar( bam_alignment);
-		int num_cigar_ops = bam_alignment_core.n_cigar;
-		int j;
-		for( j = 0; j < num_cigar_ops; j++)
+		if( bam_alignment_core.isize > 0 && !bam_is_rev( bam_alignment) && bam_is_mrev( bam_alignment))
 		{
-			inBam->cigar_ops[i][j] = bam_cigar_opchr( cigar_array[j]);
-			inBam->length_cigar_ops[i][j] = cigar_array[j] >> 4;
+			fragment_size[fragments_sampled] = bam_alignment_core.isize;
+			fragments_sampled = fragments_sampled + 1;
 		}
-
-		/* Extract the read and fragment size related information */
-		inBam->length_read[i] = bam_alignment_core.l_qseq;
-		inBam->insertion_size[i] = bam_alignment_core.isize;
-		inBam->read[i] = bam_get_seq( bam_alignment);
 
 		/* Read next alignment */
 		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
-		i = i + 1;
 	}
+
+	/* Now we have SAMPLEFRAG number of fragment sizes which are positive and pass the flag conditions.
+	 Next, sort the fragment sizes */
+	qsort( fragment_size, SAMPLEFRAG, sizeof( int), compare_size);
+
+	/* Get the median */
+	in_bam->frag_med = fragment_size[( SAMPLEFRAG / 2) - 1];
+
+	/* Find the fragment sizes which pass the second test, and will contribute to the avg and std */
+	second_pass_fragments = ( int*) malloc( SAMPLEFRAG * sizeof( int));
+	second_test_pass = 0;
+	fragment_size_total = 0;
+	for( i = 0; i < SAMPLEFRAG; i++)
+	{
+		if( fragment_size[i] <= 2 * in_bam->frag_med)
+		{
+			fragment_size_total = fragment_size_total + fragment_size[i];
+			second_pass_fragments[i] = fragment_size[i];
+			second_test_pass = second_test_pass + 1;
+		}
+	}
+
+	/* Compute the average */
+	in_bam->frag_avg = ( float) fragment_size_total / ( float) second_test_pass;
+
+	/* Compute the variance and std */
+	variance = 0;
+	for( i = 0; i < second_test_pass; i++)
+	{
+		variance = variance + ( second_pass_fragments[i] - in_bam->frag_avg) * ( second_pass_fragments[i] - in_bam->frag_avg);
+	}
+
+	variance = ( float) variance / ( float) ( second_test_pass);
+	in_bam->frag_std = sqrt( variance);
 	
 	/* Close the BAM file */
 	return_value = hts_close( bam_file);
@@ -97,7 +122,21 @@ void loadBAM( bamInfo* inBam, char* path)
 	{
 		fprintf( stderr, "Error closing BAM file\n");
 		exit( 1);
-	} 
+	}
+
+	/* Free Memory */
+	free( fragment_size);
+	free( second_pass_fragments);
+}
+
+/* Add 33 to the interger value of the qual characters to convert them to ASCII */
+void qual_to_ascii( char** qual)
+{
+	int i;
+	for( i = 0; i < strlen( ( *qual)); i++)
+	{
+		( *qual)[i] = ( *qual)[i] + 33;
+	}
 }
 
 /* Decode 4-bit encoded bases to their corresponding characters */
@@ -125,11 +164,11 @@ char base_as_char( int base_as_int)
 	}
 }
 
-void get_sample_name( bamInfo* inBam, char* header_text)
+void get_sample_name( bam_info* in_bam, char* header_text)
 {
 	/* Delimit the BAM header text with tabs and newlines */
 	char* p = strtok( header_text, "\t\n");
-	char sample_name[1024];
+	char sample_name_buffer[1024];
 
 	while( p != NULL)
 	{
@@ -138,10 +177,10 @@ void get_sample_name( bamInfo* inBam, char* header_text)
 		if( p[0] == 'S' && p[1] == 'M')
 		{
 			/* Get the Sample Name */
-			strncpy( sample_name, p + 3, strlen( p) - 3);
+			strncpy( sample_name_buffer, p + 3, strlen( p) - 3);
 
 			/* Add the NULL terminator */
-			sample_name[strlen( p) - 3] = '\0';
+			sample_name_buffer[strlen( p) - 3] = '\0';
 
 			/* Exit loop */
 			break;
@@ -149,67 +188,9 @@ void get_sample_name( bamInfo* inBam, char* header_text)
 		p = strtok( NULL, "\t\n");
 	}
 
-	inBam->sampleName = sample_name;
+	in_bam->sample_name = ( char*) malloc( ( strlen( sample_name_buffer) + 1) * sizeof( char));
+	strcpy( in_bam->sample_name, sample_name_buffer);
 }
-
-/* This function prints the read sequence at the given index 
- as a human readable string */ 
-void print_read( bamInfo* inBam, int index)
-{
-	int i;	
-	printf( "Read: ");
-	for( i = 0; i < inBam->length_read[index]; i++)
-	{
-		int base = bam_seqi( inBam->read[index], i);
-		printf( "%c", base_as_char( base));
-	}
-	printf( "\n");
-}
-
-/* Calculate the median, average, and standard deviation for the fragment size
- samples which satisfy the given criteria */
-void calculate_statistics( bamInfo* inBam)
-{
-	int i = 0;
-	int j = 0;
-	int second_test_pass = 0;
-	int fragment_size_total = 0;
-	int fragment_size[SAMPLEFRAG];
-	float variance = 0;
-
-	while( j < SAMPLEFRAG)
-	{
-		if( inBam->length_read[i] > 0 && ( inBam->flag[i] & 0x10 == 0) && ( inBam->flag[i] & 0x20 != 0))
-		{
-			fragment_size[j] = inBam->length_read[i];
-			j = j + 1;
-		}
-		
-		i = i + 1;
-	}
-
-	qsort( fragment_size, SAMPLEFRAG, sizeof( int), compare_size);
-	inBam->fragMed = fragment_size[SAMPLEFRAG / 2];
-
-	for( i = 0; i < SAMPLEFRAG; i++)
-	{
-		if( fragment_size[i] <= 2 * inBam->fragMed)
-		{
-			fragment_size_total = fragment_size_total + fragment_size[i];
-			second_test_pass = second_test_pass + 1;
-		}
-	}
-
-	inBam->fragAvg = ( float) fragment_size_total / ( float) second_test_pass;
-
-	for( i = 0; i < SAMPLEFRAG; i++)
-	{
-		variance = variance + ( fragment_size[i] - inBam->fragAvg) * ( fragment_size[i] - inBam->fragAvg);
-	}
-
-	variance = ( float) variance / ( float) SAMPLEFRAG;
-	inBam->fragStd = sqrt( variance);
-}	
 
 int compare_size( const void* p, const void* q)
 {
@@ -228,4 +209,21 @@ int compare_size( const void* p, const void* q)
 	{
 		return 1;
 	}
+}
+
+void print_bam( bam_info* in_bam)
+{
+	printf( "Number of Chromosomes: %d\n", in_bam->num_chrom);
+
+	int i;
+	for( i = 0; i < in_bam->num_chrom; i++)
+	{
+		printf( "Chromosome Name: %s\n", ( in_bam->chrom_names)[i]);
+		printf( "Length of the Chromosome: %d\n", ( in_bam->chrom_lengths)[i]);
+	}
+
+	printf( "Sample Name: %s\n", in_bam->sample_name);
+	printf( "Median Fragment Size: %d\n", in_bam->frag_med);
+	printf( "Average Fragment Size: %.3f\n", in_bam->frag_avg);
+	printf( "Standard Deviation: %.3f\n", in_bam->frag_std);
 }

@@ -1,41 +1,29 @@
 #ifndef __PROCESSBAM
 #define __PROCESSBAM
 
-typedef struct _bamInfo
+/* htslib headers */
+#include <htslib/sam.h>
+#include <htslib/hts.h>
+
+typedef struct _bam_info
 {
-	htsFile* bam; /* file pointer to the BAM file; as set in parameters->bamFile */
-  	int numChrom; /* number of chromosomes */
-	int* chromLengths; /* lengths of the chromosomes */
-	char** chromNames; /* names of the chromosomes */
-  	char* sampleName; /* name of the sample, parsed from SM in the BAM header */
-	float fragAvg; /* average fragment size */
-  	float fragStd; /* fragment size standard deviation */
-	int fragMed; /* median of the fragment sizes */
-  	int concMin; /* min cutoff for concordants */
-  	int concMax; /* max cutoff for concordants */
+	htsFile* bam_file; /* file pointer to the BAM file */
+  	int num_chrom; /* number of chromosomes */
+	int* chrom_lengths; /* lengths of the chromosomes */
+	char** chrom_names; /* names of the chromosomes */
+  	char* sample_name; /* name of the sample, parsed from SM in the BAM header */
+	float frag_avg; /* average fragment size */
+  	float frag_std; /* fragment size standard deviation */
+	int frag_med; /* median of the fragment sizes */
+  	int conc_min; /* min cutoff for concordants */
+  	int conc_max; /* max cutoff for concordants */
+} bam_info;
 
-	int* pos; /* 1-based leftmost coordinate of the read */
-	int* bin; /* bin */
-	int* qual; /* Mapping quality */
-	int* length_read_name; /* Length of the read name */
-	int* flag; /* Flags */
-	int* pos_mate_read; /* 1-based leftmost coordinate of the mate read */
-	int* is_reverse; /* True if the read maps to the reverse strand */
-	int* is_mate_reverse; /* True if the mate of the read maps to the reverse strand */
-	char** read_name; /* Names of the reads */
-	int** length_cigar_ops; /* Coefficients of CIGAR operations */	
-	char** cigar_ops; /* Characters representing CIGAR operations */
-	int* length_read; /* Length of the read */
-	int* insertion_size; /* Insertion Size, or better named as template length */
-	char** read; /* The read, as string */
-} bamInfo;
-
-
-void loadBAM( bamInfo* inBam, char* path);
+/* Function Prototypes */
+void load_bam( bam_info* in_bam, char* path);
+void print_bam( bam_info* in_bam);
 char base_as_char( int base_as_int);
-void get_sample_name( bamInfo* inBam, char* header_text);
-void print_read( bamInfo* inBam, int index);
-void calculate_statistics( bamInfo* inBam);
+void get_sample_name( bam_info* in_bam, char* header_text);
 int compare_size( const void* p, const void* q);
 
 #endif
