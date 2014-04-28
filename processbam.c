@@ -10,6 +10,9 @@
 /* Sample this many fragments to calculate avg/median/std */
 #define SAMPLEFRAG 1000000 
 
+/* Maximum sequence/quality length */
+#define MAX_SEQ 1000
+
 void load_bam( bam_info* in_bam, char* path)
 {
 	/* Variables */
@@ -130,12 +133,12 @@ void load_bam( bam_info* in_bam, char* path)
 }
 
 /* Add 33 to the interger value of the qual characters to convert them to ASCII */
-void qual_to_ascii( char** qual)
+void qual_to_ascii( char* qual)
 {
 	int i;
-	for( i = 0; i < strlen( ( *qual)); i++)
+	for( i = 0; i < strlen( qual); i++)
 	{
-		( *qual)[i] = ( *qual)[i] + 33;
+		qual[i] = qual[i] + 33;
 	}
 }
 
@@ -226,4 +229,156 @@ void print_bam( bam_info* in_bam)
 	printf( "Median Fragment Size: %d\n", in_bam->frag_med);
 	printf( "Average Fragment Size: %.3f\n", in_bam->frag_avg);
 	printf( "Standard Deviation: %.3f\n", in_bam->frag_std);
+}
+
+void create_fastq( bam_info* in_bam, char* path)
+{
+	FILE* fastq;
+	FILE* fastq2;
+	FILE *outfastq;
+	htsFile* bam_file;
+	bam1_core_t bam_alignment_core;
+	bam1_t*	bam_alignment;
+	char qname[255];
+	char sequence[MAX_SEQ];
+	char qual[MAX_SEQ];
+	char filename[255];
+	int flag;
+	int min;
+	int max;
+	int return_value;
+	int i;
+
+	/* Open FASTQ file for writing */
+	sprintf( filename, "%s_remap_1.fastq", in_bam->sample_name);
+	fastq = fopen( filename, "w");
+	if( !fastq)
+	{
+		fprintf( stderr, "Error opening the first FASTQ file\n");
+		exit( 1);
+	}
+
+	/* Open the second FASTQ file for writing */	
+	sprintf( filename, "%s_remap_2.fastq", in_bam->sample_name);
+	fastq2 = fopen( filename, "w");
+	if( !fastq2)
+	{
+		fprintf( stderr, "Error opening the second FASTQ file\n");
+		exit( 1);
+	}
+
+	/* Open BAM file for reading */
+	bam_file = hts_open( path, "r");
+	if( !bam_file)
+	{
+		fprintf( stderr, "Error opening BAM file\n");
+		exit( 1);
+	}
+
+	/* Get past the BAM header, otherwise header text gets mixed; possible htslib issue */
+	bam_hdr_read( ( bam_file->fp).bgzf);
+
+	/* For all reads within the BAM file, check if concordant */
+	bam_alignment = bam_init1();
+	return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
+
+	while( return_value != -1)
+	{
+		bam_alignment_core = bam_alignment->core;
+		flag = bam_alignment_core.flag;
+
+		min = in_bam->frag_avg - ( 4 * in_bam->frag_std);
+		max = in_bam->frag_avg + ( 4 * in_bam->frag_std);
+		
+		if( min < 0)
+		{
+			min = 0;
+		}
+
+		/* If the read is not concordant, write it to the FASTQ file */
+		if( !is_concordant( bam_alignment_core, min, max))
+		{
+			/* Line 1: Read Name */
+			strncpy( qname, bam_get_qname( bam_alignment), bam_alignment_core.l_qname);
+
+			/* Read 1 goes to /1 */
+			if( ( flag & BAM_FREAD1) != 0)
+			{
+				outfastq = fastq;
+				fprintf( outfastq, "@%s/1\n", qname);
+			}
+			else if( ( flag & BAM_FREAD2) != 0)
+			{
+				/* Read 2 goes to /2 */
+				outfastq = fastq2;
+				fprintf( outfastq, "@%s/2\n", qname);
+			}
+
+			/* Line 2: Sequence */
+			strncpy( sequence, bam_get_seq( bam_alignment), bam_alignment_core.l_qseq);
+			sequence[bam_alignment_core.l_qseq] = '\0';
+
+			char next_char;
+			/* Read mapped to the + strand */
+			if( ( flag & BAM_FREVERSE) == 0)
+			{
+				for( i = 0; i < strlen( sequence); i++)
+				{
+					next_char = base_as_char( bam_seqi( sequence, i));
+					fprintf( outfastq, "%c", next_char);
+				}		       
+			}
+			else
+			{
+				/* Read mapped to the - strand */
+				for( i = strlen( sequence) - 1; i >= 0; i--)
+				{
+					next_char = complement_char( base_as_char( bam_seqi( sequence, i)));
+					fprintf( outfastq, "%c", next_char);
+				}		       
+			}
+			
+			/* Line 3: "+" */
+			fprintf( outfastq, "\n+\n");
+
+			/* Line 4: Quality String */
+			strncpy( qual, bam_get_qual( bam_alignment), bam_alignment_core.l_qseq);
+			qual[bam_alignment_core.l_qseq] = '\0';
+
+			/* Convert the quality value to ASCII */
+			qual_to_ascii( qual);
+		
+			/* If the read is mapped to the reverse strand, reverse the quality string */
+			if( bam_is_rev( bam_alignment))
+			{
+			  	reverse_string( qual);
+			}
+			fprintf( outfastq, "%s\n", qual);
+		}
+
+		/* Read next alignment */
+		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
+	}
+		
+	/* Close the BAM file */
+	return_value = hts_close( bam_file);
+	if( return_value != 0)
+	{
+		fprintf( stderr, "Error closing BAM file\n");
+		exit( 1);
+	}
+
+	/* Close the FASTQ file */
+	return_value = fclose( fastq);
+	if( return_value != 0)
+	{
+		fprintf( stderr, "Error closing the first FASTQ file\n");
+	}
+
+	/* Close the second FASTQ file */
+	return_value = fclose( fastq2);
+	if( return_value != 0)
+	{
+		fprintf( stderr, "Error closing the second FASTQ file\n");
+	}
 }

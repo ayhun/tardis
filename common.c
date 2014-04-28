@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+
+/* htslib headers */
+#include <htslib/sam.h>
+#include <htslib/hts.h>
+
 #include "common.h"
 
 void init_params( parameters** params)
@@ -51,4 +57,113 @@ FILE* gfOpen( char* fname, char* mode)
 		print_error( err);
 	}
 	return file;
+}
+
+int is_concordant( bam1_core_t bam_alignment_core, int min, int max)
+{
+	int flag = bam_alignment_core.flag;
+
+	if( ( flag & BAM_FPROPER_PAIR) == 0) 
+	{
+		/* Not proper pair */
+		return 0;
+	}
+
+	if( ( flag & BAM_FUNMAP) != 0)  // c.a.
+	{
+		/* Read unmapped; Orphan or OEA */
+		return 0;
+	}
+
+	if( ( flag & BAM_FMUNMAP) != 0) // c.a.
+	{
+		/* Mate unmapped; Orphan or OEA */
+		return 0;
+	}
+
+	if( ( flag & BAM_FREVERSE) != 0 && ( flag & BAM_FMREVERSE) != 0)
+	{
+		/* -- orientation = inversion */
+		return 0;
+	}
+
+	if( ( flag & BAM_FREVERSE) == 0 && ( flag & BAM_FMREVERSE) == 0)
+	{
+		/* ++ orientation = inversion */
+		return 0;
+	}
+
+	if( bam_alignment_core.tid != bam_alignment_core.mtid) 
+	{
+		/* On different chromosomes */
+		return 0;
+	}
+
+	if( bam_alignment_core.pos <= bam_alignment_core.mpos) // c.a.
+	{
+		/* Read is placed BEFORE its mate */
+		if( ( flag & BAM_FREVERSE) != 0 && ( flag & BAM_FMREVERSE) == 0)
+		{
+			/* -+ orientation = tandem duplication */
+			return 0;
+		}
+	}
+	else
+	{
+		/* Read is placed AFTER its mate */
+		if( ( flag & BAM_FREVERSE) == 0 && ( flag & BAM_FMREVERSE) != 0)
+		{
+			/* +- orientation = tandem duplication */
+			return 0;
+		}
+	}
+
+	/* Passed all of the above. proper pair, both mapped, in +- orientation. Now check the isize */
+	if( abs(bam_alignment_core.isize) < min || abs(bam_alignment_core.isize) > max) // c.a.
+	{
+		/* Deletion or Insertion */
+		return 0;
+	}
+
+	/* All passed. Read is concordant */
+	return 1;
+}
+
+/* Return the complement of a base */
+char complement_char( char base)
+{
+	switch( base)
+	{
+		case 'A': 
+			return 'T';
+			break;
+		case 'C': 
+			return 'G';
+			break;
+		case 'G': 
+			return 'C';
+			break;
+		case 'T': 
+			return 'A';
+			break;
+		default: 
+			return 'N';
+			break;
+	}
+	return 'X';
+}
+
+/* Reverse a given string */
+void reverse_string( char* str)
+{
+	int i;
+	char swap;
+	int len = strlen( str);
+
+	for( i = 0; i < len / 2; i++)
+	{
+		swap = str[i];
+		str[i] = str[len - i - 1];
+		str[len - i - 1] = swap;
+	}
 }
