@@ -1,6 +1,8 @@
 #ifndef __COMMON
 #define __COMMON
 
+#include <htslib/sam.h>
+
 enum gender{ MALE, FEMALE};
 
 typedef struct _params
@@ -15,6 +17,8 @@ typedef struct _params
 	char run_vh; /* boolean stand-in to run VariationHunter */
 	char run_ns; /* boolean stand-in to run NovelSeq */
 	char run_sr; /* boolean stand-in to run SPLITREAD */
+	char skip_fastq; /* boolean stand-in to skip FASTQ dump */
+	char skip_sort; /* boolean stand-in to skip FASTQ sort */
 	int  threads; /* number of threads to use for parallel mrFAST, and maybe future parallelization of TARDIS */
 } parameters;
 

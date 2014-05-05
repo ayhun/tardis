@@ -4,6 +4,7 @@ LDFLAGS = htslib/libhts.a  -lz -lm -lpthread
 SOURCES = tardis.c cmdline.c common.c processbam.c 
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = tardis
+INSTALLPATH = /usr/local/bin/
 
 all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o
@@ -21,3 +22,5 @@ libs:
 	make clean -C htslib
 	make -C htslib
 	
+install:
+	cp tardis $(INSTALLPATH)

@@ -11,7 +11,8 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	int o;
 	static int is_male = 0, is_female = 0;
 	static int run_vh = 0, run_ns = 0, run_sr = 0, run_all = 0;
-  
+	static int skip_fastq = 0, skip_sort = 0;
+
 	static struct option long_options[] = 
 	{
 		{"input"  , required_argument,   0, 'i'},
@@ -29,6 +30,8 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"all"    , no_argument, &run_all,    1 },
 		{"xy"     , no_argument,   &is_male,  1 },
 		{"xx"     , no_argument, &is_female,  1 },
+		{"skip-fastq", no_argument, &skip_fastq,  1 },
+		{"skip-sort" , no_argument, &skip_sort,  1 },
 		{0        , 0,                   0,  0 }
 	};
   
@@ -39,7 +42,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	}
   
 	while( ( o = getopt_long( argc, argv, "hv:i:f:g:d:r:m:", long_options, &index)) != -1)
-    {
+	  {
 		switch( o)
 		{
 			case 'i':
@@ -87,7 +90,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 				return 0;
 			break; 
 		}
-	}
+	  }
   
 	/* TODO: check parameter validity */
   
@@ -106,7 +109,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	if( !is_male && !is_female)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please select --xx [female] or --xy [male] to specify sample gender.\n");
-    	return 0;
+		return 0;
 	}
 
 	if( is_male && is_female)
@@ -150,10 +153,11 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		return 0;
 	}
 
-	/* check if --mei   is invoked -- this can be optional */
+	/* check if --mei   is invoked. If not set Alu:L1Hs:SVA as default */
 	if( params->mei == NULL)
-	{  
-		//TODO: return 0;
+	{   
+   	        params->mei = (char *) malloc(sizeof(char) * (strlen("Alu:L1Hs:SVA")+1));
+		strncpy(params->mei, "Alu:L1Hs:SVA", strlen("Alu:L1Hs:SVA"));
 	}
 
 	/* check if threads>0 */
@@ -162,23 +166,35 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		fprintf( stderr, "[TARDIS CMDLINE WARNING] Invalid number of threads was entered (%d). Resetted to 1.\n", params->threads);
 		params->threads = 1;
 	}
+
+
+	/* set flags */
+	params->run_vh = run_vh;
+	params->run_sr = run_sr;
+	params->run_ns = run_ns;
+	params->skip_fastq = skip_fastq;
+	params->skip_sort = skip_sort;
+	if (is_male) params->sample_gender = MALE;
+	else if (is_female) params->sample_gender = FEMALE;
 }
 
 void print_help( void)
 {  
 	fprintf( stdout, "\nTARDIS: Toolkit for Automated and Rapid DIscovery of Structural variants.\n");
 	fprintf( stdout, "Version %s. Last update: %s\n\n", VERSION, LAST_UPDATE);
-	fprintf( stdout, "\t--input [bam file]        : Input file in sorted and indexed BAM format.\n");
-	fprintf( stdout, "\t--ref   [reference genome]: Reference genome in FASTA format.\n");
-	fprintf( stdout, "\t--gaps  [gaps file]       : Assembly gap coordinates in BED format.\n");
-	fprintf( stdout, "\t--dups  [dups file]       : Segmental duplication coordinates in BED format.\n");
-	fprintf( stdout, "\t--mei   [\"Alu|L1\"]      : List of mobile element names.\n");
-	fprintf( stdout, "\t--xx                      : Sample is male.\n");
-	fprintf( stdout, "\t--xy                      : Sample is female.\n");
-	fprintf( stdout, "\t--vh                      : Run VariationHunter (read pair + read depth).\n");
-	fprintf( stdout, "\t--ns                      : Run NovelSeq (read pair + assembly).\n");
-	fprintf( stdout, "\t--sr                      : Run SPLITREAD (split read).\n");
-	fprintf( stdout, "\t--all                     : Run all three algorithms above [DEFAULT].\n");
-	fprintf( stdout, "\t--version                 : Print version and exit.\n");
-	fprintf( stdout, "\t--help                    : Print this help screen and exit.\n\n");
+	fprintf( stdout, "\t--input [bam file]         : Input file in sorted and indexed BAM format.\n");
+	fprintf( stdout, "\t--ref   [reference genome] : Reference genome in FASTA format.\n");
+	fprintf( stdout, "\t--gaps  [gaps file]        : Assembly gap coordinates in BED format.\n");
+	fprintf( stdout, "\t--dups  [dups file]        : Segmental duplication coordinates in BED format.\n");
+	fprintf( stdout, "\t--mei   [\"Alu:L1Hs:SVA\"] : List of mobile element names.\n");
+	fprintf( stdout, "\t--xx                       : Sample is male.\n");
+	fprintf( stdout, "\t--xy                       : Sample is female.\n");
+	fprintf( stdout, "\t--vh                       : Run VariationHunter (read pair + read depth).\n");
+	fprintf( stdout, "\t--ns                       : Run NovelSeq (read pair + assembly).\n");
+	fprintf( stdout, "\t--sr                       : Run SPLITREAD (split read).\n");
+	fprintf( stdout, "\t--all                      : Run all three algorithms above [DEFAULT].\n");
+	fprintf( stdout, "\t--skip-fastq               : Skip FASTQ dump for discordants. Use this only if you are regenerating the calls.\n");
+	fprintf( stdout, "\t--skip-sort                : Skip FASTQ sort for discordants. Use this only if you are regenerating the calls.\n");
+	fprintf( stdout, "\t--version                  : Print version and exit.\n");
+	fprintf( stdout, "\t--help                     : Print this help screen and exit.\n\n");
 }

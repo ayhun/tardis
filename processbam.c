@@ -197,7 +197,7 @@ void get_sample_name( bam_info* in_bam, char* header_text)
 
 int compare_size( const void* p, const void* q)
 {
-	int i = *( const int*) p;
+    int i = *( const int*) p;
     int j = *( const int*) q;
 
 	if( i < j)
@@ -231,7 +231,7 @@ void print_bam( bam_info* in_bam)
 	printf( "Standard Deviation: %.3f\n", in_bam->frag_std);
 }
 
-void create_fastq( bam_info* in_bam, char* path)
+void create_fastq( bam_info* in_bam, parameters *params)
 {
 	FILE* fastq;
 	FILE* fastq2;
@@ -243,14 +243,29 @@ void create_fastq( bam_info* in_bam, char* path)
 	char sequence[MAX_SEQ];
 	char qual[MAX_SEQ];
 	char filename[255];
+	char filename2[255];
 	int flag;
 	int min;
 	int max;
 	int return_value;
 	int i;
+	char *path = params->bam_file;
+
+	/* Set FASTQ file names */
+	sprintf( filename, "%s_remap_1.fastq", in_bam->sample_name);
+	sprintf( filename2, "%s_remap_2.fastq", in_bam->sample_name);
+	in_bam->fastq1 = (char *) malloc (sizeof (char) * (strlen(filename)+1));
+	strncpy(in_bam->fastq1, filename, strlen(filename));
+	in_bam->fastq1[strlen(filename)] = 0;
+	in_bam->fastq2 = (char *) malloc (sizeof (char) * (strlen(filename2)+1));
+	strncpy(in_bam->fastq2, filename2, strlen(filename2));
+	in_bam->fastq2[strlen(filename2)] = 0;
+
+	/* if skip-fastq is set, return */
+	if (params->skip_fastq)
+	        return;
 
 	/* Open FASTQ file for writing */
-	sprintf( filename, "%s_remap_1.fastq", in_bam->sample_name);
 	fastq = fopen( filename, "w");
 	if( !fastq)
 	{
@@ -259,8 +274,7 @@ void create_fastq( bam_info* in_bam, char* path)
 	}
 
 	/* Open the second FASTQ file for writing */	
-	sprintf( filename, "%s_remap_2.fastq", in_bam->sample_name);
-	fastq2 = fopen( filename, "w");
+	fastq2 = fopen( filename2, "w");
 	if( !fastq2)
 	{
 		fprintf( stderr, "Error opening the second FASTQ file\n");

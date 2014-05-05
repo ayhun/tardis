@@ -4,6 +4,8 @@
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
+#include "common.h"
+
 
 typedef struct _bam_info
 {
@@ -17,6 +19,8 @@ typedef struct _bam_info
 	int frag_med; /* median of the fragment sizes */
   	int conc_min; /* min cutoff for concordants */
   	int conc_max; /* max cutoff for concordants */
+        char *fastq1; /* file name for the FASTQ file of the /1 reads */
+        char *fastq2; /* file name for the FASTQ file of the /2 reads */
 } bam_info;
 
 /* Function Prototypes */
@@ -25,6 +29,6 @@ void print_bam( bam_info* in_bam);
 char base_as_char( int base_as_int);
 void get_sample_name( bam_info* in_bam, char* header_text);
 int compare_size( const void* p, const void* q);
-void create_fastq( bam_info* in_bam, char* path);
+void create_fastq( bam_info* in_bam, parameters *params);
 
 #endif

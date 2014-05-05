@@ -31,15 +31,17 @@ int main( int argc, char** argv)
 	#endif*/
 	
 
-  /*
-    BAM is loaded, min/max/avg/std are calculated.
-    Now, extract FASTQs of discordants, OEAs, and orphans
-  */
+	/*
+	  BAM is loaded, min/max/avg/std are calculated.
+	  Now, extract FASTQs of discordants, OEAs, and orphans
+	*/
+	
+	create_fastq(in_bam, params);
   
-  /*  to be implemented.  We need to decide on the FASTQ name convention.
-    createFastqs(inBam);
-  */
-
+	/* sort FASTQ files to match /1 and /2 reads; unless skip-sort is invoked
+	if (! (params->skip_sort))
+	sortFastqs(inBam, params); */
+	
   /* 
      remap with mrFAST
   */
