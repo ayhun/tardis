@@ -53,10 +53,12 @@ void load_bam( bam_info* in_bam, char* path)
 	 and store the names as well */
 	for( i = 0; i < in_bam->num_chrom; i++)
 	{
-		( in_bam->chrom_lengths)[i] = ( bam_header->target_len)[i];
-
+	  /* -- deprecated by Can Alkan. 
+		( in_bam->chrom_lengths)[i] = ( bam_header->target_len)[i];		
 		( in_bam->chrom_names)[i] = ( char*) malloc( ( in_bam->chrom_lengths)[i] * sizeof( char));
 		strcpy( ( in_bam->chrom_names)[i], ( bam_header->target_name)[i]);
+		*/
+	   set_str( ( &(in_bam->chrom_names)[i]), ( bam_header->target_name)[i]);
 	}
 	
 	/* Extract the Sample Name from the header text */
@@ -190,9 +192,11 @@ void get_sample_name( bam_info* in_bam, char* header_text)
 		}
 		p = strtok( NULL, "\t\n");
 	}
-
+	/* -- deprecated by Can Alkan
 	in_bam->sample_name = ( char*) malloc( ( strlen( sample_name_buffer) + 1) * sizeof( char));
 	strcpy( in_bam->sample_name, sample_name_buffer);
+	*/
+	set_str( &(in_bam->sample_name), sample_name_buffer);
 }
 
 int compare_size( const void* p, const void* q)
@@ -254,12 +258,17 @@ void create_fastq( bam_info* in_bam, parameters *params)
 	/* Set FASTQ file names */
 	sprintf( filename, "%s_remap_1.fastq", in_bam->sample_name);
 	sprintf( filename2, "%s_remap_2.fastq", in_bam->sample_name);
+	/*
 	in_bam->fastq1 = (char *) malloc (sizeof (char) * (strlen(filename)+1));
 	strncpy(in_bam->fastq1, filename, strlen(filename));
-	in_bam->fastq1[strlen(filename)] = 0;
+	in_bam->fastq1[strlen(filename)] = 0; 
 	in_bam->fastq2 = (char *) malloc (sizeof (char) * (strlen(filename2)+1));
 	strncpy(in_bam->fastq2, filename2, strlen(filename2));
 	in_bam->fastq2[strlen(filename2)] = 0;
+	*/
+
+	set_str(&(in_bam->fastq1), filename);
+	set_str(&(in_bam->fastq2), filename2);
 
 	/* if skip-fastq is set, return */
 	if (params->skip_fastq)

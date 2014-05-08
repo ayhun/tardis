@@ -167,3 +167,14 @@ void reverse_string( char* str)
 		str[len - i - 1] = swap;
 	}
 }
+
+void set_str(char **target, char *source)
+{
+  
+  if (*target != NULL) free((*target));
+
+  (*target) = (char *) malloc(sizeof(char) * (strlen(source)+1));
+
+  strncpy((*target), source, (strlen(source)+1));
+
+}

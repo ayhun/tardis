@@ -46,33 +46,51 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		switch( o)
 		{
 			case 'i':
+			  /*
 	  			params->bam_file = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
 	  			strncpy( params->bam_file, optarg, strlen( optarg));
+			  */
+	  			set_str( &(params->bam_file), optarg);
 	  		break;
 	  
 			case 'f':
+			  /*
 				params->ref_genome = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
 				strncpy( params->ref_genome, optarg, strlen( optarg));
+			  */
+				set_str( &(params->ref_genome), optarg);
 			break;
 
 			case 'g':
+			  /*
 				params->gaps = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
 				strncpy( params->gaps, optarg, strlen( optarg));
+			  */
+				set_str( &(params->gaps), optarg);
 			break;
 
 			case 'd':
+			  /*
 				params->dups = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
 				strncpy( params->dups, optarg, strlen( optarg));
+			  */
+			        set_str( &(params->dups), optarg);
 			break;
 
 			case 'r':
+			  /*
 				params->reps = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
 				strncpy( params->reps, optarg, strlen( optarg));
+			  */
+				set_str( &(params->reps), optarg);
 			break;
 
 			case 'm':
+			  /*
 				params->mei = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
 				strncpy( params->mei, optarg, strlen( optarg));
+			  */
+				set_str( &(params->mei), optarg);
 			break;
 
 			case 't':
@@ -156,8 +174,11 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	/* check if --mei   is invoked. If not set Alu:L1Hs:SVA as default */
 	if( params->mei == NULL)
 	{   
+	  /*
    	        params->mei = (char *) malloc(sizeof(char) * (strlen("Alu:L1Hs:SVA")+1));
 		strncpy(params->mei, "Alu:L1Hs:SVA", strlen("Alu:L1Hs:SVA"));
+	  */
+	        set_str( &(params->mei), "Alu:L1Hs:SVA");
 	}
 
 	/* check if threads>0 */

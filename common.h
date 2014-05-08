@@ -30,5 +30,6 @@ FILE* gfOpen( char*, char*);
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max);
 char complement_char( char base);
 void reverse_string( char* str);
+void set_str( char **target, char *source);
 
 #endif
