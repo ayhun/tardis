@@ -65,7 +65,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "samtools path: %s\n", cfg->path_samtools);
+			fprintf( stderr, "samtools path: %s", cfg->path_samtools);
 		}
 
 		if( cfg->path_bcftools == NULL)
@@ -74,7 +74,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "bcftools path: %s\n", cfg->path_bcftools);
+			fprintf( stderr, "bcftools path: %s", cfg->path_bcftools);
 		}
 
 		if( cfg->path_mrfast == NULL)
@@ -83,7 +83,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "mrfast path: %s\n", cfg->path_mrfast);
+			fprintf( stderr, "mrfast path: %s", cfg->path_mrfast);
 		}
 	}
 }
@@ -152,9 +152,20 @@ void create_config( configuration* cfg, char* config_filename)
 	}
 	
 	config = fopen( config_filename, "w");
-	fprintf( config, "SAMTOOLS = %s", cfg->path_samtools);
-	fprintf( config, "BCFTOOLS = %s", cfg->path_bcftools);
-	fprintf( config, "MRFAST = %s", cfg->path_mrfast);
+	if( cfg->path_samtools != NULL)
+	{
+		fprintf( config, "SAMTOOLS = %s", cfg->path_samtools);
+	}
+
+	if( cfg->path_bcftools != NULL)	
+	{
+		fprintf( config, "BCFTOOLS = %s", cfg->path_bcftools);
+	}
+
+	if( cfg->path_mrfast != NULL)
+	{
+		fprintf( config, "MRFAST = %s", cfg->path_mrfast);
+	}
 	fclose( config);
 
 	fprintf( stderr,"\n");
