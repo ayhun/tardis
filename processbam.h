@@ -6,7 +6,6 @@
 #include <htslib/hts.h>
 #include "common.h"
 
-
 typedef struct _bam_info
 {
 	htsFile* bam_file; /* file pointer to the BAM file */
@@ -19,8 +18,8 @@ typedef struct _bam_info
 	int frag_med; /* median of the fragment sizes */
   	int conc_min; /* min cutoff for concordants */
   	int conc_max; /* max cutoff for concordants */
-        char *fastq1; /* file name for the FASTQ file of the /1 reads */
-        char *fastq2; /* file name for the FASTQ file of the /2 reads */
+	char* fastq1; /* file name for the FASTQ file of the /1 reads */
+	char* fastq2; /* file name for the FASTQ file of the /2 reads */
 } bam_info;
 
 /* Function Prototypes */

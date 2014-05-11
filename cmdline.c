@@ -46,51 +46,27 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		switch( o)
 		{
 			case 'i':
-			  /*
-	  			params->bam_file = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
-	  			strncpy( params->bam_file, optarg, strlen( optarg));
-			  */
-	  			set_str( &(params->bam_file), optarg);
-	  		break;
+	  			set_str( &( params->bam_file), optarg);
+			break;
 	  
 			case 'f':
-			  /*
-				params->ref_genome = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
-				strncpy( params->ref_genome, optarg, strlen( optarg));
-			  */
-				set_str( &(params->ref_genome), optarg);
+				set_str( &( params->ref_genome), optarg);
 			break;
 
 			case 'g':
-			  /*
-				params->gaps = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
-				strncpy( params->gaps, optarg, strlen( optarg));
-			  */
-				set_str( &(params->gaps), optarg);
+				set_str( &( params->gaps), optarg);
 			break;
 
 			case 'd':
-			  /*
-				params->dups = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
-				strncpy( params->dups, optarg, strlen( optarg));
-			  */
-			        set_str( &(params->dups), optarg);
+				set_str( &( params->dups), optarg);
 			break;
 
 			case 'r':
-			  /*
-				params->reps = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
-				strncpy( params->reps, optarg, strlen( optarg));
-			  */
-				set_str( &(params->reps), optarg);
+				set_str( &( params->reps), optarg);
 			break;
 
 			case 'm':
-			  /*
-				params->mei = ( char*) malloc( ( strlen( optarg) + 1) * sizeof( char));
-				strncpy( params->mei, optarg, strlen( optarg));
-			  */
-				set_str( &(params->mei), optarg);
+				set_str( &( params->mei), optarg);
 			break;
 
 			case 't':
@@ -171,14 +147,10 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		return 0;
 	}
 
-	/* check if --mei   is invoked. If not set Alu:L1Hs:SVA as default */
+	/* check if --mei is invoked. If not, set Alu:L1Hs:SVA as default */
 	if( params->mei == NULL)
-	{   
-	  /*
-   	        params->mei = (char *) malloc(sizeof(char) * (strlen("Alu:L1Hs:SVA")+1));
-		strncpy(params->mei, "Alu:L1Hs:SVA", strlen("Alu:L1Hs:SVA"));
-	  */
-	        set_str( &(params->mei), "Alu:L1Hs:SVA");
+	{
+		set_str( &( params->mei), "Alu:L1Hs:SVA");
 	}
 
 	/* check if threads>0 */
@@ -188,15 +160,21 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		params->threads = 1;
 	}
 
-
 	/* set flags */
 	params->run_vh = run_vh;
 	params->run_sr = run_sr;
 	params->run_ns = run_ns;
 	params->skip_fastq = skip_fastq;
 	params->skip_sort = skip_sort;
-	if (is_male) params->sample_gender = MALE;
-	else if (is_female) params->sample_gender = FEMALE;
+
+	if( is_male)
+	{
+		params->sample_gender = MALE;
+	}
+	else if( is_female)
+	{
+		params->sample_gender = FEMALE;
+	}
 }
 
 void print_help( void)

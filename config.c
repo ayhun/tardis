@@ -3,7 +3,7 @@
 #include <string.h>
 #include "config.h"
 
-void load_config()
+void load_config( configuration* cfg)
 {
 	FILE* config;
 	char* next_line = NULL;
@@ -13,9 +13,9 @@ void load_config()
 	int i;
 	
 	/* Initialize the executable paths to empty */
-	path_samtools[0] = 0;
-	path_bcftools[0] = 0;
-	path_mrfast[0] = 0;
+	cfg->path_samtools = NULL;
+	cfg->path_bcftools = NULL;
+	cfg->path_mrfast = NULL;
 
 	/* Combine the home directory path with the name of the configuration file */
 	sprintf( config_filename, "%s/%s", getenv( "HOME"), CONFIG_FILE);
@@ -25,7 +25,7 @@ void load_config()
 	if( config == NULL)
 	{
 		/* Create new config file */
-		create_config( config_filename);
+		create_config( cfg, config_filename);
 	}
 	else
 	{
@@ -37,15 +37,15 @@ void load_config()
 			{
 				if( i == 0)
 				{
-					strcpy( path_samtools, next_line);
+					set_str( &( cfg->path_samtools), next_line);
 				}
 				else if( i == 1)
 				{
-					strcpy( path_bcftools, next_line);
+					set_str( &( cfg->path_bcftools), next_line);
 				}
 				else if( i == 2)
 				{
-					strcpy( path_mrfast, next_line);
+					set_str( &( cfg->path_mrfast), next_line);
 				}
 				else
 				{
@@ -58,38 +58,37 @@ void load_config()
 		/* Free memory allocated internally by getline */
 		free( next_line);
 
-		/* If the first characters of the paths are still '0', then they are either not
-		   installed, or not in the PATH. */
-		if( path_samtools[0] == 0)
+		/* If the paths are still NULL, then they are either not installed, or not in the PATH. */
+		if( cfg->path_samtools == NULL)
 		{
 			fprintf( stderr, "Warning: samtools path is not in the configuration file.\n");
 		}
 		else
 		{
-			fprintf( stderr, "samtools path: %s\n", path_samtools);
+			fprintf( stderr, "samtools path: %s\n", cfg->path_samtools);
 		}
 
-		if( path_bcftools[0] == 0)
+		if( cfg->path_bcftools == NULL)
 		{
 			fprintf( stderr, "Warning: bcftools path is not in the configuration file.\n");
 		}
 		else
 		{
-			fprintf( stderr, "bcftools path: %s\n", path_bcftools);
+			fprintf( stderr, "bcftools path: %s\n", cfg->path_bcftools);
 		}
 
-		if( path_mrfast[0] == 0)
+		if( cfg->path_mrfast == NULL)
 		{
 			fprintf( stderr, "Warning: mrfast path is not in the configuration file.\n");
 		}
 		else
 		{
-			fprintf( stderr, "mrfast path: %s\n", path_mrfast);
+			fprintf( stderr, "mrfast path: %s\n", cfg->path_mrfast);
 		}
 	}
 }
 
-void create_config( char* config_filename)
+void create_config( configuration* cfg, char* config_filename)
 {
 	FILE* config;
 	FILE* pipe;
@@ -111,7 +110,7 @@ void create_config( char* config_filename)
 		}
 		else
 		{
-			strcpy( path_samtools, executable_path);
+			set_str( &( cfg->path_samtools), executable_path);
 		}
 		pclose( pipe);
 	}
@@ -129,7 +128,7 @@ void create_config( char* config_filename)
 		}
 		else
 		{
-			strcpy( path_bcftools, executable_path);
+			set_str( &( cfg->path_bcftools), executable_path);
 		}
 		pclose( pipe);
 	}
@@ -147,15 +146,15 @@ void create_config( char* config_filename)
 		}
 		else
 		{
-			strcpy( path_mrfast, executable_path);
+			set_str( &( cfg->path_mrfast), executable_path);
 		}
 		pclose( pipe);
 	}
 	
 	config = fopen( config_filename, "w");
-	fprintf( config, "SAMTOOLS = %s", path_samtools);
-	fprintf( config, "BCFTOOLS = %s", path_bcftools);
-	fprintf( config, "MRFAST = %s", path_mrfast);
+	fprintf( config, "SAMTOOLS = %s", cfg->path_samtools);
+	fprintf( config, "BCFTOOLS = %s", cfg->path_bcftools);
+	fprintf( config, "MRFAST = %s", cfg->path_mrfast);
 	fclose( config);
 
 	fprintf( stderr,"\n");

@@ -168,13 +168,13 @@ void reverse_string( char* str)
 	}
 }
 
-void set_str(char **target, char *source)
+void set_str( char** target, char* source)
 {
-  
-  if (*target != NULL) free((*target));
+	if( *target != NULL)
+	{
+		free( ( *target));
+	}
 
-  (*target) = (char *) malloc(sizeof(char) * (strlen(source)+1));
-
-  strncpy((*target), source, (strlen(source)+1));
-
+	( *target) = ( char*) malloc( sizeof( char) * ( strlen( source) + 1));
+	strncpy( ( *target), source, ( strlen( source) + 1));
 }
