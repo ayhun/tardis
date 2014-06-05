@@ -1,18 +1,19 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "tardis.h"
 #include "cmdline.h"
 
-int parse_command_line( int argc, char** argv, parameters* params)
+char g_error_message[500] = "";
+
+int parse_command_line( int argc, char** argv, parameters* params, MainOptions* mainOptions)
 {
 	int index;
 	int o;
+	int errorCode = 0;
 	static int is_male = 0, is_female = 0;
 	static int run_vh = 0, run_ns = 0, run_sr = 0, run_all = 0;
 	static int skip_fastq = 0, skip_sort = 0;
-
 	static struct option long_options[] = 
 	{
 		{"input"  , required_argument,   0, 'i'},
@@ -31,7 +32,20 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"xy"     , no_argument,   &is_male,  1 },
 		{"xx"     , no_argument, &is_female,  1 },
 		{"skip-fastq", no_argument, &skip_fastq,  1 },
-		{"skip-sort" , no_argument, &skip_sort,  1 },
+		{"skip-sort" , no_argument, &skip_sort,   1 },
+		{"chro"      ,required_argument,	NULL, 'c'},
+		{"init"	     ,required_argument,	NULL, 'a'},
+		{"prunprob"  ,required_argument,	NULL, 'p'},
+		{"maxmapping",required_argument,	NULL, 'x'},
+		// {"gap"	     ,required_argument,	NULL, 'g'},
+		{"repeat"    ,required_argument,    NULL, 'b'},
+		{"svsup"     ,required_argument,	NULL, 's'},
+		{"format"    ,required_argument,	NULL, 'e'},
+		{"lib"       ,required_argument,	NULL, 'l'},
+		{"help"      ,no_argument,		    NULL, 'j'},
+		{"version"   ,no_argument,		    NULL, 'k'},
+		{"output"    ,required_argument,    NULL, 'o'},
+		{"outputRead",required_argument,    NULL, 'n'},
 		{0        , 0,                   0,  0 }
 	};
   
@@ -55,6 +69,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 
 			case 'g':
 				set_str( &( params->gaps), optarg);
+				strcpy(mainOptions->gapFileName, optarg);
 			break;
 
 			case 'd':
@@ -83,6 +98,52 @@ int parse_command_line( int argc, char** argv, parameters* params)
 				fprintf( stdout, "Version %s. Last update: %s\n\n", VERSION, LAST_UPDATE);
 				return 0;
 			break; 
+			case 'c':
+				strcpy(mainOptions->chroFileName, optarg);
+				break;
+			case 'a':
+				strcpy(mainOptions->initializeFileName, optarg);
+				break;
+			case 'b':
+				strcpy(mainOptions->repeatFileName, optarg);
+				break;
+			case 'o':
+				strcpy(mainOptions->outputFile, optarg);
+				break;
+			case 'e':
+				strcpy(mainOptions->format, optarg); 
+				break;
+			case 'l':
+				strcpy(mainOptions->libFileAdrs, optarg);
+				break;
+			case 'p':
+				mainOptions->prunProb = atof(optarg);
+				break;
+			case 'x': 
+				mainOptions->overMapLimit = atoi(optarg);
+				break;		
+			case 's':
+				mainOptions->svSup = atof(optarg);
+				break;
+			case 'n':
+				strcpy(mainOptions->outputRead, optarg);
+				break;
+			case 'j':
+				mainOptions->helpWanted = true;
+				break;
+			case 'k':
+				mainOptions->versionWanted = true;
+				break;
+			case ':': //Missing arguement option
+				errorCode = ERROR_CODE_ARG;
+				sprintf(g_error_message, "Option '%s' requires an argument!", optopt);
+				break;
+			//TODO: Do you want to ignore the invalid options? 
+			case '?': //Invalid option found
+			default:
+				errorCode = ERROR_CODE_OPTION;
+				sprintf(g_error_message, "Invalid option found!");
+				break;
 		}
 	  }
   
