@@ -8,11 +8,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <zlib.h>
-
+#include <stdbool.h>
 #include "common.h"
 #include "cmdline.h"
 #include "processbam.h"
 #include "config.h"
+//#include "vh_processing.h"
 
 
 #endif
