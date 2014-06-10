@@ -27,8 +27,13 @@ void logWarning(char* message);		//Logs as: WARN: Message
 void logInfo(char* message);		//Logs as: INFO: Message
 void logDebug(char* message);		//Logs as: DEBUG: Message
 void logDebugint(int i);		//Logs as: DEBUG: Message
-void log(char* message, int logLevel);
+
 void initLogger(FILE* logOutputFile, int logLevel);
+
+
+/* @OGUZ-EDIT Dont uncomment this - linker complains when linked with math
+ * library's log function. */
+/* void log(char* message, int logLevel); */
 
 #endif
 
