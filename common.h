@@ -1,6 +1,10 @@
 #ifndef __COMMON
 #define __COMMON
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+	
 #include <htslib/sam.h>
 
 enum gender{ MALE, FEMALE};
@@ -31,5 +35,9 @@ int is_concordant( bam1_core_t bam_alignment_core, int min, int max);
 char complement_char( char base);
 void reverse_string( char* str);
 void set_str( char **target, char *source);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
