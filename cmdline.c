@@ -7,9 +7,10 @@
 char g_error_message[500] = "";
 
 int parse_command_line( int argc, char** argv, parameters* params, MainOptions* mainOptions)
+// , MainOptions* mainOptions)
 {
 	int index;
-	int o;
+	int o,cou=0;
 	int errorCode = 0;
 	static int is_male = 0, is_female = 0;
 	static int run_vh = 0, run_ns = 0, run_sr = 0, run_all = 0;
@@ -44,7 +45,7 @@ int parse_command_line( int argc, char** argv, parameters* params, MainOptions* 
 		{"lib"       ,required_argument,	NULL, 'l'},
 		{"help"      ,no_argument,		    NULL, 'j'},
 		{"version"   ,no_argument,		    NULL, 'k'},
-		{"output"    ,required_argument,    NULL, 'o'},
+		{"output"    ,required_argument,    NULL, 'q'},
 		{"outputRead",required_argument,    NULL, 'n'},
 		{0        , 0,                   0,  0 }
 	};
@@ -55,8 +56,8 @@ int parse_command_line( int argc, char** argv, parameters* params, MainOptions* 
 		return 0;
 	}
   
-	while( ( o = getopt_long( argc, argv, "hv:i:f:g:d:r:m:", long_options, &index)) != -1)
-	  {
+	while( ( o = getopt_long( argc, argv, ":h:v:i:f:g:d:r:m:c:a:p:x:b:s:e:l:j:k:q:n:", long_options, &index)) != -1)
+	  {	cou++;
 		switch( o)
 		{
 			case 'i':
@@ -107,7 +108,7 @@ int parse_command_line( int argc, char** argv, parameters* params, MainOptions* 
 			case 'b':
 				strcpy(mainOptions->repeatFileName, optarg);
 				break;
-			case 'o':
+			case 'q':
 				strcpy(mainOptions->outputFile, optarg);
 				break;
 			case 'e':
@@ -228,6 +229,7 @@ int parse_command_line( int argc, char** argv, parameters* params, MainOptions* 
 	params->skip_fastq = skip_fastq;
 	params->skip_sort = skip_sort;
 
+	printf(" \n"); //temp: @VINEET
 	if( is_male)
 	{
 		params->sample_gender = MALE;
