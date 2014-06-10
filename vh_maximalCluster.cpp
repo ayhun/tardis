@@ -1,6 +1,9 @@
 #include "vh_maximalCluster.h"
 #include "vh_common.h"
 
+// @OGUZ-EDIT - Dont use vh_main file
+FILE *fileOutput;
+
 //RightBrkPointInterval* g_listRightBrkPointIntr;
 MappingOnGenome** g_genomeIndexStart;
 MappingOnGenome** g_genomeIndexEnd;
