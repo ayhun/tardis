@@ -16,8 +16,13 @@ void printVersion();
 // parameters* params;
 // MainOptions* mainOptions;
 void run(char* , char* , char* , char *, char* , double , double , char* , int);
+#ifdef __cplusplus
+extern "C" {
+#endif
 int vhprocessing(int argc, char** argv);
-
+#ifdef __cplusplus
+}
+#endif
 
 void pruneAndNormalizeDivets(LibraryInfo* lib, double preProsPrune, int overMapLimit);
 void quitProgram(int exitCode);
