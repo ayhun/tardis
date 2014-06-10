@@ -1,6 +1,10 @@
 #ifndef __PROCESSBAM
 #define __PROCESSBAM
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
@@ -29,5 +33,9 @@ char base_as_char( int base_as_int);
 void get_sample_name( bam_info* in_bam, char* header_text);
 int compare_size( const void* p, const void* q);
 void create_fastq( bam_info* in_bam, parameters *params);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
