@@ -296,7 +296,8 @@ int vhprocessing(int argc, char** argv)
 
 	MainOptions mainOptions = {0, 0, "", "", "", "", "", "", "", false, false};
 
-	int errorCode = parse_command_line( argc, argv, &params, &mainOptions)
+	int errorCode  ;
+	// = parse_command_line( argc, argv, &params, &mainOptions);
 {
 	if (errorCode != 0)
 		quitProgram(EXIT_CODE_ARG_ERROR); 
@@ -315,5 +316,6 @@ int vhprocessing(int argc, char** argv)
 		run(mainOptions.libFileAdrs, mainOptions.chroFileName, mainOptions.gapFileName, mainOptions.repeatFileName, mainOptions.initializeFileName, mainOptions.prunProb, mainOptions.svSup, mainOptions.outputFile, mainOptions.outputRead, mainOptions.overMapLimit);
 		quitProgram(EXIT_CODE_SUCCESS);
 	}
+}
 }
 #endif
