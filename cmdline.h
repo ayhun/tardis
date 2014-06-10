@@ -1,6 +1,10 @@
 #ifndef __COMMANDLINE
 #define __COMMANDLINE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <getopt.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -31,6 +35,14 @@ typedef struct MainOptions
 } MainOptions;
 
 int parse_command_line( int, char**, parameters*, MainOptions*);
+// , MainOptions*);
 void print_help( void);
-void printVersion();
+
+	/* @OGUZ-EDIT This is already in vh_commandlineparser.h */
+/* void printVersion(); */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
