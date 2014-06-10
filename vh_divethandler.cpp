@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdbool.h>
 #include "vh_divethandler.h"
 #include "vh_gaphandler.h"
 #include "vh_repeathandler.h"
@@ -138,6 +139,7 @@ DivetRow* loadDivetFile(LibraryInfo* libInfo)
 	FILE* divetFile = fopen(libInfo->libFileAdrs, "r");
 	if (divetFile == NULL)
 	{
+		printf("adfae\n");
 		sprintf(g_error_message, "Divet file '%s' could not be opened!", libInfo->libFileAdrs);
 		// quitProgram(EXIT_CODE_DIVET_ERROR);
 	}
