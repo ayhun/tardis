@@ -305,7 +305,7 @@ void create_fastq( bam_info* in_bam, parameters *params)
 		}
 
 		/* If the read is not concordant, write it to the FASTQ file */
-		if( !is_concordant( bam_alignment_core, min, max))
+		if( !is_concordant( bam_alignment_core, min, max) && (flag & BAM_FPAIRED) != 0)
 		{
 			/* Line 1: Read Name */
 			strncpy( qname, bam_get_qname( bam_alignment), bam_alignment_core.l_qname);
@@ -324,7 +324,8 @@ void create_fastq( bam_info* in_bam, parameters *params)
 			}
 
 			/* Line 2: Sequence */
-			strncpy( sequence, bam_get_seq( bam_alignment), bam_alignment_core.l_qseq);
+			/* @OGUZ-TEMP */
+			strncpy( sequence, bam_get_seq(bam_alignment), bam_alignment_core.l_qseq); 
 			sequence[bam_alignment_core.l_qseq] = '\0';
 
 			char next_char;
@@ -351,7 +352,8 @@ void create_fastq( bam_info* in_bam, parameters *params)
 			fprintf( outfastq, "\n+\n");
 
 			/* Line 4: Quality String */
-			strncpy( qual, bam_get_qual( bam_alignment), bam_alignment_core.l_qseq);
+			/* @OGUZ-TEMP */
+			strncpy( qual, bam_get_qual( bam_alignment), bam_alignment_core.l_qseq); 
 			qual[bam_alignment_core.l_qseq] = '\0';
 
 			/* Convert the quality value to ASCII */
