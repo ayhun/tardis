@@ -7,7 +7,9 @@ FILE* g_logOutputFile =stdout;
 int g_currentLogLevel = LOG_LEVEL_ALL;
 char g_loggerMsgBuffer[400];
 
-void log(char* message, int logLevel)
+// @OGUZ-EDIT This was causing problems when linked with the math library's log
+// function - not used out of this file - make scope visible to this file.
+static void log(char* message, int logLevel)
 {
 	if (!(logLevel & g_currentLogLevel))
 		return;
