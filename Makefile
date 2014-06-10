@@ -1,4 +1,4 @@
-CC=gcc
+CC=g++
 CCP=g++
 CFLAGS = -c -O2 -g -I htslib
 CPFLAGS= -c -g -O3
@@ -8,8 +8,8 @@ OBJECTS = $(SOURCES:.c=.o) $(SOURCES:.cpp=.o)
 EXECUTABLE = tardis
 INSTALLPATH = /usr/local/bin/
 
-TARDIS:  tardis.o cmdline.o processbam.o config.o vh_processing.o vh_logger.o vh_divethandler.o vh_hash.o vh_heap.o vh_gaphandler.o vh_maximalCluster.o vh_createMaxClusterInversion.o vh_createMaxClusterDeletion.o vh_createMaxClusterInsertion.o
-	$(CC) -g -o TARDIS tardis.o cmdline.o processbam.o config.o vh_processing.o vh_logger.o vh_divethandler.o vh_hash.o vh_heap.o vh_gaphandler.o vh_maximalCluster.o vh_createMaxClusterInversion.o vh_createMaxClusterDeletion.o vh_createMaxClusterInsertion.o
+TARDIS:  tardis.o cmdline.o processbam.o config.o common.o vh_processing.o vh_logger.o vh_divethandler.o vh_hash.o vh_heap.o vh_gaphandler.o vh_maximalCluster.o vh_createMaxClusterInversion.o vh_createMaxClusterDeletion.o vh_createMaxClusterInsertion.o vh_repeathandler.o
+	$(CC) -g -o TARDIS tardis.o cmdline.o processbam.o config.o common.o vh_processing.o vh_logger.o vh_divethandler.o vh_hash.o vh_heap.o vh_gaphandler.o vh_maximalCluster.o vh_createMaxClusterInversion.o vh_createMaxClusterDeletion.o vh_createMaxClusterInsertion.o vh_repeathandler.o $(LDFLAGS)
 tardis.o: tardis.c tardis.h
 	$(CC) $(CFLAGS) tardis.c
 
@@ -34,7 +34,7 @@ vh_logger.o: vh_logger.cpp vh_logger.h
 vh_processing.o:	vh_processing.cpp vh_processing.h
 	$(CCP) $(CFLAGS) vh_processing.cpp
 
-vh_divethandler.o: vh_divethandler.cpp vh_divethandler.h
+vh_divethandler.o: vh_divethandler.cpp vh_divethandler.h 
 	$(CCP) $(CFLAGS) vh_divethandler.cpp
 
 vh_hash.o: vh_hash.cpp vh_hash.h
@@ -68,6 +68,9 @@ libs:
 
 install:
 	cp tardis $(INSTALLPATH)
+
+
+
 
 
 # all: $(SOURCES) $(EXECUTABLE)
