@@ -169,13 +169,15 @@ typedef struct {
  at the higher 4 bits having smaller coordinate on the read. It is
  recommended to use bam_seqi() macro to get the base.
  */
-#define bam_get_seq(b)   ((b)->data + ((b)->core.n_cigar<<2) + (b)->core.l_qname)
+ // @VINEET: added (char*)
+#define bam_get_seq(b)   ((char*)(b)->data + ((b)->core.n_cigar<<2) + (b)->core.l_qname)
 /*! @function
  @abstract  Get query quality
  @param  b  pointer to an alignment
  @return    pointer to quality string
  */
-#define bam_get_qual(b)  ((b)->data + ((b)->core.n_cigar<<2) + (b)->core.l_qname + (((b)->core.l_qseq + 1)>>1))
+  // @VINEET: added (char*)
+#define bam_get_qual(b)  ((char*)(b)->data + ((b)->core.n_cigar<<2) + (b)->core.l_qname + (((b)->core.l_qseq + 1)>>1))
 /*! @function
  @abstract  Get auxiliary data
  @param  b  pointer to an alignment
