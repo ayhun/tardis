@@ -19,6 +19,7 @@ int main( int argc, char** argv)
 	{
 		exit( 1);
 	}
+	printf("%d\n", return_value);
 
 	// #ifdef DEBUGMODE
 		print_params( params);
@@ -30,7 +31,7 @@ int main( int argc, char** argv)
 
 	/* Read BAM file and calculate the median/avg/std of fragment sizes */
 	in_bam = ( bam_info*) malloc( sizeof( bam_info));  
-	// load_bam( in_bam, params->bam_file);
+	load_bam( in_bam, params->bam_file);
 	printf(" \n"); //temp: @VINEET	
 	/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
 	create_fastq( in_bam, params);
@@ -41,9 +42,10 @@ int main( int argc, char** argv)
 		sortFastqs( in_bam, params);
 	}
 	*/
-	
 	/* Remap with mrFAST */
-  	vhprocessing(argc, argv);
+	run(mainOptions.libFileAdrs, mainOptions.chroFileName, mainOptions.gapFileName, mainOptions.repeatFileName, mainOptions.initializeFileName, mainOptions.prunProb, mainOptions.svSup, mainOptions.outputFile, mainOptions.outputRead, mainOptions.overMapLimit);
+		
+  	// vhprocessing(argc, argv,return_value);
   	printf(" \n"); //temp: @VINEET
 	/* to be implemented.
 	pass config (mrfast path) and FASTQ names. 
