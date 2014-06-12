@@ -15,11 +15,12 @@ void printVersion();
 //void run(char* fileName, char* chro, char* gap, char *repeat, char* init, double preProsPrune, double minSVSup, char* outputFile);
 // parameters* params;
 // MainOptions* mainOptions;
-void run(char* , char* , char* , char *, char* , double , double , char* , int);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-int vhprocessing(int argc, char** argv);
+	void run(char* , char* , char* , char *, char* , double , double , char* ,char*, int);
+int vhprocessing(int argc, char** argv, int errorCode);
 #ifdef __cplusplus
 }
 #endif
@@ -27,6 +28,12 @@ int vhprocessing(int argc, char** argv);
 void pruneAndNormalizeDivets(LibraryInfo* lib, double preProsPrune, int overMapLimit);
 void quitProgram(int exitCode);
 LibraryInfo* readLibraryInfos(char* libFileAdrs);
+
+
+
+// ********************
+
+
 
 
 #endif

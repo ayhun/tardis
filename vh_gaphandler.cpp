@@ -71,6 +71,7 @@ void readChros(char* fileName)
 
 	FILE* chroFile = fopen(fileName ,"r");
 	if (!chroFile)
+		printf("ERROR with chrofile\n");
 		//TODO: handle me
 		;
 

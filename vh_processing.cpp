@@ -213,7 +213,6 @@ void run(char* libFileAdrs, char* chroFileName, char* gapFileName, char * repeat
 		sprintf(g_loggerMsgBuffer, "%d rows after pruning.", cursor->size);
 		logInfo(g_loggerMsgBuffer);
 	}
-	
 	if (strcmp(outputRead,""))
 	{
 		logInfo("Writing ReadName Sorted");
@@ -288,18 +287,20 @@ bool isValid(MainOptions o)
 }
 
 #ifdef MAIN_MAIN
-int vhprocessing(int argc, char** argv)
+int vhprocessing(int argc, char** argv, int errorCode)
 {
 	initLogger(stdout, LOG_LEVEL_ALL);
 
 	//overMapLimit = 1000; // default value. The user can change this value.
 
+
 	MainOptions mainOptions = {0, 0, "", "", "", "", "", "", "", false, false};
 
-	int errorCode  ;
-	// = parse_command_line( argc, argv, &params, &mainOptions);
-{
-	if (errorCode != 0)
+	// int errorCode = 0;
+	// parse_command_line( argc, argv, params, &mainOptions);
+{	
+	printf("%d\n",errorCode );
+	if (errorCode == 0)
 		quitProgram(EXIT_CODE_ARG_ERROR); 
 	else if (mainOptions.helpWanted)
 		printHelp();
@@ -310,7 +311,7 @@ int vhprocessing(int argc, char** argv)
 		if (!isValid(mainOptions))
 		{
 			strcpy(g_error_message, "Error in arguments!");
-			quitProgram(EXIT_CODE_ARG_ERROR);
+			// quitProgram(EXIT_CODE_ARG_ERROR);
 		}
 		//TODO: Test the arguments are OK and the input is valid
 		run(mainOptions.libFileAdrs, mainOptions.chroFileName, mainOptions.gapFileName, mainOptions.repeatFileName, mainOptions.initializeFileName, mainOptions.prunProb, mainOptions.svSup, mainOptions.outputFile, mainOptions.outputRead, mainOptions.overMapLimit);

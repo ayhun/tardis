@@ -56,7 +56,7 @@ int parse_command_line( int argc, char** argv, parameters* params, MainOptions* 
 		return 0;
 	}
   
-	while( ( o = getopt_long( argc, argv, ":h:v:i:f:g:d:r:m:c:a:p:x:b:s:e:l:j:k:q:n:", long_options, &index)) != -1)
+	while( ( o = getopt_long( argc, argv, ":hv:i:f:g:d:r:m:c:a:p:x:b:s:e:l:j:k:q:n:", long_options, &index)) != -1)
 	  {	cou++;
 		switch( o)
 		{
