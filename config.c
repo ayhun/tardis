@@ -16,6 +16,7 @@ void load_config( configuration* cfg)
 	cfg->path_samtools = NULL;
 	cfg->path_bcftools = NULL;
 	cfg->path_mrfast = NULL;
+	cfg->path_gnuplot = NULL;
 
 	/* Combine the home directory path with the name of the configuration file */
 	sprintf( config_filename, "%s/%s", getenv( "HOME"), CONFIG_FILE);
@@ -33,6 +34,7 @@ void load_config( configuration* cfg)
 		i = 0;
 		while( ( bytes_read = getline( &next_line, &len, config)) != -1)
 		{
+			/* Ignore comments, which begin with the '#' character */
 			if( next_line[0] != '#')
 			{
 				if( i == 0)
@@ -46,6 +48,10 @@ void load_config( configuration* cfg)
 				else if( i == 2)
 				{
 					set_str( &( cfg->path_mrfast), next_line);
+				}
+				else if( i == 3)
+				{
+					set_str( &( cfg->path_gnuplot), next_line);
 				}
 				else
 				{
@@ -84,6 +90,15 @@ void load_config( configuration* cfg)
 		else
 		{
 			fprintf( stderr, "mrfast path: %s", cfg->path_mrfast);
+		}
+
+		if( cfg->path_gnuplot == NULL)
+		{
+			fprintf( stderr, "Warning: gnuplot path is not in the configuration file.\n");
+		}
+		else
+		{
+			fprintf( stderr, "gnuplot path: %s", cfg->path_gnuplot);
 		}
 	}
 }
@@ -151,6 +166,24 @@ void create_config( configuration* cfg, char* config_filename)
 		pclose( pipe);
 	}
 	
+	pipe = popen( "which gnuplot 2>/dev/null", "r");
+	if( pipe == NULL)
+	{
+		fprintf( stderr, "Error opening pipe\n");
+	}
+	else
+	{
+		if( fgets( executable_path, MAX_LENGTH, pipe) == NULL)
+		{
+			fprintf( stderr, "gnuplot not found in PATH. Install it or manually configure the %s file.\n", config_filename);
+		}
+		else
+		{
+			set_str( &( cfg->path_gnuplot), executable_path);
+		}
+		pclose( pipe);
+	}
+
 	config = fopen( config_filename, "w");
 	if( cfg->path_samtools != NULL)
 	{
@@ -165,6 +198,11 @@ void create_config( configuration* cfg, char* config_filename)
 	if( cfg->path_mrfast != NULL)
 	{
 		fprintf( config, "MRFAST = %s", cfg->path_mrfast);
+	}
+
+	if( cfg->path_gnuplot != NULL)
+	{
+		fprintf( config, "GNUPLOT = %s", cfg->path_gnuplot);
 	}
 	fclose( config);
 
