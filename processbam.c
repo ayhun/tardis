@@ -306,7 +306,7 @@ void create_fastq( bam_info* in_bam, parameters *params)
 		}
 
 		/* If the read is not concordant, write it to the FASTQ file */
-		if( !is_concordant( bam_alignment_core, min, max) && (flag & BAM_FPAIRED) != 0)
+		if( !is_concordant( bam_alignment_core, min, max) && ( flag & BAM_FPAIRED) != 0)
 		{
 			/* Line 1: Read Name */
 			strncpy( qname, bam_get_qname( bam_alignment), bam_alignment_core.l_qname);

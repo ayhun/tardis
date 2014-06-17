@@ -8,6 +8,10 @@ int main( int argc, char** argv)
 	configuration* cfg;
 	int return_value;
 
+	/* Load configuration file (created if it does not exist) */
+	cfg = ( configuration*) malloc( sizeof( configuration));
+	load_config( cfg);
+
 	/* Set program parameters */
 	init_params( &params);
 
@@ -21,10 +25,6 @@ int main( int argc, char** argv)
 	#ifdef DEBUGMODE
 		print_params( params);
 	#endif
-
-	/* Load configuration file */
-	cfg = ( configuration*) malloc( sizeof( configuration));
-	load_config( cfg);
 
 	/* Read BAM file and calculate the median/avg/std of fragment sizes */
 	in_bam = ( bam_info*) malloc( sizeof( bam_info));  
