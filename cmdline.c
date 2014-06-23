@@ -130,10 +130,10 @@ int parse_command_line( int argc, char** argv, parameters* params, MainOptions* 
 				strcpy(mainOptions->outputRead, optarg);
 				break;
 			case 'j':
-				mainOptions->helpWanted = true;
+				mainOptions->helpWanted = 1;
 				break;
 			case 'k':
-				mainOptions->versionWanted = true;
+				mainOptions->versionWanted = 1;
 				break;
 			case ':': //Missing arguement option
 				errorCode = ERROR_CODE_ARG;

@@ -8,9 +8,7 @@ void load_config( configuration* cfg)
 	FILE* config;
 	char* next_line = NULL;
 	char config_filename[MAX_LENGTH];
-	/* @OGUZ-EDIT Pointer conversion problem: changed int => size_t */
-	size_t len = 0;
-	/* int len = 0; */
+	int len = 0;
 	int bytes_read;
 	int i;
 	
