@@ -7,7 +7,7 @@
 /* tardis headers */
 #include "processbam.h"
 
-/* Sample this many fragments to calculate avg/median/std */
+/* Sample this many fragments to calculate avg/median/std per library */
 #define SAMPLEFRAG 1000000 
 
 /* Maximum sequence/quality length */
@@ -31,12 +31,7 @@ void load_bam( bam_info* in_bam, char* path)
 
 	/* Open the BAM file for reading. htslib automatically detects the format
 		of the file, so appending "b" after "r" in mode is redundant. */
-	bam_file = hts_open( path, "r");
-	if( !bam_file)
-	{
-		fprintf( stderr, "Error opening BAM file\n");
-		exit( 1);
-	}
+	bam_file = safe_hts_open( path, "r");
 
 	/* Read in BAM header information */
 	bam_header = bam_hdr_read( ( bam_file->fp).bgzf);

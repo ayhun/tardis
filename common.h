@@ -2,6 +2,7 @@
 #define __COMMON
 
 #include <htslib/sam.h>
+#include <htslib/hts.h>
 
 enum gender{ MALE, FEMALE};
 
@@ -26,7 +27,8 @@ typedef struct _params
 void init_params( parameters**);
 void print_params( parameters*);
 void print_error( char*);
-FILE* gfOpen( char*, char*);
+FILE* safe_fopen( char* path, char* mode);
+htsFile* safe_hts_open( char* path, char* mode);
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max);
 char complement_char( char base);
 void reverse_string( char* str);

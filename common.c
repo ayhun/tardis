@@ -26,7 +26,7 @@ void init_params( parameters** params)
 	( *params)->threads = 1;
 }
 
-void print_params(parameters *params)
+void print_params( parameters *params)
 {
 	printf( "bam_file: %s\n", params->bam_file);
 	printf( "ref_genome: %s\n", params->ref_genome);
@@ -44,19 +44,34 @@ void print_error( char* msg)
 	exit( 1);
 }
 
-FILE* gfOpen( char* fname, char* mode)
+FILE* safe_fopen( char* path, char* mode)
 {
-	/* gfOpen: graceful file open. Try to open a file; exit if file does not exist */
+	/* Safe file open. Try to open a file; exit if file does not exist */
 	FILE* file;
 	char err[500];
-	file = fopen( fname, mode);
-  
-	if( file == NULL)
+
+	file = fopen( path, mode);  
+	if( !file)
 	{
-		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", fname, mode[0]=='w' ? "write" : "read");
+		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", path, mode[0]=='w' ? "write" : "read");
 		print_error( err);
 	}
 	return file;
+}
+
+htsFile* safe_hts_open( char* path, char* mode)
+{
+	htsFile* bam_file;
+	char err[500];
+	
+	bam_file = hts_open( path, mode);
+	if( !bam_file)
+	{
+		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", path, mode[0]=='w' ? "write" : "read");
+		print_error( err);
+	}
+
+	return bam_file;
 }
 
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max)
