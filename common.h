@@ -23,15 +23,32 @@ typedef struct _params
 	int  threads; /* number of threads to use for parallel mrFAST, and maybe future parallelization of TARDIS */
 } parameters;
 
-/* Function prototypes */
+/* Parameter related TARDIS functions */
 void init_params( parameters**);
 void print_params( parameters*);
+
+/* BAM Utility functions */
+void get_sample_name( bam_info* in_bam, char* header_text);
+void get_library_count( bam_info* in_bam, char* header_text);
+void get_library_names( bam_info* in_bam, char* header_text);
+
+/* FILE opening and error printing functions. For opening regular and BAM/SAM
+ files safely */
 void print_error( char*);
 FILE* safe_fopen( char* path, char* mode);
 htsFile* safe_hts_open( char* path, char* mode);
+
+/* General bioinformatics functions */
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max);
+char base_as_char( int base_as_int);
 char complement_char( char base);
+void qual_to_ascii( char* qual);
+
+/* String functions */
+void set_str( char **target, char *source); /* Even safer than strncpy */
 void reverse_string( char* str);
-void set_str( char **target, char *source);
+
+/* Misc. Utility */
+int compare_size_int( const void* p, const void* q);
 
 #endif

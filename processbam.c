@@ -20,12 +20,12 @@ void load_bam( bam_info* in_bam, char* path)
 	bam_hdr_t* bam_header;
 	bam1_core_t bam_alignment_core;
 	bam1_t*	bam_alignment;
-	int* fragment_size;
-	int* second_pass_fragments;
-	int fragments_sampled;
-	int second_test_pass;
-	int fragment_size_total;
-	float variance;
+	int** fragment_size;
+	int** second_pass_fragments;
+	int* fragments_sampled;
+	int* second_test_pass;
+	int* fragment_size_total;
+	float* variance;
 	int return_value;
 	int i;
 
@@ -54,6 +54,13 @@ void load_bam( bam_info* in_bam, char* path)
 	/* Extract the Sample Name from the header text */
 	get_sample_name( in_bam, bam_header->text);
 
+	/* Extract the number of libraries within the BAM file */
+	get_library_count( in_bam, bam_header->text);
+
+	/* Extract the ids/names for the libraries. A single Sample with multiple 
+	 possible libraries are assumed for each BAM file */
+	get_library_names( in_bam, bam_header->text);
+ 
 	/* For SAMPLEFRAG number of alignments, store the template length field */
 	fragment_size = ( int*) malloc( SAMPLEFRAG * sizeof( int));
 
@@ -79,7 +86,7 @@ void load_bam( bam_info* in_bam, char* path)
 
 	/* Now we have SAMPLEFRAG number of fragment sizes which are positive and pass the flag conditions.
 	 Next, sort the fragment sizes */
-	qsort( fragment_size, SAMPLEFRAG, sizeof( int), compare_size);
+	qsort( fragment_size, SAMPLEFRAG, sizeof( int), compare_size_int);
 
 	/* Get the median */
 	in_bam->frag_med = fragment_size[( SAMPLEFRAG / 2) - 1];
@@ -122,87 +129,6 @@ void load_bam( bam_info* in_bam, char* path)
 	/* Free Memory */
 	free( fragment_size);
 	free( second_pass_fragments);
-}
-
-/* Add 33 to the interger value of the qual characters to convert them to ASCII */
-void qual_to_ascii( char* qual)
-{
-	int i;
-	for( i = 0; i < strlen( qual); i++)
-	{
-		qual[i] = qual[i] + 33;
-	}
-}
-
-/* Decode 4-bit encoded bases to their corresponding characters */
-char base_as_char( int base_as_int)
-{
-	if( base_as_int == 1)
-	{
-		return 'A';
-	}
-	else if( base_as_int == 2)
-	{
-		return 'C';
-	}
-	else if( base_as_int == 4)
-	{
-		return 'G';
-	}
-	else if( base_as_int == 8)
-	{
-		return 'T';
-	}
-	else if( base_as_int == 15)
-	{
-		return 'N';
-	}
-}
-
-void get_sample_name( bam_info* in_bam, char* header_text)
-{
-	/* Delimit the BAM header text with tabs and newlines */
-	char* p = strtok( header_text, "\t\n");
-	char sample_name_buffer[1024];
-
-	while( p != NULL)
-	{
-		/* If the current token has "SM" as the first two characters,
-			we have found our Sample Name */
-		if( p[0] == 'S' && p[1] == 'M')
-		{
-			/* Get the Sample Name */
-			strncpy( sample_name_buffer, p + 3, strlen( p) - 3);
-
-			/* Add the NULL terminator */
-			sample_name_buffer[strlen( p) - 3] = '\0';
-
-			/* Exit loop */
-			break;
-		}
-		p = strtok( NULL, "\t\n");
-	}
-
-	set_str( &( in_bam->sample_name), sample_name_buffer);
-}
-
-int compare_size( const void* p, const void* q)
-{
-    int i = *( const int*) p;
-    int j = *( const int*) q;
-
-	if( i < j)
-	{
-		return -1;
-	}
-	else if( i == j)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
 }
 
 void print_bam( bam_info* in_bam)
