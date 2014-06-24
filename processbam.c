@@ -336,11 +336,19 @@ void print_bam( bam_info* in_bam)
 	}
 }
 
-void create_fastq( bam_info* in_bam, parameters *params)
+void create_fastq( bam_info* in_bam, parameters* params)
+{
+	int i;
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		create_fastq_library( ( in_bam->libraries)[i], in_bam->sample_name, params->bam_file, params);
+	}
+}
+void create_fastq_library( struct library_properties* in_lib, char* sample_name, char* bam_path, parameters* params)
 {
 	FILE* fastq;
 	FILE* fastq2;
-	FILE *outfastq;
+	FILE* outfastq;
 	htsFile* bam_file;
 	bam1_core_t bam_alignment_core;
 	bam1_t*	bam_alignment;
@@ -349,19 +357,19 @@ void create_fastq( bam_info* in_bam, parameters *params)
 	char qual[MAX_SEQ];
 	char filename[255];
 	char filename2[255];
+	char* current_lib_name;
 	int flag;
 	int min;
 	int max;
 	int return_value;
 	int i;
-	char *path = params->bam_file;
 
 	/* Set FASTQ file names */
-	sprintf( filename, "%s_remap_1.fastq", in_bam->sample_name);
-	sprintf( filename2, "%s_remap_2.fastq", in_bam->sample_name);
+	sprintf( filename, "%s_%s_remap_1.fastq", sample_name, in_lib->libname);
+	sprintf( filename2, "%s_%s_remap_2.fastq", sample_name, in_lib->libname);
 
-	set_str( &( in_bam->fastq1), filename);
-	set_str( &( in_bam->fastq2), filename2);
+	set_str( &( in_lib->fastq1), filename);
+	set_str( &( in_lib->fastq2), filename2);
 
 	/* if skip-fastq is set, return */
 	if( params->skip_fastq)
@@ -386,36 +394,32 @@ void create_fastq( bam_info* in_bam, parameters *params)
 	}
 
 	/* Open BAM file for reading */
-	bam_file = hts_open( path, "r");
-	if( !bam_file)
-	{
-		fprintf( stderr, "Error opening BAM file\n");
-		exit( 1);
-	}
+	bam_file = safe_hts_open( bam_path, "r");
 
 	/* Get past the BAM header, otherwise header text gets mixed; possible htslib issue */
 	bam_hdr_read( ( bam_file->fp).bgzf);
 
-	/* For all reads within the BAM file, check if concordant */
+	/* Read the BAM file alignment by alignment */
 	bam_alignment = bam_init1();
 	return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
-
 	while( return_value != -1)
 	{
 		bam_alignment_core = bam_alignment->core;
 		flag = bam_alignment_core.flag;
 
-
-		min = in_bam->frag_avg - ( 4 * in_bam->frag_std);
-		max = in_bam->frag_avg + ( 4 * in_bam->frag_std);
+		min = in_lib->frag_avg - ( 4 * in_lib->frag_std);
+		max = in_lib->frag_avg + ( 4 * in_lib->frag_std);
 		
 		if( min < 0)
 		{
 			min = 0;
 		}
 
-		/* If the read is not concordant, write it to the FASTQ file */
-		if( !is_concordant( bam_alignment_core, min, max) && ( flag & BAM_FPAIRED) != 0)
+		/* Get the library id/name for the current alignment */
+		set_str( &current_lib_name, bam_aux_get( bam_alignment, "RG"));
+
+		/* If the read is not concordant AND belongs to the current library, write it to the FASTQ file */
+		if( !is_concordant( bam_alignment_core, min, max) && ( flag & BAM_FPAIRED) != 0 && strcmp( in_lib->libname, current_lib_name) == 0)
 		{
 			/* Line 1: Read Name */
 			strncpy( qname, bam_get_qname( bam_alignment), bam_alignment_core.l_qname);
@@ -500,4 +504,7 @@ void create_fastq( bam_info* in_bam, parameters *params)
 	{
 		fprintf( stderr, "Error closing the second FASTQ file\n");
 	}
+
+	/* Free memory */
+	free( current_lib_name);
 }

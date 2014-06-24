@@ -35,6 +35,7 @@ void print_bam( bam_info* in_bam);
 void print_libs( bam_info* in_bam);
 int find_library_index( bam_info* in_bam, char* library_name);
 int sufficient_fragments_sampled( int* fragments_sampled, int num_libraries);
+void create_fastq_library( struct library_properties* in_lib, char* sample_name, char* bam_path, parameters* params);
 void create_fastq( bam_info* in_bam, parameters *params);
 
 /* BAM Utility functions */
