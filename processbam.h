@@ -33,6 +33,13 @@ typedef struct _bam_info
 void load_bam( bam_info* in_bam, char* path);
 void print_bam( bam_info* in_bam);
 void print_libs( bam_info* in_bam);
+int find_library_index( bam_info* in_bam, char* library_name);
+int sufficient_fragments_sampled( int* fragments_sampled, int num_libraries);
 void create_fastq( bam_info* in_bam, parameters *params);
+
+/* BAM Utility functions */
+void get_sample_name( bam_info* in_bam, char* header_text);
+void get_library_count( bam_info* in_bam, char* header_text);
+void get_library_names( bam_info* in_bam, char* header_text);
 
 #endif

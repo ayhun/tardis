@@ -27,10 +27,7 @@ typedef struct _params
 void init_params( parameters**);
 void print_params( parameters*);
 
-/* BAM Utility functions */
-void get_sample_name( bam_info* in_bam, char* header_text);
-void get_library_count( bam_info* in_bam, char* header_text);
-void get_library_names( bam_info* in_bam, char* header_text);
+
 
 /* FILE opening and error printing functions. For opening regular and BAM/SAM
  files safely */

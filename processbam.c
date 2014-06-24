@@ -26,8 +26,12 @@ void load_bam( bam_info* in_bam, char* path)
 	int* second_test_pass;
 	int* fragment_size_total;
 	float* variance;
+	char* library_name;
+	int library_index;
+	int diff;
 	int return_value;
 	int i;
+	int j;
 
 	/* Open the BAM file for reading. htslib automatically detects the format
 		of the file, so appending "b" after "r" in mode is redundant. */
@@ -57,66 +61,119 @@ void load_bam( bam_info* in_bam, char* path)
 	/* Extract the number of libraries within the BAM file */
 	get_library_count( in_bam, bam_header->text);
 
+	/* Initialize the structures for library properties */
+	in_bam->libraries = ( library_properties*) malloc( in_bam->num_libraries * sizeof( library_properties));
+
 	/* Extract the ids/names for the libraries. A single Sample with multiple 
 	 possible libraries are assumed for each BAM file */
 	get_library_names( in_bam, bam_header->text);
  
-	/* For SAMPLEFRAG number of alignments, store the template length field */
-	fragment_size = ( int*) malloc( SAMPLEFRAG * sizeof( int));
+	/* For SAMPLEFRAG number of alignments, store the template length field.
+	 Performed for each different library */
+	fragment_size = ( int**) malloc( in_bam->num_libraries * sizeof( int*));
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		fragment_size[i] = ( int*) malloc( SAMPLEFRAG * sizeof( int));
+	}
 
 	/* Initial read */	
 	bam_alignment = bam_init1();
 	return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
 
 	/* The remaining reads */
-	fragments_sampled = 0;
-	while( return_value != -1 && fragments_sampled != SAMPLEFRAG)
+	fragments_sampled = ( int*) malloc( in_bam->num_libraries * sizeof( int));
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		fragments_sampled[i] = 0;
+	}
+
+	while( return_value != -1 && !sufficient_fragments_sampled( fragments_sampled, in_bam->num_libraries))
 	{
 		bam_alignment_core = bam_alignment->core;
 
 		if( bam_alignment_core.isize > 0 && !bam_is_rev( bam_alignment) && bam_is_mrev( bam_alignment))
 		{
-			fragment_size[fragments_sampled] = bam_alignment_core.isize;
-			fragments_sampled = fragments_sampled + 1;
+			set_str( &library_name, bam_aux_get( bam_alignment, "RG"));
+			library_index = find_library_index( in_bam, library_name);
+
+			/* Sample SAMPLEFRAG number of alignments for each library at most */
+			if( fragments_sampled[library_index] < SAMPLEFRAG)
+			{
+				fragment_size[library_index][fragments_sampled[library_index]] = bam_alignment_core.isize;
+				fragments_sampled[library_index] = fragments_sampled[library_index] + 1;
+			}
 		}
 
 		/* Read next alignment */
 		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
 	}
 
-	/* Now we have SAMPLEFRAG number of fragment sizes which are positive and pass the flag conditions.
-	 Next, sort the fragment sizes */
-	qsort( fragment_size, SAMPLEFRAG, sizeof( int), compare_size_int);
-
-	/* Get the median */
-	in_bam->frag_med = fragment_size[( SAMPLEFRAG / 2) - 1];
-
-	/* Find the fragment sizes which pass the second test, and will contribute to the avg and std */
-	second_pass_fragments = ( int*) malloc( SAMPLEFRAG * sizeof( int));
-	second_test_pass = 0;
-	fragment_size_total = 0;
-	for( i = 0; i < SAMPLEFRAG; i++)
+	/* Now we have SAMPLEFRAG number of fragment sizes which are positive and pass the flag conditions */
+	for( i = 0; i < in_bam->num_libraries; i++)
 	{
-		if( fragment_size[i] <= 2 * in_bam->frag_med)
+		/* Sort the fragment sizes */
+		qsort( fragment_size[i], SAMPLEFRAG, sizeof( int), compare_size_int);
+		
+		/* Get the medians */
+		( in_bam->libraries)[i].frag_med = fragment_size[i][( SAMPLEFRAG / 2) - 1];
+	}
+	
+	/* Find the fragment sizes which pass the second test, and will contribute to the avg and std */
+	second_pass_fragments = ( int**) malloc( in_bam->num_libraries * sizeof( int*));
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		second_pass_fragments[i] = ( int*) malloc( SAMPLEFRAG * sizeof( int));
+	}
+
+	second_test_pass = ( int*) malloc( in_bam->num_libraries * sizeof( int));
+	fragment_size_total = ( int*) malloc( in_bam->num_libraries * sizeof( int));
+
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		second_test_pass[i] = 0;
+		fragment_size_total[i] = 0;
+	}
+
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		for( j = 0; j < SAMPLEFRAG; j++)
 		{
-			fragment_size_total = fragment_size_total + fragment_size[i];
-			second_pass_fragments[i] = fragment_size[i];
-			second_test_pass = second_test_pass + 1;
+			if( fragment_size[i][j] <= 2 * ( in_bam->libraries)[i].frag_med)
+			{
+				fragment_size_total[i] = fragment_size_total[i] + fragment_size[i][j];
+				second_pass_fragments[i][j] = fragment_size[i][j];
+				second_test_pass[i] = second_test_pass[i] + 1;
+			}
 		}
 	}
 
-	/* Compute the average */
-	in_bam->frag_avg = ( float) fragment_size_total / ( float) second_test_pass;
-
-	/* Compute the variance and std */
-	variance = 0;
-	for( i = 0; i < second_test_pass; i++)
+	for( i = 0; i < in_bam->num_libraries; i++)
 	{
-		variance = variance + ( second_pass_fragments[i] - in_bam->frag_avg) * ( second_pass_fragments[i] - in_bam->frag_avg);
+		/* Compute the averages */
+		( in_bam->libraries)[i].frag_avg = ( float) fragment_size_total[i] / ( float) second_test_pass[i];
 	}
 
-	variance = ( float) variance / ( float) ( second_test_pass);
-	in_bam->frag_std = sqrt( variance);
+	/* Compute the variance and std */
+	variance = ( float*) malloc( in_bam->num_libraries * sizeof( float));
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		variance[i] = 0;
+	}
+
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		for( j = 0; j < second_test_pass[i]; j++)
+		{
+			diff = ( second_pass_fragments[i][j] - ( in_bam->libraries)[i].frag_avg);
+			variance[i] = variance[i] +  diff * diff;
+		}
+	}
+
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		variance[i] = ( float) variance[i] / ( float) second_test_pass[i];
+		( in_bam->libraries)[i].frag_std = sqrt( variance[i]);
+	}
 	
 	/* Close the BAM file */
 	return_value = hts_close( bam_file);
@@ -127,10 +184,142 @@ void load_bam( bam_info* in_bam, char* path)
 	}
 
 	/* Free Memory */
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		free( fragment_size[i]);
+		free( second_pass_fragments[i]);
+	}
 	free( fragment_size);
-	free( second_pass_fragments);
+	free( second_pass_fragments);	
+	free( fragments_sampled);
+	free( second_test_pass);
+	free( fragment_size_total);
+	free( variance);
+	free( library_name);
 }
 
+void get_sample_name( bam_info* in_bam, char* header_text)
+{
+	/* Delimit the BAM header text with tabs and newlines */
+	char* p = strtok( header_text, "\t\n");
+	char sample_name_buffer[1024];
+
+	while( p != NULL)
+	{
+		/* If the current token has "SM" as the first two characters,
+			we have found our Sample Name */
+		if( p[0] == 'S' && p[1] == 'M')
+		{
+			/* Get the Sample Name */
+			strncpy( sample_name_buffer, p + 3, strlen( p) - 3);
+
+			/* Add the NULL terminator */
+			sample_name_buffer[strlen( p) - 3] = '\0';
+
+			/* Exit loop */
+			break;
+		}
+		p = strtok( NULL, "\t\n");
+	}
+
+	set_str( &( in_bam->sample_name), sample_name_buffer);
+}
+
+void get_library_count( bam_info* in_bam, char* header_text)
+{
+	int number_of_libraries = 0;
+
+	/* Delimit the BAM header text with newlines */
+	char* p = strtok( header_text, "\n");
+	while( p != NULL)
+	{
+		/* If the current token (which is a line) has "RG" as the second and third characters,
+		 we have found a new library */
+		if( p[1] == 'R' && p[2] == 'G')
+		{
+			number_of_libraries = number_of_libraries + 1;
+		}
+	}
+
+	in_bam->num_libraries = number_of_libraries;
+}
+
+void get_library_names( bam_info* in_bam, char* header_text)
+{
+	char line_buffer[1024];
+	char library_name_buffer[1024];
+	int i;
+
+	/* Delimit the BAM header text with newlines */
+	i = 0;
+	char* p = strtok( header_text, "\n");
+	while( p != NULL)
+	{
+		/* If the current token (which is a line) has "RG" as the second and third characters,
+			we copy the current line to a new char* and tokenize it to get the id/name */
+		if( p[1] == 'R' && p[2] == 'G')
+		{
+			/* Copy the current line to the line buffer */
+			strncpy( line_buffer, p, strlen( p));
+			line_buffer[strlen( p)] = '\0';
+			
+			/* Tokenize the line buffer by tabs */
+			char* q = strtok( line_buffer, "\t");
+			while( q != NULL)
+			{
+				if( q[0] == 'I' && p[1] == 'D')
+				{
+					/* Get the Library Name */
+					strncpy( library_name_buffer, q + 3, strlen( q) - 3);
+
+					/* Add the NULL terminator */
+					library_name_buffer[strlen( q) - 3] = '\0';
+
+					/* Exit loop */
+					break;
+				}
+
+				q = strtok( NULL, "\t");
+			}
+
+			set_str( &( ( in_bam->libraries)[i].libname), library_name_buffer);
+			i = i + 1;
+		}
+
+		p = strtok( NULL, "\n");
+	}
+}
+
+int find_library_index( bam_info* in_bam, char* library_name)
+{
+	int library_index;
+	int i;
+
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		if( strcmp( ( in_bam->libraries)[i].libname, library_name) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+	
+int sufficient_fragments_sampled( int* fragments_sampled, int num_libraries)
+{
+	int i;
+	for( i = 0; i < num_libraries; i++)
+	{
+		if( fragments_sampled[i] != SAMPLEFRAG)
+		{
+			return 0;
+		}
+	}
+	
+	return 1;
+}
+		
 void print_bam( bam_info* in_bam)
 {
 	printf( "Number of Chromosomes: %d\n", in_bam->num_chrom);
@@ -141,11 +330,6 @@ void print_bam( bam_info* in_bam)
 		printf( "Chromosome Name: %s\n", ( in_bam->chrom_names)[i]);
 		printf( "Length of the Chromosome: %d\n", ( in_bam->chrom_lengths)[i]);
 	}
-
-	printf( "Sample Name: %s\n", in_bam->sample_name);
-	printf( "Median Fragment Size: %d\n", in_bam->frag_med);
-	printf( "Average Fragment Size: %.3f\n", in_bam->frag_avg);
-	printf( "Standard Deviation: %.3f\n", in_bam->frag_std);
 }
 
 void create_fastq( bam_info* in_bam, parameters *params)
