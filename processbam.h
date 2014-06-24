@@ -6,7 +6,7 @@
 #include <htslib/hts.h>
 #include "common.h"
 
-typedef struct _library_properties
+struct library_properties
 {
 	char* libname; /* id/name of the library */
 	float frag_avg; /* average fragment size */
@@ -16,7 +16,7 @@ typedef struct _library_properties
   	int conc_max; /* max cutoff for concordants */
 	char* fastq1; /* file name for the FASTQ file of the /1 reads */
 	char* fastq2; /* file name for the FASTQ file of the /2 reads */
-} library_properties;
+};
 
 typedef struct _bam_info
 {
@@ -26,7 +26,7 @@ typedef struct _bam_info
 	char** chrom_names; /* names of the chromosomes */
   	char* sample_name; /* name of the sample, parsed from SM in the BAM header */
 	int num_libraries; /* number of libraries, counted from the RG tags in the BAM header */
-	library_properties* libraries; /* each library_properties struct holds statistical/other info */
+	struct library_properties** libraries; /* each library_properties struct holds statistical/other info */
 } bam_info;
 
 /* Function Prototypes */

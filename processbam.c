@@ -62,7 +62,11 @@ void load_bam( bam_info* in_bam, char* path)
 	get_library_count( in_bam, bam_header->text);
 
 	/* Initialize the structures for library properties */
-	in_bam->libraries = ( library_properties*) malloc( in_bam->num_libraries * sizeof( library_properties));
+	in_bam->libraries = ( struct library_properties**) malloc( in_bam->num_libraries * sizeof( struct library_properties*));
+	for( i = 0; i < in_bam->num_libraries; i++)
+	{
+		( in_bam->libraries)[i] = ( struct library_properties*) malloc( in_bam->num_libraries * sizeof( struct library_properties));
+	}
 
 	/* Extract the ids/names for the libraries. A single Sample with multiple 
 	 possible libraries are assumed for each BAM file */
@@ -115,7 +119,7 @@ void load_bam( bam_info* in_bam, char* path)
 		qsort( fragment_size[i], SAMPLEFRAG, sizeof( int), compare_size_int);
 		
 		/* Get the medians */
-		( in_bam->libraries)[i].frag_med = fragment_size[i][( SAMPLEFRAG / 2) - 1];
+		( in_bam->libraries)[i]->frag_med = fragment_size[i][( SAMPLEFRAG / 2) - 1];
 	}
 	
 	/* Find the fragment sizes which pass the second test, and will contribute to the avg and std */
@@ -138,7 +142,7 @@ void load_bam( bam_info* in_bam, char* path)
 	{
 		for( j = 0; j < SAMPLEFRAG; j++)
 		{
-			if( fragment_size[i][j] <= 2 * ( in_bam->libraries)[i].frag_med)
+			if( fragment_size[i][j] <= 2 * ( in_bam->libraries)[i]->frag_med)
 			{
 				fragment_size_total[i] = fragment_size_total[i] + fragment_size[i][j];
 				second_pass_fragments[i][j] = fragment_size[i][j];
@@ -150,7 +154,7 @@ void load_bam( bam_info* in_bam, char* path)
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
 		/* Compute the averages */
-		( in_bam->libraries)[i].frag_avg = ( float) fragment_size_total[i] / ( float) second_test_pass[i];
+		( in_bam->libraries)[i]->frag_avg = ( float) fragment_size_total[i] / ( float) second_test_pass[i];
 	}
 
 	/* Compute the variance and std */
@@ -164,7 +168,7 @@ void load_bam( bam_info* in_bam, char* path)
 	{
 		for( j = 0; j < second_test_pass[i]; j++)
 		{
-			diff = ( second_pass_fragments[i][j] - ( in_bam->libraries)[i].frag_avg);
+			diff = ( second_pass_fragments[i][j] - ( in_bam->libraries)[i]->frag_avg);
 			variance[i] = variance[i] +  diff * diff;
 		}
 	}
@@ -172,7 +176,7 @@ void load_bam( bam_info* in_bam, char* path)
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
 		variance[i] = ( float) variance[i] / ( float) second_test_pass[i];
-		( in_bam->libraries)[i].frag_std = sqrt( variance[i]);
+		( in_bam->libraries)[i]->frag_std = sqrt( variance[i]);
 	}
 	
 	/* Close the BAM file */
@@ -282,7 +286,7 @@ void get_library_names( bam_info* in_bam, char* header_text)
 				q = strtok( NULL, "\t");
 			}
 
-			set_str( &( ( in_bam->libraries)[i].libname), library_name_buffer);
+			set_str( &( ( in_bam->libraries)[i]->libname), library_name_buffer);
 			i = i + 1;
 		}
 
@@ -297,7 +301,7 @@ int find_library_index( bam_info* in_bam, char* library_name)
 
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
-		if( strcmp( ( in_bam->libraries)[i].libname, library_name) == 0)
+		if( strcmp( ( in_bam->libraries)[i]->libname, library_name) == 0)
 		{
 			return i;
 		}
