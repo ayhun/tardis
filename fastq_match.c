@@ -4,7 +4,7 @@
 #include <string.h>
 #include "common.h"
 
-#define MEMUSE 2147483648
+#define MEMUSE 2047483648
 #define MEMSCALE 1.5
 #define STRLEN 256
 
