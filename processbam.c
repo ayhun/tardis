@@ -65,7 +65,7 @@ void load_bam( bam_info* in_bam, char* path)
 	in_bam->libraries = ( struct library_properties**) malloc( in_bam->num_libraries * sizeof( struct library_properties*));
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
-		( in_bam->libraries)[i] = ( struct library_properties*) malloc( in_bam->num_libraries * sizeof( struct library_properties));
+		( in_bam->libraries)[i] = ( struct library_properties*) malloc( sizeof( struct library_properties));
 	}
 
 	/* Extract the ids/names for the libraries. A single Sample with multiple 
