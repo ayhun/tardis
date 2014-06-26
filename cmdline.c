@@ -242,6 +242,7 @@ void parse_bam_list( parameters** params)
 	while( fscanf( bam_list, "%s\n", next_path) == 1)
 	{
 		set_str( &( ( *params)->bam_file_list)[i], next_path);
+		i = i + 1;
 	}
 
 	fclose( bam_list);
