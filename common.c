@@ -16,7 +16,9 @@ void init_params( parameters** params)
 	( *params)->ref_genome = NULL;
 	( *params)->reps = NULL;
 	( *params)->dups = NULL;
-	( *params)->bam_file = NULL;
+	( *params)->bam_files = NULL;
+	( *params)->bam_list_path = NULL;
+	( *params)->bam_file_list = NULL;
 	( *params)->gaps = NULL;
 	( *params)->mei = NULL;
 	( *params)->sample_gender = MALE;
@@ -24,11 +26,18 @@ void init_params( parameters** params)
 	( *params)->run_ns = 0;
 	( *params)->run_sr = 0;
 	( *params)->threads = 1;
+	( *params)->num_bams = 0;
 }
 
-void print_params( parameters *params)
+void print_params( parameters* params)
 {
-	printf( "bam_file: %s\n", params->bam_file);
+	int i;
+
+	printf( "Number of bam files: %d\n", params->num_bams);
+	for( i = 0; i < params->num_bams; i++)
+	{
+		printf( "BAM input: %s\n", params->bam_file_list[i]);
+	}
 	printf( "ref_genome: %s\n", params->ref_genome);
 	printf( "reps: %s\n", params->reps);
 	printf( "dups: %s\n", params->dups);

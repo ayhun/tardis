@@ -22,8 +22,10 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"reps"   , required_argument,   0, 'r'},      
 		{"mei"    , required_argument,   0, 'm'},
 		{"threads", required_argument,   0, 't'},
+		{"num-bams", required_argument,	 0, 'n'},
 		{"help"   , no_argument,         0, 'h'},
 		{"version", no_argument,         0, 'v'},
+		{"bamlist", no_argument,		 0, 'b'},
 		{"vh"     , no_argument, &run_vh,     1 },
 		{"ns"     , no_argument, &run_ns,     1 },
 		{"sr"     , no_argument, &run_sr,     1 },
@@ -41,12 +43,18 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		return 0;
 	}
   
-	while( ( o = getopt_long( argc, argv, "hv:i:f:g:d:r:m:", long_options, &index)) != -1)
-	  {
+	while( ( o = getopt_long( argc, argv, "hvb:i:f:g:d:r:m:n:", long_options, &index)) != -1)
+	{
 		switch( o)
 		{
+			case 'b':
+				set_str( &( params->bam_list_path), optarg);
+				parse_bam_list( &params);
+			break;
+
 			case 'i':
-	  			set_str( &( params->bam_file), optarg);
+	  			set_str( &( params->bam_files), optarg);
+				tokenize_bam_files( &params);
 			break;
 	  
 			case 'f':
@@ -69,6 +77,11 @@ int parse_command_line( int argc, char** argv, parameters* params)
 				set_str( &( params->mei), optarg);
 			break;
 
+			case 'n':
+				params->num_bams = atoi( optarg);
+				params->bam_file_list = ( char**) malloc( params->num_bams * sizeof( char*));
+			break;
+
 			case 't':
 				params->threads = atoi( optarg);
 			break;
@@ -84,7 +97,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 				return 0;
 			break; 
 		}
-	  }
+	}
   
 	/* TODO: check parameter validity */
   
@@ -112,11 +125,28 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		return 0;
 	}
 
-	/* check if --input is invoked */
-	if( params->bam_file == NULL)
+	/* check if --num-bams > 0 */
+	if( params->num_bams <= 0)
 	{
-		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter input BAM file through the --input option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Invalid number of input BAM files was entered (%d).\n", params->num_bams);
 		return 0;
+	}
+
+	/* check if --bamlist is invoked */
+	if( params->bam_list_path == NULL)
+	{
+		fprintf( stderr, "[TARDIS CMDLINE WARNING] Path to the file that lists BAM file paths not entered through the --bamlist option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE WARNING] Searching for BAM files after the --input option.\n");
+	}
+
+	/* check if --input is invoked */
+	if( params->bam_files == NULL)
+	{
+		if( params->bam_list_path == NULL)
+		{
+			fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter list of input BAM files through the --input option.\n");
+			return 0;
+		}
 	}
 
 	/* check if --ref   is invoked */
@@ -181,7 +211,9 @@ void print_help( void)
 {  
 	fprintf( stdout, "\nTARDIS: Toolkit for Automated and Rapid DIscovery of Structural variants.\n");
 	fprintf( stdout, "Version %s. Last update: %s\n\n", VERSION, LAST_UPDATE);
-	fprintf( stdout, "\t--input [bam file]         : Input file in sorted and indexed BAM format.\n");
+	fprintf( stdout, "\t--num-bams  [number of BAM files] : Number of input BAM files.\n");
+	fprintf( stdout, "\t--bamlist   [bamlist file] : A text file that lists input BAM files one file per line.\n");
+	fprintf( stdout, "\t--input [comma separated list of bam files]         : Input files in sorted and indexed BAM format.\n");
 	fprintf( stdout, "\t--ref   [reference genome] : Reference genome in FASTA format.\n");
 	fprintf( stdout, "\t--gaps  [gaps file]        : Assembly gap coordinates in BED format.\n");
 	fprintf( stdout, "\t--dups  [dups file]        : Segmental duplication coordinates in BED format.\n");
@@ -197,3 +229,38 @@ void print_help( void)
 	fprintf( stdout, "\t--version                  : Print version and exit.\n");
 	fprintf( stdout, "\t--help                     : Print this help screen and exit.\n\n");
 }
+
+void parse_bam_list( parameters** params)
+{
+	FILE* bam_list;
+	char next_path[1024];
+	int i;
+
+	bam_list = safe_fopen( ( *params)->bam_list_path, "r");
+
+	i = 0;
+	while( fscanf( bam_list, "%s\n", next_path) == 1)
+	{
+		set_str( &( ( *params)->bam_file_list)[i], next_path);
+	}
+
+	fclose( bam_list);
+}
+
+void tokenize_bam_files( parameters** params)
+{
+	/* Delimit the bam_files string with commas */
+	char* p = strtok( ( *params)->bam_files, ",");
+	char bam_path_buffer[1024];
+	int i;
+
+	i = 0;
+	while( p != NULL)
+	{
+		set_str( &( ( *params)->bam_file_list)[i], bam_path_buffer);
+		i = i + 1;
+		p = strtok( NULL, ",");
+	}
+}
+
+	

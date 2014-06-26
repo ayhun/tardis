@@ -336,12 +336,12 @@ void print_bam( bam_info* in_bam)
 	}
 }
 
-void create_fastq( bam_info* in_bam, parameters* params)
+void create_fastq( bam_info* in_bam, char* bam_path, parameters* params)
 {
 	int i;
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
-		create_fastq_library( ( in_bam->libraries)[i], in_bam->sample_name, params->bam_file, params);
+		create_fastq_library( ( in_bam->libraries)[i], in_bam->sample_name, bam_path, params);
 	}
 }
 void create_fastq_library( struct library_properties* in_lib, char* sample_name, char* bam_path, parameters* params)

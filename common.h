@@ -11,7 +11,9 @@ typedef struct _params
 	char* ref_genome; /* path to reference genome - fasta */
 	char* reps; /* path to repeatmasker file - *rm.out */
 	char* dups; /* path to segmental duplications file - bed */
-	char* bam_file; /* path to input BAM file */
+	char* bam_files; /* paths to comma separated input BAM files as a single string before being tokenized */
+	char* bam_list_path; /* path to a file that lists BAM file paths in advance */
+	char** bam_file_list; /* the actual list that holds all bam file paths after tokenization */
 	char* gaps; /* path to assembly gaps file - bed */
 	char* mei;  /* regular expression-like MEI list */
 	enum gender sample_gender; /* gender of the sample */
@@ -21,13 +23,12 @@ typedef struct _params
 	char skip_fastq; /* boolean stand-in to skip FASTQ dump */
 	char skip_sort; /* boolean stand-in to skip FASTQ sort */
 	int  threads; /* number of threads to use for parallel mrFAST, and maybe future parallelization of TARDIS */
+	int num_bams; /* number of input BAM files */
 } parameters;
 
 /* Parameter related TARDIS functions */
 void init_params( parameters**);
 void print_params( parameters*);
-
-
 
 /* FILE opening and error printing functions. For opening regular and BAM/SAM
  files safely */

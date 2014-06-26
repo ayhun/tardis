@@ -3,10 +3,11 @@
 
 int main( int argc, char** argv)
 {
-	bam_info* in_bam;
+	bam_info** in_bams;
 	parameters* params;
 	configuration* cfg;
 	int return_value;
+	int i;
 
 	/* Load configuration file (created if it does not exist) */
 	cfg = ( configuration*) malloc( sizeof( configuration));
@@ -26,13 +27,17 @@ int main( int argc, char** argv)
 		print_params( params);
 	#endif
 
-	/* Read BAM file and calculate the median/avg/std of fragment sizes */
-	in_bam = ( bam_info*) malloc( sizeof( bam_info));  
-	load_bam( in_bam, params->bam_file);
+	/* Read BAM files and calculate the median/avg/std of fragment sizes per library */
+	in_bams = ( bam_info**) malloc( sizeof( bam_info*));
+	for( i = 0; i < params->num_bams; i++)
+	{
+		in_bams[i] = ( bam_info*) malloc( sizeof( bam_info));  
+		load_bam( in_bams[i], params->bam_file_list[i]);
 
-	/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
-	create_fastq( in_bam, params);
-  
+		/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
+		create_fastq( in_bams[i], params->bam_file_list[i], params);
+	}
+
 	/* sort FASTQ files to match /1 and /2 reads; unless skip-sort is invoked
 	if( !( params->skip_sort))
 	{
