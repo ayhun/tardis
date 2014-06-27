@@ -56,4 +56,7 @@ int main( int argc, char** argv)
 	params->threads will be used for multithreading option of mrFAST
 	remap(params, ...); 
 	*/
+
+
+	return EXIT_SUCCESS;
 }
