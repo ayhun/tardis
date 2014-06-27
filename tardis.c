@@ -27,6 +27,8 @@ int main( int argc, char** argv)
 		print_params( params);
 	#endif
 
+		exit(0);
+
 	/* Read BAM files and calculate the median/avg/std of fragment sizes per library */
 	in_bams = ( bam_info**) malloc( sizeof( bam_info*));
 	for( i = 0; i < params->num_bams; i++)

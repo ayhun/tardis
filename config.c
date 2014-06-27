@@ -8,7 +8,7 @@ void load_config( configuration* cfg)
 	FILE* config;
 	char* next_line = NULL;
 	char config_filename[MAX_LENGTH];
-	int len = 0;
+	size_t len = 0;
 	int bytes_read;
 	int i;
 	

@@ -4,6 +4,8 @@
 #include <htslib/sam.h>
 #include <htslib/hts.h>
 
+#define MAX_BAMS 100
+
 enum gender{ MALE, FEMALE};
 
 typedef struct _params
@@ -11,7 +13,7 @@ typedef struct _params
 	char* ref_genome; /* path to reference genome - fasta */
 	char* reps; /* path to repeatmasker file - *rm.out */
 	char* dups; /* path to segmental duplications file - bed */
-	char* bam_files; /* paths to comma separated input BAM files as a single string before being tokenized */
+  	char* bam_files; /* paths to comma separated input BAM files as a single string before being tokenized */
 	char* bam_list_path; /* path to a file that lists BAM file paths in advance */
 	char** bam_file_list; /* the actual list that holds all bam file paths after tokenization */
 	char* gaps; /* path to assembly gaps file - bed */

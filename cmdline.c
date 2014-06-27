@@ -53,8 +53,8 @@ int parse_command_line( int argc, char** argv, parameters* params)
 			break;
 
 			case 'i':
-	  			set_str( &( params->bam_files), optarg);
-				tokenize_bam_files( &params);
+			  set_str( &( params->bam_file_list[ (params->num_bams)++]), optarg);
+				//tokenize_bam_files( &params);
 			break;
 	  
 			case 'f':
@@ -76,11 +76,13 @@ int parse_command_line( int argc, char** argv, parameters* params)
 			case 'm':
 				set_str( &( params->mei), optarg);
 			break;
-
-			case 'n':
+			
+                        /*
+ 		        case 'n':
 				params->num_bams = atoi( optarg);
 				params->bam_file_list = ( char**) malloc( params->num_bams * sizeof( char*));
 			break;
+			*/
 
 			case 't':
 				params->threads = atoi( optarg);
@@ -126,25 +128,25 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	}
 
 	/* check if --num-bams > 0 */
-	if( params->num_bams <= 0)
+	if( params->num_bams <= 0 && params->bam_list_path == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Invalid number of input BAM files was entered (%d).\n", params->num_bams);
 		return 0;
 	}
 
-	/* check if --bamlist is invoked */
+	/* check if --bamlist is invoked 
 	if( params->bam_list_path == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE WARNING] Path to the file that lists BAM file paths not entered through the --bamlist option.\n");
 		fprintf( stderr, "[TARDIS CMDLINE WARNING] Searching for BAM files after the --input option.\n");
-	}
+		} */
 
 	/* check if --input is invoked */
-	if( params->bam_files == NULL)
+	if( params->bam_file_list[0] == NULL)
 	{
 		if( params->bam_list_path == NULL)
 		{
-			fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter list of input BAM files through the --input option.\n");
+			fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter list of input BAM files through the --input or --bamlist option.\n");
 			return 0;
 		}
 	}
@@ -173,7 +175,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	/* check if --dups  is invoked */
 	if( params->dups == NULL)
 	{
-		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the segmental duplications file (BED) through the --gaps option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the segmental duplications file (BED) through the --dups option.\n");
 		return 0;
 	}
 

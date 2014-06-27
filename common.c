@@ -11,6 +11,7 @@
 
 void init_params( parameters** params)
 {
+        int i;
 	/* initialize parameters */
 	*params = ( parameters*) malloc( sizeof( parameters));
 	( *params)->ref_genome = NULL;
@@ -18,7 +19,8 @@ void init_params( parameters** params)
 	( *params)->dups = NULL;
 	( *params)->bam_files = NULL;
 	( *params)->bam_list_path = NULL;
-	( *params)->bam_file_list = NULL;
+	//( *params)->bam_file_list = NULL;
+	( *params)->bam_file_list = (char **) malloc( sizeof ( char *) * MAX_BAMS);
 	( *params)->gaps = NULL;
 	( *params)->mei = NULL;
 	( *params)->sample_gender = MALE;
@@ -27,6 +29,11 @@ void init_params( parameters** params)
 	( *params)->run_sr = 0;
 	( *params)->threads = 1;
 	( *params)->num_bams = 0;
+	
+	for ( i = 0; i < MAX_BAMS; i++)
+        {
+	        ( *params)->bam_file_list[i] = NULL;
+	}
 }
 
 void print_params( parameters* params)
