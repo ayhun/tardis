@@ -4,7 +4,14 @@
 #include <htslib/sam.h>
 #include <htslib/hts.h>
 
-#define MAX_BAMS 100
+/* exit codes */
+
+#define EXIT_SUCCESS 0
+#define EXIT_COMMON 1
+#define EXIT_MAXBAMS 2
+#define EXIT_PARAM_ERROR 3
+
+#define MAX_BAMS 256
 
 enum gender{ MALE, FEMALE};
 

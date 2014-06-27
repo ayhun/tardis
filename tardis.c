@@ -20,14 +20,16 @@ int main( int argc, char** argv)
 	return_value = parse_command_line( argc, argv, params);
 	if( return_value == 0)
 	{
-		exit( 1);
+		exit( EXIT_SUCCESS);
 	}
+	else if ( return_value != 1)
+        {
+  	        exit ( return_value);
+        }
 
 	#ifdef DEBUGMODE
 		print_params( params);
 	#endif
-
-		exit(0);
 
 	/* Read BAM files and calculate the median/avg/std of fragment sizes per library */
 	in_bams = ( bam_info**) malloc( sizeof( bam_info*));

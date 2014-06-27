@@ -53,6 +53,11 @@ int parse_command_line( int argc, char** argv, parameters* params)
 			break;
 
 			case 'i':
+			  if ( params->num_bams == MAX_BAMS)
+			  {
+			        fprintf ( stderr, "Number of input BAMs exceeded the maximum value (%d). Exiting.\n", MAX_BAMS);
+				exit ( EXIT_MAXBAMS);
+			  }
 			  set_str( &( params->bam_file_list[ (params->num_bams)++]), optarg);
 				//tokenize_bam_files( &params);
 			break;
@@ -94,8 +99,8 @@ int parse_command_line( int argc, char** argv, parameters* params)
 			break;
 
 			case 'v':
-				fprintf( stdout, "\nTARDIS: Toolkit for Automated and Rapid DIscovery of Structural variants.\n");
-				fprintf( stdout, "Version %s. Last update: %s\n\n", VERSION, LAST_UPDATE);
+				fprintf( stderr, "\nTARDIS: Toolkit for Automated and Rapid DIscovery of Structural variants.\n");
+				fprintf( stderr, "Version %s. Last update: %s\n\n", VERSION, LAST_UPDATE);
 				return 0;
 			break; 
 		}
@@ -118,20 +123,20 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	if( !is_male && !is_female)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please select --xx [female] or --xy [male] to specify sample gender.\n");
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	if( is_male && is_female)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please select either --xx [female] or --xy [male] to specify sample gender. Not both!\n");
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --num-bams > 0 */
 	if( params->num_bams <= 0 && params->bam_list_path == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Invalid number of input BAM files was entered (%d).\n", params->num_bams);
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --bamlist is invoked 
@@ -147,7 +152,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		if( params->bam_list_path == NULL)
 		{
 			fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter list of input BAM files through the --input or --bamlist option.\n");
-			return 0;
+			return EXIT_PARAM_ERROR;
 		}
 	}
 
@@ -155,28 +160,28 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	if( params->ref_genome == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter reference genome file (FASTA) through the --ref option.\n");
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --gaps  is invoked */
 	if( params->gaps == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the assembly gaps file (BED) through the --gaps option.\n");
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --reps  is invoked */
 	if( params->reps == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the repeats file (RepeaMasker) through the --reps option.\n");
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --dups  is invoked */
 	if( params->dups == NULL)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the segmental duplications file (BED) through the --dups option.\n");
-		return 0;
+		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --mei is invoked. If not, set Alu:L1Hs:SVA as default */
@@ -207,6 +212,9 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	{
 		params->sample_gender = FEMALE;
 	}
+
+	return 1;
+
 }
 
 void print_help( void)
