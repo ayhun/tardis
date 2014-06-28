@@ -12,6 +12,7 @@
 #include "common.h"
 #include "cmdline.h"
 #include "processbam.h"
+#include "processfq.h"
 #include "config.h"
 
 

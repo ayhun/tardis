@@ -4,8 +4,7 @@
 #include <htslib/sam.h>
 #include <htslib/hts.h>
 
-/* exit codes */
-
+/* Exit Codes */
 #define EXIT_SUCCESS 0
 #define EXIT_COMMON 1
 #define EXIT_MAXBAMS 2

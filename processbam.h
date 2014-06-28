@@ -4,19 +4,14 @@
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
+#include "processfq.h"
 #include "common.h"
 
-struct library_properties
-{
-	char* libname; /* id/name of the library */
-	float frag_avg; /* average fragment size */
-  	float frag_std; /* fragment size standard deviation */
-	int frag_med; /* median of the fragment sizes */
-  	int conc_min; /* min cutoff for concordants */
-  	int conc_max; /* max cutoff for concordants */
-	char* fastq1; /* file name for the FASTQ file of the /1 reads */
-	char* fastq2; /* file name for the FASTQ file of the /2 reads */
-};
+/* Sample this many fragments to calculate avg/median/std per library */
+#define SAMPLEFRAG 1000000 
+
+/* Maximum sequence/quality length */
+#define MAX_SEQ 1000
 
 typedef struct _bam_info
 {
@@ -31,12 +26,11 @@ typedef struct _bam_info
 
 /* Function Prototypes */
 void load_bam( bam_info* in_bam, char* path);
+void create_fastq( bam_info* in_bam, char* bam_path, parameters *params);
 void print_bam( bam_info* in_bam);
 void print_libs( bam_info* in_bam);
 int find_library_index( bam_info* in_bam, char* library_name);
 int sufficient_fragments_sampled( int* fragments_sampled, int num_libraries);
-void create_fastq_library( struct library_properties* in_lib, char* sample_name, char* bam_path, parameters* params);
-void create_fastq( bam_info* in_bam, char* bam_path, parameters *params);
 
 /* BAM Utility functions */
 void get_sample_name( bam_info* in_bam, char* header_text);

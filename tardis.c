@@ -8,6 +8,7 @@ int main( int argc, char** argv)
 	configuration* cfg;
 	int return_value;
 	int i;
+	int j;
 
 	/* Load configuration file (created if it does not exist) */
 	cfg = ( configuration*) malloc( sizeof( configuration));
@@ -22,10 +23,10 @@ int main( int argc, char** argv)
 	{
 		exit( EXIT_SUCCESS);
 	}
-	else if ( return_value != 1)
-        {
-  	        exit ( return_value);
-        }
+	else if( return_value != 1)
+	{
+		exit( return_value);
+	}
 
 	#ifdef DEBUGMODE
 		print_params( params);
@@ -40,15 +41,20 @@ int main( int argc, char** argv)
 
 		/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
 		create_fastq( in_bams[i], params->bam_file_list[i], params);
+
+		/* Sort FASTQ files to match /1 and /2 reads; unless skip-sort is invoked */
+		if( !( params->skip_sort))
+		{
+			for( j = 0; j < in_bams[i]->num_libraries; j++)
+			{
+				/* Sort the libraries */
+				fastq_match( ( in_bams[i]->libraries[j])->fastq1, ( in_bams[i]->libraries[j])->fastq2,
+							 ( in_bams[i]->libraries[j])->num_sequences, ( in_bams[i]->libraries[j])->read_length);
+			}
+		}
+		
 	}
 
-	/* sort FASTQ files to match /1 and /2 reads; unless skip-sort is invoked
-	if( !( params->skip_sort))
-	{
-		sortFastqs( in_bam, params);
-	}
-	*/
-	
 	/* Remap with mrFAST */
   
 	/* to be implemented.
@@ -56,7 +62,6 @@ int main( int argc, char** argv)
 	params->threads will be used for multithreading option of mrFAST
 	remap(params, ...); 
 	*/
-
 
 	return EXIT_SUCCESS;
 }
