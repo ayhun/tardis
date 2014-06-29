@@ -40,20 +40,10 @@ int main( int argc, char** argv)
 		load_bam( in_bams[i], params->bam_file_list[i]);
 
 		/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
-		create_fastq( in_bams[i], params->bam_file_list[i], params);
-
-		/* Sort FASTQ files to match /1 and /2 reads; unless skip-sort is invoked */
-		if( !( params->skip_sort))
-		{
-			for( j = 0; j < in_bams[i]->num_libraries; j++)
-			{
-				/* Sort the libraries */
-				fastq_match( ( in_bams[i]->libraries[j])->fastq1, ( in_bams[i]->libraries[j])->fastq2,
-							 ( in_bams[i]->libraries[j])->num_sequences, ( in_bams[i]->libraries[j])->read_length);
-			}
-		}
-		
+		create_fastq( in_bams[i], params->bam_file_list[i], params);		
 	}
+
+        fprintf( stderr, "\nAll FASTQ files ready for remapping.\n");
 
 	/* Remap with mrFAST */
   

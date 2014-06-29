@@ -264,3 +264,4 @@ int compare_size_int( const void* p, const void* q)
 		return 1;
 	}
 }
+

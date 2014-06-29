@@ -41,8 +41,6 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 		num_batch = num_seq;
 	}
 
-	fprintf( stderr, "numseq: %d\tnumbatch: %d\n", num_seq, num_batch);
-
 	alloc_reads( &reads1, num_batch);
 	alloc_reads( &reads2, num_batch);
 
@@ -94,7 +92,6 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 				}
 			}
 		}
-		fprintf( stderr, "matched: %d of %d\n", num_matched, num_seq);
 	}
   
 	fclose(of1);
@@ -249,7 +246,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	char qual[MAX_SEQ];
 	char filename[255];
 	char filename2[255];
-	char* current_lib_name;
+	char* current_lib_name = NULL;
 	int num_seq;
 	int flag;
 	int min;
@@ -315,8 +312,8 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 			min = 0;
 		}
 
-		/* Get the library id/name for the current alignment */
-		set_str( &current_lib_name, bam_aux_get( bam_alignment, "RG"));
+		/* Get the library id/name for the current alignment. +1 gets rid of the leading 'Z' */
+		set_str( &current_lib_name, bam_aux_get( bam_alignment, "RG") + 1);
 
 		/* If the read is not concordant AND belongs to the current library, write it to the FASTQ file */
 		if( !is_concordant( bam_alignment_core, min, max) && ( flag & BAM_FPAIRED) != 0 && strcmp( in_lib->libname, current_lib_name) == 0)
@@ -417,4 +414,11 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 
 	/* Free memory */
 	free( current_lib_name);
+
+	if( !( params->skip_sort))
+        {
+	        fprintf( stderr, "Sorting FASTQ files for library: %s.\n", in_lib->libname);
+	        fastq_match( in_lib->fastq1, in_lib->fastq2, in_lib->num_sequences, in_lib->read_length);
+	}	    
+	
 }

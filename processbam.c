@@ -20,12 +20,14 @@ void load_bam( bam_info* in_bam, char* path)
 	int* second_test_pass;
 	int* fragment_size_total;
 	float* variance;
-	char* library_name;
+	char* library_name = NULL;
 	int library_index;
 	int diff;
 	int return_value;
 	int i;
 	int j;
+
+	fprintf( stderr, "Processing BAM file %s.\n", path);
 
 	/* Open the BAM file for reading. htslib automatically detects the format
 		of the file, so appending "b" after "r" in mode is redundant. */
@@ -41,19 +43,22 @@ void load_bam( bam_info* in_bam, char* path)
 	in_bam->chrom_lengths = ( int*) malloc( in_bam->num_chrom * sizeof( int));
 
 	in_bam->chrom_names = ( char**) malloc( in_bam->num_chrom * sizeof( char*));
-	
+
 	/* Store chromosome lengths, allocate memory for reference sequence names,
 	 and store the names as well */
 	for( i = 0; i < in_bam->num_chrom; i++)
 	{
+	        in_bam->chrom_lengths[i] = (int) ( bam_header->target_len)[i];
 		set_str( ( &( in_bam->chrom_names)[i]), ( bam_header->target_name)[i]);
 	}
-	
+
 	/* Extract the Sample Name from the header text */
 	get_sample_name( in_bam, bam_header->text);
 
 	/* Extract the number of libraries within the BAM file */
 	get_library_count( in_bam, bam_header->text);
+
+	fprintf( stderr, "Total of %d libraries found in %s. Sample name is %s.\n", in_bam->num_libraries, path, in_bam->sample_name);
 
 	/* Initialize the structures for library properties */
 	in_bam->libraries = ( struct library_properties**) malloc( in_bam->num_libraries * sizeof( struct library_properties*));
@@ -85,17 +90,21 @@ void load_bam( bam_info* in_bam, char* path)
 		fragments_sampled[i] = 0;
 	}
 
+	fprintf( stderr, "Sampling reads from libraries to infer fragment sizes.\n");
+
 	while( return_value != -1 && !sufficient_fragments_sampled( fragments_sampled, in_bam->num_libraries))
 	{
 		bam_alignment_core = bam_alignment->core;
 
 		if( bam_alignment_core.isize > 0 && !bam_is_rev( bam_alignment) && bam_is_mrev( bam_alignment))
 		{
-			set_str( &library_name, bam_aux_get( bam_alignment, "RG"));
-			library_index = find_library_index( in_bam, library_name);
+		        set_str( &library_name, bam_aux_get( bam_alignment, "RG"));
+
+			/* get rid of the leading 'Z' in front of the library_name */
+			library_index = find_library_index( in_bam, library_name+1);
 
 			/* Sample SAMPLEFRAG number of alignments for each library at most */
-			if( fragments_sampled[library_index] < SAMPLEFRAG)
+			if( library_index != -1 && fragments_sampled[library_index] < SAMPLEFRAG)
 			{
 				fragment_size[library_index][fragments_sampled[library_index]] = bam_alignment_core.isize;
 				fragments_sampled[library_index] = fragments_sampled[library_index] + 1;
@@ -104,7 +113,10 @@ void load_bam( bam_info* in_bam, char* path)
 
 		/* Read next alignment */
 		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
+		//fprintf (stderr, "sample %d\n", fragments_sampled[0]);
 	}
+
+	fprintf( stderr, "Sampling finished. Now calculating library statistics.\n");
 
 	/* Now we have SAMPLEFRAG number of fragment sizes which are positive and pass the flag conditions */
 	for( i = 0; i < in_bam->num_libraries; i++)
@@ -171,6 +183,7 @@ void load_bam( bam_info* in_bam, char* path)
 	{
 		variance[i] = ( float) variance[i] / ( float) second_test_pass[i];
 		( in_bam->libraries)[i]->frag_std = sqrt( variance[i]);
+		fprintf( stderr, "\nLibrary %s\n\tMean: %f\n\tStdev: %f\n", ( in_bam->libraries)[i]->libname, ( in_bam->libraries)[i]->frag_avg, ( in_bam->libraries)[i]->frag_std);
 	}
 	
 	/* Close the BAM file */
@@ -196,10 +209,13 @@ void load_bam( bam_info* in_bam, char* path)
 	free( library_name);
 }
 
+
 void get_sample_name( bam_info* in_bam, char* header_text)
 {
 	/* Delimit the BAM header text with tabs and newlines */
-	char* p = strtok( header_text, "\t\n");
+        char tmp_header[32768];
+	strcpy( tmp_header, header_text);
+	char* p = strtok( tmp_header, "\t\n");
 	char sample_name_buffer[1024];
 
 	while( p != NULL)
@@ -228,7 +244,10 @@ void get_library_count( bam_info* in_bam, char* header_text)
 	int number_of_libraries = 0;
 
 	/* Delimit the BAM header text with newlines */
-	char* p = strtok( header_text, "\n");
+        char tmp_header[32768];
+	strcpy( tmp_header, header_text);
+	char* p = strtok( tmp_header, "\n");
+
 	while( p != NULL)
 	{
 		/* If the current token (which is a line) has "RG" as the second and third characters,
@@ -237,6 +256,7 @@ void get_library_count( bam_info* in_bam, char* header_text)
 		{
 			number_of_libraries = number_of_libraries + 1;
 		}
+		p = strtok( NULL, "\n");
 	}
 
 	in_bam->num_libraries = number_of_libraries;
@@ -250,7 +270,11 @@ void get_library_names( bam_info* in_bam, char* header_text)
 
 	/* Delimit the BAM header text with newlines */
 	i = 0;
-	char* p = strtok( header_text, "\n");
+
+        char tmp_header[32768];
+	strcpy( tmp_header, header_text);
+	char* p = strtok( tmp_header, "\n");
+
 	while( p != NULL)
 	{
 		/* If the current token (which is a line) has "RG" as the second and third characters,
@@ -265,7 +289,7 @@ void get_library_names( bam_info* in_bam, char* header_text)
 			char* q = strtok( line_buffer, "\t");
 			while( q != NULL)
 			{
-				if( q[0] == 'I' && p[1] == 'D')
+				if( q[0] == 'I' && q[1] == 'D')
 				{
 					/* Get the Library Name */
 					strncpy( library_name_buffer, q + 3, strlen( q) - 3);
@@ -279,7 +303,6 @@ void get_library_names( bam_info* in_bam, char* header_text)
 
 				q = strtok( NULL, "\t");
 			}
-
 			set_str( &( ( in_bam->libraries)[i]->libname), library_name_buffer);
 			i = i + 1;
 		}
@@ -335,6 +358,7 @@ void create_fastq( bam_info* in_bam, char* bam_path, parameters* params)
 	int i;
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
+ 	        fprintf( stderr, "Creating FASTQ files for the library: %s.\n", ( in_bam->libraries)[i]->libname);
 		create_fastq_library( ( in_bam->libraries)[i], in_bam->sample_name, bam_path, params);
 	}
 }
