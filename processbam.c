@@ -184,6 +184,7 @@ void load_bam( bam_info* in_bam, char* path)
 		variance[i] = ( float) variance[i] / ( float) second_test_pass[i];
 		( in_bam->libraries)[i]->frag_std = sqrt( variance[i]);
 		fprintf( stderr, "\nLibrary %s\n\tMean: %f\n\tStdev: %f\n", ( in_bam->libraries)[i]->libname, ( in_bam->libraries)[i]->frag_avg, ( in_bam->libraries)[i]->frag_std);
+		set_library_min_max( ( in_bam->libraries)[i]);
 	}
 	
 	/* Close the BAM file */
@@ -361,4 +362,12 @@ void create_fastq( bam_info* in_bam, char* bam_path, parameters* params)
  	        fprintf( stderr, "Creating FASTQ files for the library: %s.\n", ( in_bam->libraries)[i]->libname);
 		create_fastq_library( ( in_bam->libraries)[i], in_bam->sample_name, bam_path, params);
 	}
+}
+
+void set_library_min_max( struct library_properties* in_lib)
+{
+	in_lib->conc_min = in_lib->frag_avg - ( 4 * in_lib->frag_std);
+	if ( in_lib->conc_min < 0)
+		in_lib->conc_min = 0;
+	in_lib->conc_max = in_lib->frag_avg + ( 4 * in_lib->frag_std);
 }

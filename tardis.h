@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <zlib.h>
+#include <signal.h>
 
 #include "common.h"
 #include "cmdline.h"

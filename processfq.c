@@ -304,13 +304,8 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	{		
 		flag = bam_alignment_core.flag;
 
-		min = in_lib->frag_avg - ( 4 * in_lib->frag_std);
-		max = in_lib->frag_avg + ( 4 * in_lib->frag_std);
-		
-		if( min < 0)
-		{
-			min = 0;
-		}
+		min = in_lib->conc_min;
+		max = in_lib->conc_max;
 
 		/* Get the library id/name for the current alignment. +1 gets rid of the leading 'Z' */
 		set_str( &current_lib_name, bam_aux_get( bam_alignment, "RG") + 1);

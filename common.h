@@ -9,6 +9,7 @@
 #define EXIT_COMMON 1
 #define EXIT_MAXBAMS 2
 #define EXIT_PARAM_ERROR 3
+#define EXIT_EXTERNAL_PROG_ERROR 4
 
 #define MAX_BAMS 256
 

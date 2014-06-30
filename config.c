@@ -38,25 +38,26 @@ void load_config( configuration* cfg)
 			/* Ignore comments, which begin with the '#' character */
 			if( next_line[0] != '#')
 			{
-				if( i == 0)
+				next_line[strlen(next_line)-1] = 0; // get rid of \n
+				if( strstr( next_line, "SAMTOOLS"))
 				{
-					set_str( &( cfg->path_samtools), next_line);
+					set_str( &( cfg->path_samtools), next_line + strlen("SAMTOOLS = "));
 				}
-				else if( i == 1)
+				else if( strstr( next_line, "BCFTOOLS"))
 				{
-					set_str( &( cfg->path_bcftools), next_line);
+					set_str( &( cfg->path_bcftools), next_line + strlen("BCFTOOLS = "));
 				}
-				else if( i == 2)
+				else if( strstr( next_line, "MRFAST"))
 				{
-					set_str( &( cfg->path_mrfast), next_line);
+					set_str( &( cfg->path_mrfast), next_line + strlen("MRFAST = "));
 				}
-				else if( i == 3)
+				else if( strstr( next_line, "GNUPLOT"))
 				{
-					set_str( &( cfg->path_gnuplot), next_line);
+					set_str( &( cfg->path_gnuplot), next_line + strlen("GNUPLOT = "));
 				}
-				else if( i == 4)
+				else if( strstr( next_line, "MEGABLAST"))
 				{
-					set_str( &( cfg->path_megablast), next_line);
+					set_str( &( cfg->path_megablast), next_line + strlen("MEGABLAST = "));
 				}
 				else
 				{
