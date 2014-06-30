@@ -28,7 +28,10 @@ void init_params( parameters** params)
 	( *params)->run_sr = 0;
 	( *params)->threads = 1;
 	( *params)->num_bams = 0;
-	
+	( *params)->skip_fastq = 0;
+	( *params)->skip_sort = 0;
+	( *params)->skip_remap = 0;
+
 	for( i = 0; i < MAX_BAMS; i++)
 	{
 		( *params)->bam_file_list[i] = NULL;

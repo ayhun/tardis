@@ -11,7 +11,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	int o;
 	static int is_male = 0, is_female = 0;
 	static int run_vh = 0, run_ns = 0, run_sr = 0, run_all = 0;
-	static int skip_fastq = 0, skip_sort = 0;
+	static int skip_fastq = 0, skip_sort = 0, skip_remap = 0;
 
 	static struct option long_options[] = 
 	{
@@ -33,6 +33,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"xx"     , no_argument, &is_female,  1 },
 		{"skip-fastq", no_argument, &skip_fastq,  1 },
 		{"skip-sort" , no_argument, &skip_sort,  1 },
+		{"skip-remap" , no_argument, &skip_remap,  1 },
 		{0        , 0,                   0,  0 }
 	};
   
@@ -187,6 +188,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	params->run_ns = run_ns;
 	params->skip_fastq = skip_fastq;
 	params->skip_sort = skip_sort;
+	params->skip_remap = skip_remap;
 
 	if( is_male)
 	{
@@ -206,7 +208,7 @@ void print_help( void)
 	fprintf( stdout, "\nTARDIS: Toolkit for Automated and Rapid DIscovery of Structural variants.\n");
 	fprintf( stdout, "Version %s. Last update: %s\n\n", VERSION, LAST_UPDATE);
 	fprintf( stdout, "\t--bamlist   [bamlist file] : A text file that lists input BAM files one file per line.\n");
-	fprintf( stdout, "\t--input [list of input BAM files]         : Input files in sorted and indexed BAM format.\n");
+	fprintf( stdout, "\t--input [BAM files]        : Input files in sorted and indexed BAM format. You can pass multiple BAMs using multiple --input parameters.\n");
 	fprintf( stdout, "\t--ref   [reference genome] : Reference genome in FASTA format.\n");
 	fprintf( stdout, "\t--gaps  [gaps file]        : Assembly gap coordinates in BED format.\n");
 	fprintf( stdout, "\t--dups  [dups file]        : Segmental duplication coordinates in BED format.\n");
@@ -219,6 +221,7 @@ void print_help( void)
 	fprintf( stdout, "\t--all                      : Run all three algorithms above [DEFAULT].\n");
 	fprintf( stdout, "\t--skip-fastq               : Skip FASTQ dump for discordants. Use this only if you are regenerating the calls.\n");
 	fprintf( stdout, "\t--skip-sort                : Skip FASTQ sort for discordants. Use this only if you are regenerating the calls.\n");
+	fprintf( stdout, "\t--skip-remap               : Skip FASTQ remapping for discordants. Use this only if you are regenerating the calls.\n");
 	fprintf( stdout, "\t--version                  : Print version and exit.\n");
 	fprintf( stdout, "\t--help                     : Print this help screen and exit.\n\n");
 }

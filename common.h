@@ -31,6 +31,7 @@ typedef struct _params
 	char run_sr; /* boolean stand-in to run SPLITREAD */
 	char skip_fastq; /* boolean stand-in to skip FASTQ dump */
 	char skip_sort; /* boolean stand-in to skip FASTQ sort */
+	char skip_remap; /* boolean stand-in to skip FASTQ remap */
 	int  threads; /* number of threads to use for parallel mrFAST, and maybe future parallelization of TARDIS */
 	int num_bams; /* number of input BAM files */
 } parameters;
