@@ -11,6 +11,10 @@
 #define EXIT_PARAM_ERROR 3
 #define EXIT_EXTERNAL_PROG_ERROR 4
 
+/* Return Codes */
+#define RETURN_SUCCESS 0
+#define RETURN_ERROR 1
+
 #define MAX_BAMS 256
 
 enum gender{ MALE, FEMALE};

@@ -15,6 +15,6 @@
 #include "processbam.h"
 #include "processfq.h"
 #include "config.h"
-
+#include "external.h"
 
 #endif

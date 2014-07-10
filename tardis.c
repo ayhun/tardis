@@ -9,7 +9,6 @@ int main( int argc, char** argv)
 	int return_value;
 	int i;
 	int j;
-	char cmdline[2048];
 
 	/* Load configuration file (created if it does not exist) */
 	cfg = ( configuration*) malloc( sizeof( configuration));
@@ -50,32 +49,12 @@ int main( int argc, char** argv)
 
 	if ( params->skip_remap == 0)
 	{
-		for( i = 0; i < params->num_bams; i++)
-		{
-			for ( j = 0; j < in_bams[i]->num_libraries; j++)
-		        {
-				fprintf( stderr, "\nRemapping:\n\t\tSample: %s\n\t\tLibrary: %s\n", in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-				sprintf( cmdline, "%s --search %s --pe --min %d --max %d --sample %s --lib %s --rg %s --seq1 %s --seq2 %s -o %s-%s.sam -u %s-%s.unmapped.fastq", 
-					cfg->path_mrfast, params->ref_genome, in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max,
-					in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname, in_bams[i]->libraries[j]->libname, 
-					in_bams[i]->libraries[j]->fastq1, in_bams[i]->libraries[j]->fastq2,
-					in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname,
-					in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-				return_value = system( cmdline);
-				
-				if (WIFSIGNALED(return_value) && (WTERMSIG(return_value) == SIGINT || WTERMSIG(return_value) == SIGQUIT))
-				{
-					fprintf( stderr, "mrFAST remapping failed.\n");
-					return EXIT_EXTERNAL_PROG_ERROR;
-				}
+		return_value = remap_mrfast( params, in_bams, cfg);
 
-				/* to be implemented.
-					params->threads will be used for multithreading option of mrFAST
-				*/		       
-			}
-		}  
+		if (return_value != RETURN_SUCCESS)
+			return EXIT_EXTERNAL_PROG_ERROR;
 	}
-
+	
 
 	return EXIT_SUCCESS;
 }

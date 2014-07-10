@@ -5,6 +5,7 @@
 #include "tardis.h"
 #include "cmdline.h"
 
+
 int parse_command_line( int argc, char** argv, parameters* params)
 {
 	int index;
@@ -24,7 +25,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"threads", required_argument,   0, 't'},
 		{"help"   , no_argument,         0, 'h'},
 		{"version", no_argument,         0, 'v'},
-		{"bamlist", no_argument,		 0, 'b'},
+		{"bamlist", no_argument,	 0, 'b'},
 		{"vh"     , no_argument, &run_vh,     1 },
 		{"ns"     , no_argument, &run_ns,     1 },
 		{"sr"     , no_argument, &run_sr,     1 },
@@ -181,6 +182,14 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		fprintf( stderr, "[TARDIS CMDLINE WARNING] Invalid number of threads was entered (%d). Resetted to 1.\n", params->threads);
 		params->threads = 1;
 	}
+
+	/* check if both --input and --bamlist are invoked */
+	if ( params->bam_list_path != NULL && params->bam_file_list[0] != NULL)
+        {
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please use either --input or --bamlist parameter. Not both!\n");
+		return EXIT_PARAM_ERROR;	        
+	}
+
 
 	/* set flags */
 	params->run_vh = run_vh;
