@@ -40,7 +40,7 @@
 #define COLLAPSE_SOME   8   // at least some of the ALTs must match
 #define COLLAPSE_BOTH  (COLLAPSE_SNPS|COLLAPSE_INDELS)
 
-typedef struct
+typedef struct _bcf_sr_regions_t
 {
     // for reading from tabix-indexed file (big data)
     tbx_t *tbx;             // tabix index
@@ -53,6 +53,10 @@ typedef struct
     kstring_t als_str;      // block of parsed alleles
     int nals, mals;         // number of set alleles and the size of allocated array
     int als_type;           // alleles type, currently VCF_SNP or VCF_INDEL
+
+    // user handler to deal with skipped regions without a counterpart in VCFs
+    void (*missed_reg_handler)(struct _bcf_sr_regions_t *, void *);
+    void *missed_reg_data;
 
     // for in-memory regions (small data)
     struct _region_t *regs; // the regions
@@ -103,11 +107,16 @@ typedef struct
     int explicit_regs;  // was the list of regions se by bcf_sr_set_regions or guessed from tabix index?
 	char **samples;	// List of samples 
     bcf_sr_regions_t *regions, *targets;    // see bcf_sr_set_[targets|regions] for description
-    int targets_als;    // subset to targets not only by position but also by alleles? (todo)
+    int targets_als;    // subset to targets not only by position but also by alleles?
+    int targets_exclude;
     kstring_t tmps;
 	int n_smpl;
 }
 bcf_srs_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Init bcf_srs_t struct */
 bcf_srs_t *bcf_sr_init(void);
@@ -185,6 +194,8 @@ int bcf_sr_set_samples(bcf_srs_t *readers, const char *samples, int is_file);
  *  duplicate VCF lines. It is up to the caller to examine targets->als if
  *  perfect match is sought after. Note that the duplicate positions in targets
  *  file are currently not supported.
+ *  Targets (but not regions) can be prefixed with "^" to request logical complement,
+ *  for example "^X,Y,MT" indicates that sequences X, Y and MT should be skipped.
  */
 int bcf_sr_set_targets(bcf_srs_t *readers, const char *targets, int is_file, int alleles);
 int bcf_sr_set_regions(bcf_srs_t *readers, const char *regions, int is_file);
@@ -207,7 +218,9 @@ int bcf_sr_set_regions(bcf_srs_t *readers, const char *regions, int is_file);
  *              inclusive. 
  *              These parameters are ignored when reading from VCF, BED or
  *              tabix-indexed files. When end position column is not present,
- *              supply 'from' in place of 'to'.
+ *              supply 'from' in place of 'to'. When 'to' is negative, first
+ *              abs(to) will be attempted and if that fails, 'from' will be used
+ *              instead.
  */
 bcf_sr_regions_t *bcf_sr_regions_init(const char *regions, int is_file, int chr, int from, int to);
 void bcf_sr_regions_destroy(bcf_sr_regions_t *regions);
@@ -239,5 +252,15 @@ int bcf_sr_regions_next(bcf_sr_regions_t *reg);
  *  regions left.
  */
 int bcf_sr_regions_overlap(bcf_sr_regions_t *reg, const char *seq, int start, int end);
+
+/*
+ *  bcf_sr_regions_flush() - calls repeatedly regs->missed_reg_handler() until
+ *  all remaining records are processed.
+ */
+void bcf_sr_regions_flush(bcf_sr_regions_t *regs);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

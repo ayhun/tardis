@@ -19,12 +19,6 @@ typedef struct __kstring_t {
 } kstring_t;
 #endif
 
-#if defined(__GNUC__)
-# define val_unused __attribute__((unused))
-#else
-# define val_unused
-#endif
-
 #ifndef kroundup32
 #define kroundup32(x) (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 #endif
@@ -131,6 +125,15 @@ char **hts_readlines(const char *fn, int *_n);
 char **hts_readlist(const char *fn, int is_file, int *_n);
 
 /*!
+  @abstract  Create extra threads to aid compress/decompression for this file
+  @param fp  The file handle
+  @param n   The number of worker threads to create
+  @return    0 for success, or negative if an error occurred.
+  @notes     THIS THREADING API IS LIKELY TO CHANGE IN FUTURE.
+*/
+int hts_set_threads(htsFile *fp, int n);
+
+/*!
   @abstract  Set .fai filename for a file opened for reading
   @return    0 for success, negative on failure
   @discussion
@@ -205,6 +208,9 @@ extern "C" {
 
 	uint8_t *hts_idx_get_meta(hts_idx_t *idx, int *l_meta);
 	void hts_idx_set_meta(hts_idx_t *idx, int l_meta, uint8_t *meta, int is_copy);
+
+	int hts_idx_get_stat(const hts_idx_t* idx, int tid, uint64_t* mapped, uint64_t* unmapped);
+	uint64_t hts_idx_get_n_no_coor(const hts_idx_t* idx);
 
 	const char *hts_parse_reg(const char *s, int *beg, int *end);
 	hts_itr_t *hts_itr_query(const hts_idx_t *idx, int tid, int beg, int end, hts_readrec_func *readrec);
