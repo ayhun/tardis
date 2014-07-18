@@ -8,7 +8,7 @@ void load_config( configuration* cfg)
 	FILE* config;
 	char* next_line = NULL;
 	char config_filename[MAX_LENGTH];
-	int len = 0;
+	size_t len = 0;
 	int bytes_read;
 	int i;
 	
@@ -16,6 +16,8 @@ void load_config( configuration* cfg)
 	cfg->path_samtools = NULL;
 	cfg->path_bcftools = NULL;
 	cfg->path_mrfast = NULL;
+	cfg->path_gnuplot = NULL;
+	cfg->path_megablast = NULL;
 
 	/* Combine the home directory path with the name of the configuration file */
 	sprintf( config_filename, "%s/%s", getenv( "HOME"), CONFIG_FILE);
@@ -33,19 +35,29 @@ void load_config( configuration* cfg)
 		i = 0;
 		while( ( bytes_read = getline( &next_line, &len, config)) != -1)
 		{
+			/* Ignore comments, which begin with the '#' character */
 			if( next_line[0] != '#')
 			{
-				if( i == 0)
+				next_line[strlen(next_line)-1] = 0; // get rid of \n
+				if( strstr( next_line, "SAMTOOLS"))
 				{
-					set_str( &( cfg->path_samtools), next_line);
+					set_str( &( cfg->path_samtools), next_line + strlen("SAMTOOLS = "));
 				}
-				else if( i == 1)
+				else if( strstr( next_line, "BCFTOOLS"))
 				{
-					set_str( &( cfg->path_bcftools), next_line);
+					set_str( &( cfg->path_bcftools), next_line + strlen("BCFTOOLS = "));
 				}
-				else if( i == 2)
+				else if( strstr( next_line, "MRFAST"))
 				{
-					set_str( &( cfg->path_mrfast), next_line);
+					set_str( &( cfg->path_mrfast), next_line + strlen("MRFAST = "));
+				}
+				else if( strstr( next_line, "GNUPLOT"))
+				{
+					set_str( &( cfg->path_gnuplot), next_line + strlen("GNUPLOT = "));
+				}
+				else if( strstr( next_line, "MEGABLAST"))
+				{
+					set_str( &( cfg->path_megablast), next_line + strlen("MEGABLAST = "));
 				}
 				else
 				{
@@ -84,6 +96,24 @@ void load_config( configuration* cfg)
 		else
 		{
 			fprintf( stderr, "mrfast path: %s", cfg->path_mrfast);
+		}
+
+		if( cfg->path_gnuplot == NULL)
+		{
+			fprintf( stderr, "Warning: gnuplot path is not in the configuration file.\n");
+		}
+		else
+		{
+			fprintf( stderr, "gnuplot path: %s", cfg->path_gnuplot);
+		}
+
+		if( cfg->path_megablast == NULL)
+		{
+			fprintf( stderr, "Warning: megablast path is not in the configuration file.\n");
+		}
+		else
+		{
+			fprintf( stderr, "megablast path: %s", cfg->path_megablast);
 		}
 	}
 }
@@ -151,6 +181,42 @@ void create_config( configuration* cfg, char* config_filename)
 		pclose( pipe);
 	}
 	
+	pipe = popen( "which gnuplot 2>/dev/null", "r");
+	if( pipe == NULL)
+	{
+		fprintf( stderr, "Error opening pipe\n");
+	}
+	else
+	{
+		if( fgets( executable_path, MAX_LENGTH, pipe) == NULL)
+		{
+			fprintf( stderr, "gnuplot not found in PATH. Install it or manually configure the %s file.\n", config_filename);
+		}
+		else
+		{
+			set_str( &( cfg->path_gnuplot), executable_path);
+		}
+		pclose( pipe);
+	}
+
+	pipe = popen( "which megablast 2>/dev/null", "r");
+	if( pipe == NULL)
+	{
+		fprintf( stderr, "Error opening pipe\n");
+	}
+	else
+	{
+		if( fgets( executable_path, MAX_LENGTH, pipe) == NULL)
+		{
+			fprintf( stderr, "megablast not found in PATH. Install it or manually configure the %s file.\n", config_filename);
+		}
+		else
+		{
+			set_str( &( cfg->path_megablast), executable_path);
+		}
+		pclose( pipe);
+	}
+
 	config = fopen( config_filename, "w");
 	if( cfg->path_samtools != NULL)
 	{
@@ -165,6 +231,16 @@ void create_config( configuration* cfg, char* config_filename)
 	if( cfg->path_mrfast != NULL)
 	{
 		fprintf( config, "MRFAST = %s", cfg->path_mrfast);
+	}
+
+	if( cfg->path_gnuplot != NULL)
+	{
+		fprintf( config, "GNUPLOT = %s", cfg->path_gnuplot);
+	}
+
+	if( cfg->path_megablast != NULL)
+	{
+		fprintf( config, "MEGABLAST = %s", cfg->path_megablast);
 	}
 	fclose( config);
 

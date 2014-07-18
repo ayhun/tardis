@@ -1,29 +1,36 @@
 CC=gcc
-CFLAGS = -c -O2 -g -I htslib -I vh
-LDFLAGS = htslib/libhts.a vh/libvh.a -lz -lm -lpthread
-SOURCES = tardis.c cmdline.c common.c processbam.c config.c
+CFLAGS =  -O2 -g -I htslib -I vhc -I vhsc 
+LDFLAGS = htslib/libhts.a vhc/libvhc.a vhsc/libvhsc.a -lz -lm -lpthread
+SOURCES = tardis.c cmdline.c common.c processbam.c config.c processfq.c external.c VHtoVCF.c clustering.c
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = tardis
 INSTALLPATH = /usr/local/bin/
 
-all: libs $(SOURCES) $(EXECUTABLE)
+all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o
 
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CC)  $(OBJECTS) -o $@ $(LDFLAGS)
 
 .c.o:
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean: 
 	rm -f $(EXECUTABLE) *.o *~
 
-libs: htslib readpair
+libs: htslib vhc vhsc
 
-htslib:
+htslib:	
 	make -C htslib
-readpair:
-	make -C vh
+	# make clean -C htslib
+
+vhc:
+	make -C vhc
+	# make clean -C vhc
+
+vhsc:
+	make -C vhsc
+	# make clean -C vhsc
 
 install:
 	cp tardis $(INSTALLPATH)

@@ -2,12 +2,20 @@
 #define __COMMON
 
 #include <htslib/sam.h>
-#define FORMAT_MAX_LEN 10
-#define INPUT_MAX_LEN 120
-#define ERROR_CODE_ARG 10
-#define ERROR_CODE_OPTION 11
+#include <htslib/hts.h>
 
+/* Exit Codes */
+#define EXIT_SUCCESS 0
+#define EXIT_COMMON 1
+#define EXIT_MAXBAMS 2
+#define EXIT_PARAM_ERROR 3
+#define EXIT_EXTERNAL_PROG_ERROR 4
 
+/* Return Codes */
+#define RETURN_SUCCESS 0
+#define RETURN_ERROR 1
+
+#define MAX_BAMS 256
 
 enum gender{ MALE, FEMALE};
 
@@ -16,7 +24,9 @@ typedef struct _params
 	char* ref_genome; /* path to reference genome - fasta */
 	char* reps; /* path to repeatmasker file - *rm.out */
 	char* dups; /* path to segmental duplications file - bed */
-	char* bam_file; /* path to input BAM file */
+  	char* bam_files; /* paths to comma separated input BAM files as a single string before being tokenized */
+	char* bam_list_path; /* path to a file that lists BAM file paths in advance */
+	char** bam_file_list; /* the actual list that holds all bam file paths after tokenization */
 	char* gaps; /* path to assembly gaps file - bed */
 	char* mei;  /* regular expression-like MEI list */
 	enum gender sample_gender; /* gender of the sample */
@@ -25,34 +35,32 @@ typedef struct _params
 	char run_sr; /* boolean stand-in to run SPLITREAD */
 	char skip_fastq; /* boolean stand-in to skip FASTQ dump */
 	char skip_sort; /* boolean stand-in to skip FASTQ sort */
+	char skip_remap; /* boolean stand-in to skip FASTQ remap */
 	int  threads; /* number of threads to use for parallel mrFAST, and maybe future parallelization of TARDIS */
+	int num_bams; /* number of input BAM files */
 } parameters;
 
-typedef struct MainOptions
-{
-	float prunProb;
-	double svSup;
-	char format[FORMAT_MAX_LEN]; //TODO: Can be removed
-	char libFileAdrs[INPUT_MAX_LEN];
-	char chroFileName[INPUT_MAX_LEN];
-	char repeatFileName[INPUT_MAX_LEN];
-	char initializeFileName[INPUT_MAX_LEN];
-	char gapFileName[INPUT_MAX_LEN];
-	char outputFile[INPUT_MAX_LEN];
-	char outputRead[INPUT_MAX_LEN];
-	int overMapLimit;
-	int helpWanted;
-	int versionWanted;
-} MainOptions;
-
-/* Function prototypes */
+/* Parameter related TARDIS functions */
 void init_params( parameters**);
 void print_params( parameters*);
+
+/* FILE opening and error printing functions. For opening regular and BAM/SAM
+ files safely */
 void print_error( char*);
-FILE* gfOpen( char*, char*);
+FILE* safe_fopen( char* path, char* mode);
+htsFile* safe_hts_open( char* path, char* mode);
+
+/* General bioinformatics functions */
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max);
+char base_as_char( int base_as_int);
 char complement_char( char base);
+void qual_to_ascii( char* qual);
+
+/* String functions */
+void set_str( char **target, char *source); /* Even safer than strncpy */
 void reverse_string( char* str);
-void set_str( char **target, char *source);
+
+/* Misc. Utility */
+int compare_size_int( const void* p, const void* q);
 
 #endif

@@ -4,7 +4,14 @@
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
+#include "processfq.h"
 #include "common.h"
+
+/* Sample this many fragments to calculate avg/median/std per library */
+#define SAMPLEFRAG 1000000 
+
+/* Maximum sequence/quality length */
+#define MAX_SEQ 1000
 
 typedef struct _bam_info
 {
@@ -13,21 +20,23 @@ typedef struct _bam_info
 	int* chrom_lengths; /* lengths of the chromosomes */
 	char** chrom_names; /* names of the chromosomes */
   	char* sample_name; /* name of the sample, parsed from SM in the BAM header */
-	float frag_avg; /* average fragment size */
-  	float frag_std; /* fragment size standard deviation */
-	int frag_med; /* median of the fragment sizes */
-  	int conc_min; /* min cutoff for concordants */
-  	int conc_max; /* max cutoff for concordants */
-	char* fastq1; /* file name for the FASTQ file of the /1 reads */
-	char* fastq2; /* file name for the FASTQ file of the /2 reads */
+	int num_libraries; /* number of libraries, counted from the RG tags in the BAM header */
+	struct library_properties** libraries; /* each library_properties struct holds statistical/other info */
 } bam_info;
 
 /* Function Prototypes */
 void load_bam( bam_info* in_bam, char* path);
+void create_fastq( bam_info* in_bam, char* bam_path, parameters *params);
 void print_bam( bam_info* in_bam);
-char base_as_char( int base_as_int);
+void print_libs( bam_info* in_bam);
+int find_library_index( bam_info* in_bam, char* library_name);
+int sufficient_fragments_sampled( int* fragments_sampled, int num_libraries);
+void set_library_min_max( struct library_properties* in_lib);
+
+/* BAM Utility functions */
 void get_sample_name( bam_info* in_bam, char* header_text);
-int compare_size( const void* p, const void* q);
-void create_fastq( bam_info* in_bam, parameters *params);
+void get_library_count( bam_info* in_bam, char* header_text);
+void get_library_names( bam_info* in_bam, char* header_text);
+
 
 #endif

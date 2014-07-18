@@ -11,12 +11,15 @@
 
 void init_params( parameters** params)
 {
+	int i;
 	/* initialize parameters */
 	*params = ( parameters*) malloc( sizeof( parameters));
 	( *params)->ref_genome = NULL;
 	( *params)->reps = NULL;
 	( *params)->dups = NULL;
-	( *params)->bam_file = NULL;
+	( *params)->bam_files = NULL;
+	( *params)->bam_list_path = NULL;
+	( *params)->bam_file_list = ( char**) malloc( sizeof( char*) * MAX_BAMS);
 	( *params)->gaps = NULL;
 	( *params)->mei = NULL;
 	( *params)->sample_gender = MALE;
@@ -24,11 +27,26 @@ void init_params( parameters** params)
 	( *params)->run_ns = 0;
 	( *params)->run_sr = 0;
 	( *params)->threads = 1;
+	( *params)->num_bams = 0;
+	( *params)->skip_fastq = 0;
+	( *params)->skip_sort = 0;
+	( *params)->skip_remap = 0;
+
+	for( i = 0; i < MAX_BAMS; i++)
+	{
+		( *params)->bam_file_list[i] = NULL;
+	}
 }
 
-void print_params(parameters *params)
+void print_params( parameters* params)
 {
-	printf( "bam_file: %s\n", params->bam_file);
+	int i;
+
+	printf( "Number of bam files: %d\n", params->num_bams);
+	for( i = 0; i < params->num_bams; i++)
+	{
+		printf( "BAM input: %s\n", params->bam_file_list[i]);
+	}
 	printf( "ref_genome: %s\n", params->ref_genome);
 	printf( "reps: %s\n", params->reps);
 	printf( "dups: %s\n", params->dups);
@@ -44,19 +62,34 @@ void print_error( char* msg)
 	exit( 1);
 }
 
-FILE* gfOpen( char* fname, char* mode)
+FILE* safe_fopen( char* path, char* mode)
 {
-	/* gfOpen: graceful file open. Try to open a file; exit if file does not exist */
+	/* Safe file open. Try to open a file; exit if file does not exist */
 	FILE* file;
 	char err[500];
-	file = fopen( fname, mode);
-  
-	if( file == NULL)
+
+	file = fopen( path, mode);  
+	if( !file)
 	{
-		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", fname, mode[0]=='w' ? "write" : "read");
+		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", path, mode[0]=='w' ? "write" : "read");
 		print_error( err);
 	}
 	return file;
+}
+
+htsFile* safe_hts_open( char* path, char* mode)
+{
+	htsFile* bam_file;
+	char err[500];
+	
+	bam_file = hts_open( path, mode);
+	if( !bam_file)
+	{
+		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", path, mode[0]=='w' ? "write" : "read");
+		print_error( err);
+	}
+
+	return bam_file;
 }
 
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max)
@@ -129,6 +162,31 @@ int is_concordant( bam1_core_t bam_alignment_core, int min, int max)
 	return 1;
 }
 
+/* Decode 4-bit encoded bases to their corresponding characters */
+char base_as_char( int base_as_int)
+{
+	if( base_as_int == 1)
+	{
+		return 'A';
+	}
+	else if( base_as_int == 2)
+	{
+		return 'C';
+	}
+	else if( base_as_int == 4)
+	{
+		return 'G';
+	}
+	else if( base_as_int == 8)
+	{
+		return 'T';
+	}
+	else if( base_as_int == 15)
+	{
+		return 'N';
+	}
+}
+
 /* Return the complement of a base */
 char complement_char( char base)
 {
@@ -153,6 +211,29 @@ char complement_char( char base)
 	return 'X';
 }
 
+/* Add 33 to the interger value of the qual characters to convert them to ASCII */
+void qual_to_ascii( char* qual)
+{
+	int i;
+	for( i = 0; i < strlen( qual); i++)
+	{
+		qual[i] = qual[i] + 33;
+	}
+}
+
+/* Even safer than strncpy as it dynamically allocates space for the string if
+ there hasn't been already */
+void set_str( char** target, char* source)
+{
+	if( *target != NULL)
+	{
+		free( ( *target));
+	}
+
+	( *target) = ( char*) malloc( sizeof( char) * ( strlen( source) + 1));
+	strncpy( ( *target), source, ( strlen( source) + 1));
+}
+
 /* Reverse a given string */
 void reverse_string( char* str)
 {
@@ -168,13 +249,22 @@ void reverse_string( char* str)
 	}
 }
 
-void set_str( char** target, char* source)
+int compare_size_int( const void* p, const void* q)
 {
-	if( *target != NULL)
-	{
-		free( ( *target));
-	}
+    int i = *( const int*) p;
+    int j = *( const int*) q;
 
-	( *target) = ( char*) malloc( sizeof( char) * ( strlen( source) + 1));
-	strncpy( ( *target), source, ( strlen( source) + 1));
+	if( i < j)
+	{
+		return -1;
+	}
+	else if( i == j)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
 }
+

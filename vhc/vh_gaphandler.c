@@ -17,9 +17,9 @@ void vh_readGapTable (char *gapFileName)
 
 
   FILE *gapFile = fopen (gapFileName, "r");
-  if (!gapFile)
+  if (!gapFile);
     //TODO: handle me
-    ;
+  
 
   int index = 0;
   while (!feof (gapFile))
@@ -47,48 +47,32 @@ void vh_readGapTable (char *gapFileName)
 
 
 
-void vh_readInitFile (char *fileName)
+void vh_readInitFile ()
 {
-  FILE *initFile = fopen (fileName, "r");
+  // FILE *initFile = fopen (fileName, "r");
+  int i = 10000000;
+ //  while (!feof (initFile))
+ //    {
+ //      int i = 0;
+ //      char str[50];
+ //      int res = fscanf (initFile, "%s%d", str, &i);
+ //      if (res != 2)
+	// break;
 
-  while (!feof (initFile))
-    {
-      int i = 0;
-      char str[50];
-      int res = fscanf (initFile, "%s%d", str, &i);
-      if (res != 2)
-	break;
-
-      if (!strcmp (str, "max_potential_cluster_size"))	//TODO: Move as a constant to gap_handler.c
+ //      if (!strcmp (str, "max_potential_cluster_size"))	//TODO: Move as a constant to gap_handler.c
 	g_maxListBrkPointIntr = i;
-    }
+    // }
 
-  fclose (initFile);
+  // fclose (initFile);
 }
 
-void vh_readChros (char *fileName)
-{
-//      char chroName[500];
+void vh_readChros (bam_info* in_bam){
+  int i;
+  for(i=0;i<in_bam->num_chrom;i++){
+    strcpy(g_chroTable[i].chroName,in_bam->chrom_names[i]);
+    g_chroTable[i].size=in_bam->chrom_lengths[i];
+  }
+  printf("ok here!\n");
+  g_chroTableSize=i;
 
-  FILE *chroFile = fopen (fileName, "r");
-  if (!chroFile)
-    //TODO: handle me
-    ;
-
-  int index = 0;
-  while (!feof (chroFile))
-    {
-      int res = fscanf (chroFile, "%s%d", g_chroTable[index].chroName,
-			&(g_chroTable[index].size));
-      //int res = fscanf(chroFile,"%s%d", chroName, &(g_chroTable[index].size));
-      //g_chroTable[index].chroName = (char *) malloc((strlen(chroName)+1)*sizeof(char));
-      //strcpy(g_chroTable[index].chroName, chroName);
-      if (res != 2)		//TODO: Error in file
-	break;
-      //logDebug(g_chroTable[index].chroName);
-      index++;
-    }
-  g_chroTableSize = index;
-
-  fclose (chroFile);
 }

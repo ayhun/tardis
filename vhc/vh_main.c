@@ -206,20 +206,28 @@ static int vh_cmprReadNameStr (const void *a, const void *b)
 
 
 //We assume that the arguments are valid at this point and the file exists
-void vh_clustering (char *libFileAdrs, char *chroFileName, char *gapFileName,
-  char *repeatFileName, char *initFileName, double preProsPrune,
-	double minSVSup, char *outputFile, char *outputRead, int overMapLimit)
+void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
+  char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 {
+    printf("check 1\n");
+
   int totalNumUniqueReads = 0;
   int indexStart = 0;
   int count;
-  int i;
-  vh_readInitFile (initFileName);
-  vh_readChros (chroFileName);
+  int i,j;
+
+  vh_readInitFile ();
+  vh_readChros (in_bam);
   vh_readGapTable (gapFileName);
+    printf("OK here!?\n");
+
   vh_readRepeatTable (repeatFileName);
+  printf("OK here!?\n");
   vh_readLibraryInfos (libFileAdrs);
+    printf("check 1\n");
+
   struct LibraryInfo *cursor = g_libInfo;
+  printf("check 1\n");
   fileOutput = fopen (outputFile, "w");
   printf ("prune %f\n", preProsPrune);
 
@@ -233,6 +241,7 @@ void vh_clustering (char *libFileAdrs, char *chroFileName, char *gapFileName,
       sprintf (g_loggerMsgBuffer, "%d rows after pruning.", cursor->size);
       vh_logInfo (g_loggerMsgBuffer);
     }
+  printf("check 1\n");
 
   if (strcmp (outputRead, ""))
     {
@@ -241,6 +250,7 @@ void vh_clustering (char *libFileAdrs, char *chroFileName, char *gapFileName,
       FILE *fileOutputReadName;
       fileOutputReadName = fopen (outputRead, "w");
       while (cursor != NULL)
+  printf("check 1\n");
 
 	{
 	  totalNumUniqueReads =
@@ -262,6 +272,7 @@ void vh_clustering (char *libFileAdrs, char *chroFileName, char *gapFileName,
       fclose (fileOutputReadName);
     }
 
+  printf("check 1\n");
 
   //TODO: Someone should free the memory allocated for the divets and for the libraryinfos
 
@@ -311,6 +322,9 @@ int vh_isValid (struct MainOptions o)
   return 1;
 }
 
+// int main(){
+//   return 0;
+// }
 #ifdef MAIN_MAIN
 int main (int argc, char **argv)
 {
@@ -335,7 +349,7 @@ int main (int argc, char **argv)
 	  vh_quitProgram (EXIT_CODE_ARG_ERROR);
 	}
       //TODO: Test the arguments are OK and the input is valid
-      vh_run (mainOptions.libFileAdrs, mainOptions.chroFileName,
+      vh_clustering (mainOptions.libFileAdrs, mainOptions.chroFileName,
 	      mainOptions.gapFileName, mainOptions.repeatFileName,
 	      mainOptions.initializeFileName, mainOptions.prunProb,
 	      mainOptions.svSup, mainOptions.outputFile,

@@ -172,8 +172,7 @@ DivetRow *vh_loadDivetFile (LibraryInfo * libInfo)
       if (isEmpty)
 	continue;
 
-      DivetRow *newRow = vh_loadDivetRowFromString (libInfo->hash, line, libInfo,
-						 counterDivetRow);
+      DivetRow *newRow = vh_loadDivetRowFromString (libInfo->hash, line, libInfo, counterDivetRow);
       //printf("%s\n", newRow->readName->readName);
       //fixOrientation(newRow);
 

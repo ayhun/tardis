@@ -15,6 +15,8 @@ typedef struct _configuration
 	char* path_samtools;
 	char* path_bcftools;
 	char* path_mrfast;
+	char* path_gnuplot;
+	char* path_megablast;
 } configuration;
 
 /* Function Prototypes */
