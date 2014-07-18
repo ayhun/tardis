@@ -2,7 +2,7 @@
 //#include "weighted_SetCover_MultiColor_W_ConflictRes2.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "multiInd_SetCover.h"
 
 
 clusterInBuffer listClusterInBuffer[maxSizeOfBuffer];

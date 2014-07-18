@@ -1,2 +1,0 @@
-gcc  -c -g -o multiInd_SetCover.o multiInd_SetCover.c
-gcc  -g -o multiInd_SetCover multiInd_SetCover.c buffer.o -lm

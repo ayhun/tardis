@@ -2,6 +2,7 @@
 #define __BUFFER__
 
 #define maxSizeOfBuffer 100
+
 //#include <stdio.h>
 
 /*Buffer keeps a list of top score (minimim score) picked from previous calculation of
