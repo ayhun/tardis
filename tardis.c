@@ -59,7 +59,7 @@ int main( int argc, char** argv)
 
 	if ( params->skip_remap == 0)
 	{
-		divettovcf(params, in_bams);
+		return_value=divettovcf(params, in_bams);
 		if (return_value != RETURN_SUCCESS){
 			fprintf(stderr, "ERROR while converting DIVET files to VCF format. Exiting.\n");	
 			return EXIT_EXTERNAL_PROG_ERROR;
