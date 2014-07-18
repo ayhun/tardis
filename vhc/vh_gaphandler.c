@@ -72,7 +72,6 @@ void vh_readChros (bam_info* in_bam){
     strcpy(g_chroTable[i].chroName,in_bam->chrom_names[i]);
     g_chroTable[i].size=in_bam->chrom_lengths[i];
   }
-  printf("ok here!\n");
   g_chroTableSize=i;
 
 }

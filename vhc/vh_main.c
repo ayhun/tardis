@@ -209,7 +209,6 @@ static int vh_cmprReadNameStr (const void *a, const void *b)
 void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
   char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 {
-    printf("check 1\n");
 
   int totalNumUniqueReads = 0;
   int indexStart = 0;
@@ -219,21 +218,17 @@ void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
   vh_readInitFile ();
   vh_readChros (in_bam);
   vh_readGapTable (gapFileName);
-    printf("OK here!?\n");
 
   vh_readRepeatTable (repeatFileName);
-  printf("OK here!?\n");
   vh_readLibraryInfos (libFileAdrs);
-    printf("check 1\n");
 
   struct LibraryInfo *cursor = g_libInfo;
-  printf("check 1\n");
   fileOutput = fopen (outputFile, "w");
   printf ("prune %f\n", preProsPrune);
 
   for (; cursor; cursor = cursor->next)
     {
-      vh_logInfo ("Reading Divet Fileshyus ...");
+      vh_logInfo ("Reading Divet Files ...");
       vh_loadDivetFile (cursor);
       sprintf (g_loggerMsgBuffer, "%d rows loaded successfully.",cursor->size);
       vh_logInfo (g_loggerMsgBuffer);
@@ -241,7 +236,6 @@ void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
       sprintf (g_loggerMsgBuffer, "%d rows after pruning.", cursor->size);
       vh_logInfo (g_loggerMsgBuffer);
     }
-  printf("check 1\n");
 
   if (strcmp (outputRead, ""))
     {
@@ -250,7 +244,6 @@ void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
       FILE *fileOutputReadName;
       fileOutputReadName = fopen (outputRead, "w");
       while (cursor != NULL)
-  printf("check 1\n");
 
 	{
 	  totalNumUniqueReads =
@@ -272,7 +265,6 @@ void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
       fclose (fileOutputReadName);
     }
 
-  printf("check 1\n");
 
   //TODO: Someone should free the memory allocated for the divets and for the libraryinfos
 
