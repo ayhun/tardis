@@ -18,14 +18,13 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 		divetlib=fopen(divetadd,"w");
 		fprintf( divetlib, "%d \n", in_bams[i]->num_libraries);
 		for ( j = 0; j < in_bams[i]->num_libraries; j++){
-			fprintf(divetlib, "%s %s %s-%s.sam_divet.vh %d %d %d\n",in_bams[i]->libraries[j]->libname,in_bams[i]->sample_name,in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname,in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max, read_length);
+			fprintf(divetlib, "%s %s %s-%s.sam_DIVET.vh %d %d %d\n",in_bams[i]->libraries[j]->libname,in_bams[i]->sample_name,in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname,in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max, read_length);
 			}
 			fclose(divetlib);
 			for ( j = 0; j < in_bams[i]->num_libraries; j++){
 			sprintf(outputfile,"%s-%s.cluster.out",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			sprintf(outputread,"%s-%s.name",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-			  printf("check 1\n");
-			vh_clustering (divetadd, in_bams[i], params->gaps, params->reps, preProsPrune, outputfile, outputread, overMapLimit);
+			vh_clustering (divetadd, in_bams[i], params->gaps, "build37.satellite.bed", preProsPrune, outputfile, outputread, overMapLimit);
 			vh_setcover(divetadd, outputread, outputfile);
 		}
 			remove(divetadd);
