@@ -5,7 +5,7 @@
 
 
 
-clusterInBuffer* listClusterInBuffer[maxSizeOfBuffer];
+clusterInBuffer listClusterInBuffer[maxSizeOfBuffer];
 int countInBuffer;
 float maxScoreInBuffer;
 
@@ -18,16 +18,16 @@ float bestSetScore=10000000;
 int count;
 	for (count=0; count<countInBuffer; count++)
 	{
-		if (bestSetScore>listClusterInBuffer[count]->score)
+		if (bestSetScore>listClusterInBuffer[count].score)
 			{
-				bestSetScore=listClusterInBuffer[count]->score;
+				bestSetScore=listClusterInBuffer[count].score;
 				bestSet=count;
 			}
 	}
-	printf("The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet]->clusterId);
+	printf("The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet].clusterId);
 
 
-return listClusterInBuffer[bestSet]->clusterId;
+return listClusterInBuffer[bestSet].clusterId;
 
 }
 
@@ -57,8 +57,8 @@ int addToBuffer(float score, int clusterId)
 			}
 		}*/
 
-		listClusterInBuffer[countInBuffer]->score=score;
-		listClusterInBuffer[countInBuffer]->clusterId=clusterId;
+		listClusterInBuffer[countInBuffer].score=score;
+		listClusterInBuffer[countInBuffer].clusterId=clusterId;
 		countInBuffer++;
 		if (score>maxScoreInBuffer)
 			maxScoreInBuffer=score;
@@ -73,18 +73,18 @@ int addToBuffer(float score, int clusterId)
 //	printf("L66 %f %f %i\n", score, maxScoreInBuffer, clusterId);
 		for (count=0; count<maxSizeOfBuffer; count++)
 		{
-			if (listClusterInBuffer[count]->score==maxScoreInBuffer)
+			if (listClusterInBuffer[count].score==maxScoreInBuffer)
 			{
-				listClusterInBuffer[count]->score=score;
-				listClusterInBuffer[count]->clusterId=clusterId;
+				listClusterInBuffer[count].score=score;
+				listClusterInBuffer[count].clusterId=clusterId;
 				//listClusterInBuffer[count].valid=true;
 				maxScoreInBuffer=0;
 				int count2;
 				for (count2=0; count2<maxSizeOfBuffer; count2++)
 				{
-					if (listClusterInBuffer[count2]->score > maxScoreInBuffer)
+					if (listClusterInBuffer[count2].score > maxScoreInBuffer)
 					{
-						maxScoreInBuffer= listClusterInBuffer[count2]->score;	
+						maxScoreInBuffer= listClusterInBuffer[count2].score;	
 					}
 				}
 				return 0;

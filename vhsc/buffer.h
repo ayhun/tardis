@@ -28,7 +28,7 @@ typedef struct clusterInBuffer{
 //	bool valid; //true : it is oay to use this index
 }clusterInBuffer;
 // const int maxSizeOfBuffer=100;
-extern clusterInBuffer* listClusterInBuffer[maxSizeOfBuffer];
+extern struct clusterInBuffer listClusterInBuffer[maxSizeOfBuffer];
 extern int countInBuffer;
 extern float maxScoreInBuffer;
 int addToBuffer(float, int);

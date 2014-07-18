@@ -1087,20 +1087,20 @@ float bestWeight=inf;
 int bestWeightId=-1;
 	for (count=0; count<countInBuffer; count++)
 	{
-		if (listClusterEl[listClusterInBuffer[count]->clusterId].oldBestIsGood==false)
+		if (listClusterEl[listClusterInBuffer[count].clusterId].oldBestIsGood==false)
 			{
-				listClusterEl[listClusterInBuffer[count]->clusterId].oldBestScore=calWeight(listClusterInBuffer[count]->clusterId, listClusterEl[listClusterInBuffer[count]->clusterId].bestReadToRemove );
-				listClusterEl[listClusterInBuffer[count]->clusterId].oldBestIsGood=true;
-				listClusterInBuffer[count]->score=listClusterEl[listClusterInBuffer[count]->clusterId].oldBestScore;
+				listClusterEl[listClusterInBuffer[count].clusterId].oldBestScore=calWeight(listClusterInBuffer[count].clusterId, listClusterEl[listClusterInBuffer[count].clusterId].bestReadToRemove );
+				listClusterEl[listClusterInBuffer[count].clusterId].oldBestIsGood=true;
+				listClusterInBuffer[count].score=listClusterEl[listClusterInBuffer[count].clusterId].oldBestScore;
 			}
 			
 	}
 
 	for (count=0; count<countInBuffer; count++)
 	{
-		if (bestWeight > listClusterEl[listClusterInBuffer[count]->clusterId].oldBestScore)
+		if (bestWeight > listClusterEl[listClusterInBuffer[count].clusterId].oldBestScore)
 		{
-			bestWeight=listClusterEl[listClusterInBuffer[count]->clusterId].oldBestScore;
+			bestWeight=listClusterEl[((listClusterInBuffer[count]).clusterId)].oldBestScore;
 			bestWeightId=count;	
 		};
 

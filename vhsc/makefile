@@ -11,7 +11,7 @@ all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o
 
 $(EXECUTABLE): $(OBJECTS) 
-	ar -rc libvhsc.a  $(OBJECTS) 
+	ar -rc libvhsc.a  $(OBJECTS)  
 
 .c.o:
 	$(CC) -c $(CFLAGS) $< -o $@
