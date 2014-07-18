@@ -71,7 +71,7 @@ int conversion(parameters *params, bam_info ** in_bams, int i, int j){
 
 	strcpy(samplename, "VHcall_");
 
-	sprintf(fname,"%s-%s.vh",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
+	sprintf(fname,"%s-%s.sam_DIVET.vh",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 	sprintf(outfname,"%s-%s.vcf",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 
 	// for (i=1;i<argc;i++){
