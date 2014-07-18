@@ -24,6 +24,7 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 			for ( j = 0; j < in_bams[i]->num_libraries; j++){
 			sprintf(outputfile,"%s-%s.cluster.out",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			sprintf(outputread,"%s-%s.name",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
+			/* satellite.bed file hard coded, command line untampered*/
 			vh_clustering (divetadd, in_bams[i], params->gaps, "build37.satellite.bed", preProsPrune, outputfile, outputread, overMapLimit);
 			vh_setcover(divetadd, outputread, outputfile);
 		}
