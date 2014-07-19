@@ -1244,7 +1244,7 @@ void readMobileElements(FILE *fp)
                 listMobileElSize++;
         }
 }
-int vh_setcover(char* divetadd, char* outputread, char* outputfile){
+int vh_setcover(char* divetadd, char* outputread, char* outputfile, char* svfile){
 	FILE *readFp=NULL, *clusterFp=NULL, *libFp=NULL, *weightsFp=NULL, *fpOut=NULL, *fpMobile=NULL, *coverageFp=NULL;
 	numCallsRequsted = 100;
 	// for (count=0; count<argv; count++)
@@ -1252,6 +1252,7 @@ int vh_setcover(char* divetadd, char* outputread, char* outputfile){
 		libFp=fopen(divetadd,"r");
 		readFp=fopen(outputread,"r");
 		clusterFp=fopen(outputfile,"r");
+		fpOut=fopen(svfile,"w");
 	// 	if (strcmp(argc[count],"-w")==0)
 	// 		weightsFp=fopen(argc[count+1],"r");
 	// 	if (strcmp(argc[count],"-co")==0)
