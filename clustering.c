@@ -10,6 +10,7 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 	char* divetadd= "divetlib";
 	char outputfile[2000];
 	char outputread[2000];
+	char svfile[2000];
 	for( i = 0; i < params->num_bams; i++)
 	{
 		
@@ -24,10 +25,11 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 			for ( j = 0; j < in_bams[i]->num_libraries; j++){
 			sprintf(outputfile,"%s-%s.cluster.out",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			sprintf(outputread,"%s-%s.name",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
+			sprintf(svfile,"%s-%s.out.sv",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			vh_clustering (divetadd, in_bams[i], params->gaps, "build37.satellite.bed", preProsPrune, outputfile, outputread, overMapLimit);
-			vh_setcover(divetadd, outputread, outputfile);
+			vh_setcover(divetadd, outputread, outputfile, svfile);
 		}
-			remove(divetlib);
+			remove(divetadd);
 	}  
 	
 	return RETURN_SUCCESS;
