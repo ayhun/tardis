@@ -27,7 +27,7 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 			vh_clustering (divetadd, in_bams[i], params->gaps, "build37.satellite.bed", preProsPrune, outputfile, outputread, overMapLimit);
 			vh_setcover(divetadd, outputread, outputfile);
 		}
-			remove(divetadd);
+			remove(divetlib);
 	}  
 	
 	return RETURN_SUCCESS;
