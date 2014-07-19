@@ -127,7 +127,7 @@ typedef struct clusterElRead{// the cluster which is being read and processed be
 	int sizeOfCluster;
 	struct readMappingEl readMappingElArray[maxListClusterSize];
 }clusterElRead;
-int vh_setcover(char* divetadd, char* outputread, char* outputfile);
+int vh_setcover(char* divetadd, char* outputread, char* outputfile, char* svfile);
 ////////////////////////////////////
 
 /*typedef struct clusterInBuffer{
