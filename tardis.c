@@ -55,10 +55,7 @@ int main( int argc, char** argv)
 		if (return_value != RETURN_SUCCESS)
 			return EXIT_EXTERNAL_PROG_ERROR;
 	}
-	*/
 	
-	/* Remap with mrFAST */
-  
 	if ( params->skip_remap == 0)
 	{
 		return_value=divettovcf(params, in_bams);
