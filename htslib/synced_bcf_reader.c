@@ -9,6 +9,8 @@
 #include "htslib/kseq.h"
 #include "htslib/khash_str2int.h"
 
+#define MAX_CSI_COOR 0x7fffffff     // maximum indexable coordinate of .csi
+
 typedef struct
 {
     uint32_t start, end;
@@ -63,7 +65,7 @@ int bcf_sr_set_regions(bcf_srs_t *readers, const char *regions, int is_file)
         fprintf(stderr,"[%s:%d %s] Error: bcf_sr_set_regions() must be called before bcf_sr_add_reader()\n", __FILE__,__LINE__,__FUNCTION__);
         return -1;
     }
-    readers->regions = bcf_sr_regions_init(regions,is_file,0,1,2);
+    readers->regions = bcf_sr_regions_init(regions,is_file,0,1,-2);
     if ( !readers->regions ) return -1;
     readers->explicit_regs = 1;
     readers->require_index = 1;
@@ -72,7 +74,12 @@ int bcf_sr_set_regions(bcf_srs_t *readers, const char *regions, int is_file)
 int bcf_sr_set_targets(bcf_srs_t *readers, const char *targets, int is_file, int alleles)
 {
     assert( !readers->targets );
-    readers->targets = bcf_sr_regions_init(targets,is_file,0,1,2);
+    if ( targets[0]=='^' ) 
+    {
+        readers->targets_exclude = 1;
+        targets++;
+    }
+    readers->targets = bcf_sr_regions_init(targets,is_file,0,1,-2);
     if ( !readers->targets ) return -1;
     readers->targets_als = alleles;
     return 0;
@@ -310,6 +317,11 @@ static inline int has_filter(bcf_sr_t *reader, bcf1_t *line)
 
 static int _reader_seek(bcf_sr_t *reader, const char *seq, int start, int end)
 {
+    if ( end>=MAX_CSI_COOR )
+    {
+        fprintf(stderr,"The coordinate is out of csi index limit: %d\n", end+1);
+        exit(1);
+    }
     if ( reader->itr ) 
     {
         hts_itr_destroy(reader->itr); 
@@ -504,6 +516,8 @@ static int _reader_match_alleles(bcf_srs_t *files, bcf_sr_t *reader, bcf1_t *tmp
                 if ( nmatch==tmpl->n_allele ) { irec=i; break; }    // found: exact match
                 continue;
             }
+
+            if ( line->n_allele==1 && tmpl->n_allele==1 ) { irec=i; break; }    // both sites are non-variant
             
             // COLLAPSE_SOME: at least some ALTs must match
             for (ial=1; ial<tmpl->n_allele; ial++)
@@ -561,7 +575,8 @@ int _reader_next_line(bcf_srs_t *files)
         // Skip this position if not present in targets
         if ( files->targets )
         {
-            if ( bcf_sr_regions_overlap(files->targets, chr, min_pos, min_pos)<0 ) 
+            int ret = bcf_sr_regions_overlap(files->targets, chr, min_pos, min_pos);
+            if ( (!files->targets_exclude && ret<0) || (files->targets_exclude && !ret) )
             {
                 // Remove all lines with this position from the buffer
                 for (i=0; i<files->nreaders; i++)
@@ -647,43 +662,9 @@ int bcf_sr_seek(bcf_srs_t *readers, const char *seq, int pos)
     int i, nret = 0;
     for (i=0; i<readers->nreaders; i++) 
     {
-        nret += _reader_seek(&readers->readers[i],seq,pos,1<<29);
+        nret += _reader_seek(&readers->readers[i],seq,pos,MAX_CSI_COOR-1);
     }
     return nret;
-}
-
-size_t mygetline(char **line, size_t *n, FILE *fp)
-{
-    if (line == NULL || n == NULL || fp == NULL)
-    {
-        errno = EINVAL;
-        return -1;
-    }
-    if (*n==0 || !*line)
-    {
-        *line = NULL;
-        *n = 0;
-    }
-
-    size_t nread=0;
-    int c;
-    while ((c=getc(fp))!= EOF && c!='\n')
-    {
-        if ( ++nread>=*n )
-        {
-            *n += 255;
-            *line = (char*) realloc(*line, sizeof(char)*(*n));
-        }
-        (*line)[nread-1] = c;
-    }
-    if ( nread>=*n )
-    {
-        *n += 255;
-        *line = (char*) realloc(*line, sizeof(char)*(*n));
-    }
-    (*line)[nread] = 0;
-    return nread>0 ? nread : -1;
-
 }
 
 int bcf_sr_set_samples(bcf_srs_t *files, const char *fname, int is_file)
@@ -765,7 +746,7 @@ static void _regions_add(bcf_sr_regions_t *reg, const char *chr, int start, int 
 {
     if ( start==-1 && end==-1 )
     {
-        start = 0; end = (1<<29) - 1;
+        start = 0; end = MAX_CSI_COOR-1;
     }
     else
     {
@@ -854,7 +835,7 @@ static bcf_sr_regions_t *_regions_init_string(const char *str)
                 fprintf(stderr,"[%s:%d %s] Could not parse the region(s): %s\n", __FILE__,__LINE__,__FUNCTION__,str);
                 free(reg); free(tmp.s); return NULL;
             }
-            if ( sp==ep ) to = 1<<29;
+            if ( sp==ep ) to = MAX_CSI_COOR-1;
             _regions_add(reg, tmp.s, from, to);
             if ( !*ep ) break;
             sp = ep;
@@ -870,10 +851,12 @@ static bcf_sr_regions_t *_regions_init_string(const char *str)
     return reg;
 }
 
-// ichr,ifrom,ito are 0-based; line will be modified so that the *chr pointer is 0-terminated.
+// ichr,ifrom,ito are 0-based;
 // returns -1 on error, 0 if the line is a comment line, 1 on success
-static int _regions_parse_line(char *line, int ichr,int ifrom,int ito, char **chr,int *from,int *to)
+static int _regions_parse_line(char *line, int ichr,int ifrom,int ito, char **chr,char **chr_end,int *from,int *to)
 {
+    *chr_end = NULL;
+
     if ( line[0]=='#' ) return 0;
 
     int k,l;    // index of the start and end column of the tab-delimited file
@@ -924,7 +907,7 @@ static int _regions_parse_line(char *line, int ichr,int ifrom,int ito, char **ch
         while (*se && *se!='\t') se++;
     }
     if ( i<=ichr ) return -1;
-    *se = 0;
+    *chr_end = se;
     *chr = ss;
     return 1;
 }
@@ -958,18 +941,25 @@ bcf_sr_regions_t *bcf_sr_regions_init(const char *regions, int is_file, int ichr
         // read the whole file, tabix index is not present
         while ( hts_getline(reg->file, KS_SEP_LINE, &reg->line) > 0 )
         {
-            char *chr;
+            char *chr, *chr_end;
             int from, to, ret;
-            ret = _regions_parse_line(reg->line.s, ichr,ifrom,ito, &chr,&from,&to);
+            ret = _regions_parse_line(reg->line.s, ichr,ifrom,abs(ito), &chr,&chr_end,&from,&to);
             if ( ret < 0 ) 
             {
-                fprintf(stderr,"[%s:%d] Could not parse the file %s, using the columns %d,%d,%d\n", __FILE__,__LINE__,regions,ichr+1,ifrom+1,ito+1);
-                hts_close(reg->file); reg->file = NULL; free(reg); 
-                return NULL;
+                if ( ito<0 )
+                    ret = _regions_parse_line(reg->line.s, ichr,ifrom,ifrom, &chr,&chr_end,&from,&to);
+                if ( ret<0 )
+                {
+                    fprintf(stderr,"[%s:%d] Could not parse the file %s, using the columns %d,%d[,%d]\n", __FILE__,__LINE__,regions,ichr+1,ifrom+1,ito+1);
+                    hts_close(reg->file); reg->file = NULL; free(reg); 
+                    return NULL;
+                }
             }
             if ( !ret ) continue;
             if ( is_bed ) from++;
+            *chr_end = 0;
             _regions_add(reg, chr, from, to);
+            *chr_end = '\t';
         }
         hts_close(reg->file); reg->file = NULL;
         if ( !reg->nseqs ) { free(reg); return NULL; }
@@ -981,7 +971,9 @@ bcf_sr_regions_t *bcf_sr_regions_init(const char *regions, int is_file, int ichr
         reg->seq_hash = khash_str2int_init();
     int i;
     for (i=0; i<reg->nseqs; i++)
+    {
         khash_str2int_set(reg->seq_hash,reg->seq_names[i],i);
+    }
     reg->fname  = strdup(regions);
     reg->is_bin = 1;
     return reg;
@@ -1051,7 +1043,7 @@ int bcf_sr_regions_next(bcf_sr_regions_t *reg)
     }
 
     // reading from tabix
-    char *chr;
+    char *chr, *chr_end;
     int ichr = 0, ifrom = 1, ito = 2, is_bed = 0, from, to;
     if ( reg->tbx )
     {
@@ -1093,7 +1085,7 @@ int bcf_sr_regions_next(bcf_sr_regions_t *reg)
             ret = hts_getline(reg->file, KS_SEP_LINE, &reg->line);
             if ( ret<0 ) { reg->iseq = -1; return -1; }
         }
-        ret = _regions_parse_line(reg->line.s, ichr,ifrom,ito, &chr,&from,&to);
+        ret = _regions_parse_line(reg->line.s, ichr,ifrom,ito, &chr,&chr_end,&from,&to);
         if ( ret<0 ) 
         {
             fprintf(stderr,"[%s:%d] Could not parse the file %s, using the columns %d,%d,%d\n", __FILE__,__LINE__,reg->fname,ichr+1,ifrom+1,ito+1);
@@ -1102,16 +1094,13 @@ int bcf_sr_regions_next(bcf_sr_regions_t *reg)
     }
     if ( is_bed ) from++;
 
+    *chr_end = 0;
     if ( khash_str2int_get(reg->seq_hash, chr, &reg->iseq)<0 )
     {
         fprintf(stderr,"Broken tabix index? The sequence \"%s\" not in dictionary [%s]\n", chr,reg->line.s);
         exit(1);
     }
-
-    // This is a bit hacky: unset the chr-terminating 0 set by _regions_parse_line, or
-    //  otherwise _regions_match_alleles will be confused.
-    int len = strlen(chr);
-    if ( len < reg->line.l ) chr[len] = '\t';
+    *chr_end = '\t';
 
     reg->start = from - 1;
     reg->end   = to - 1;
@@ -1170,8 +1159,12 @@ int bcf_sr_regions_overlap(bcf_sr_regions_t *reg, const char *seq, int start, in
     int iseq;
     if ( khash_str2int_get(reg->seq_hash, seq, &iseq)<0 ) return -1;    // no such sequence
 
-    if ( reg->prev_seq==-1 || iseq!=reg->prev_seq || reg->prev_start > start ) // new chromosome
+    if ( reg->prev_seq==-1 || iseq!=reg->prev_seq || reg->prev_start > start ) // new chromosome or after a seek
     {
+        // flush regions left on previous chromosome
+        if ( reg->missed_reg_handler && reg->prev_seq!=-1 && reg->iseq!=-1 )
+            bcf_sr_regions_flush(reg);
+
         bcf_sr_regions_seek(reg, seq);
         reg->start = reg->end = -1;
     }
@@ -1183,8 +1176,16 @@ int bcf_sr_regions_overlap(bcf_sr_regions_t *reg, const char *seq, int start, in
     {
         if ( bcf_sr_regions_next(reg) < 0 ) return -2;  // no more regions left
         if ( reg->iseq != iseq ) return -1; // does not overlap any regions
+        if ( reg->missed_reg_handler && reg->end < start ) reg->missed_reg_handler(reg, reg->missed_reg_data);
     }
     if ( reg->start <= end ) return 0;    // region overlap
     return -1;  // no overlap
+}
+
+void bcf_sr_regions_flush(bcf_sr_regions_t *reg)
+{
+    if ( !reg->missed_reg_handler || reg->prev_seq==-1 ) return;
+    while ( !bcf_sr_regions_next(reg) ) reg->missed_reg_handler(reg, reg->missed_reg_data);
+    return;
 }
 

@@ -39,10 +39,10 @@ int main( int argc, char** argv)
 		in_bams[i] = ( bam_info*) malloc( sizeof( bam_info));  
 		load_bam( in_bams[i], params->bam_file_list[i]);
 
-		/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
+	/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
 		create_fastq( in_bams[i], params->bam_file_list[i], params);		
 	}
-
+  
         fprintf( stderr, "\nAll FASTQ files ready for remapping.\n");
 
 	/* Remap with mrFAST */
@@ -55,8 +55,10 @@ int main( int argc, char** argv)
 		if (return_value != RETURN_SUCCESS)
 			return EXIT_EXTERNAL_PROG_ERROR;
 	}
-
-
+	*/
+	
+	/* Remap with mrFAST */
+  
 	if ( params->skip_remap == 0)
 	{
 		return_value=divettovcf(params, in_bams);

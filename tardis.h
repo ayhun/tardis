@@ -15,6 +15,7 @@
 #include "processbam.h"
 #include "processfq.h"
 #include "config.h"
+
 #include "external.h"
 #include "VHtoVCF.h"
 #include "clustering.h"

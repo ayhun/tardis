@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 	/*!
-	  @abstract   Build index for a FASTA or razip compressed FASTA file.
+	  @abstract   Build index for a FASTA or bgzip-compressed FASTA file.
 	  @param  fn  FASTA file name
 	  @return     0 on success; or -1 on failure
 	  @discussion File "fn.fai" will be generated.
@@ -104,6 +104,14 @@ extern "C" {
 	  and should be destroyed by end users by calling free() on it.
 	 */
 	char *faidx_fetch_seq(const faidx_t *fai, const char *c_name, int p_beg_i, int p_end_i, int *len);
+
+   	/*!
+	  @abstract    Query if sequence is present
+	  @param  fai  Pointer to the faidx_t struct
+	  @param  seq  Sequence name 
+	  @return      1 if present or 0 if absent
+	 */
+    int faidx_has_seq(const faidx_t *fai, const char *seq);
 
 #ifdef __cplusplus
 }

@@ -37,4 +37,3 @@ int remap_mrfast( parameters *params, bam_info ** in_bams, configuration *cfg)
 	
 	return RETURN_SUCCESS;
 }
-
