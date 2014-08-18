@@ -18,19 +18,13 @@ $(EXECUTABLE): $(OBJECTS)
 clean: 
 	rm -f $(EXECUTABLE) *.o *~
 
-libs: htslib vhc vhsc
-
-htslib:	
+libs: 
 	make -C htslib
-	# make clean -C htslib
-
-vhc:
+	make clean -C htslib
 	make -C vhc
-	# make clean -C vhc
-
-vhsc:
+	make clean -C vhc
 	make -C vhsc
-	# make clean -C vhsc
+	make clean -C vhsc
 
 install:
 	cp tardis $(INSTALLPATH)
