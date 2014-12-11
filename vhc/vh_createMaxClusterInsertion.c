@@ -71,7 +71,6 @@ void vh_initializeReadMapping_Insertion (char *chroName, int chroSize)
     }
 
   //Initing the List of begin and end of right side break point ranges - make sure to free
-  printf ("Insertion %i\n", g_maxListBrkPointIntr);
   g_listRightBrkPointIntr =
     (RightBrkPointInterval *) malloc (g_maxListBrkPointIntr *
 				      sizeof (RightBrkPointInterval));

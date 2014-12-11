@@ -8,26 +8,6 @@
 FILE *fileOutput = NULL;
 char **allReadNameList;
 
-void vh_printHelp ()
-{
-  FILE *helpFile = fopen ("vh_help.hlp", "r");
-  if (helpFile == NULL)
-    {
-      vh_logError ("Help file \"vh_help.hlp\" not found.\n");
-    }
-  else
-    {
-      char line[1024];
-      while (!feof (helpFile))
-	{
-	  line[0] = line[1] = '\0';
-	  fgets (line, 1024, helpFile);
-	  vh_logOutput (line);
-	}
-      fclose (helpFile);
-    }
-}
-
 void vh_printVersion ()
 {
   vh_logOutput ("Variation Hunter 3.0 New Version\r\n");
@@ -48,12 +28,10 @@ void vh_quitProgram (int exitCode)
 	case EXIT_CODE_ARG_ERROR:
 	  sprintf (errMsg, "Error in options: %s", g_error_message);
 	  vh_logError (errMsg);
-	  vh_printHelp ();
 	  break;
 	case EXIT_CODE_DIVET_ERROR:
 	  sprintf (errMsg, "Error in DIVET file: %s", g_error_message);
 	  vh_logError (errMsg);
-	  vh_printHelp ();
 	  break;
 	case EXIT_CODE_MEMORY_ERROR:
 	  sprintf (errMsg, "Memory Problem Occured: %s", g_error_message);
@@ -62,7 +40,6 @@ void vh_quitProgram (int exitCode)
 	default:
 	  sprintf (errMsg, "Uncategorized Error Found: %s", g_error_message);
 	  vh_logError (errMsg);
-	  vh_printHelp ();
 	  break;
 	}
       exit (exitCode);
@@ -290,6 +267,7 @@ void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
    */
   for (i = 0; i < g_chroTableSize; i++)
     {
+      fprintf(stderr, "Processing chromosome %s\n", g_chroTable[i].chroName);
       vh_initializeReadMapping_Deletion (g_chroTable[i].chroName,
 				      g_chroTable[i].size);
       vh_createDeletionClusters (g_chroTable[i].size);

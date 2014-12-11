@@ -77,7 +77,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "samtools path: %s", cfg->path_samtools);
+			fprintf( stderr, "samtools path: %s\n", cfg->path_samtools);
 		}
 
 		if( cfg->path_bcftools == NULL)
@@ -86,7 +86,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "bcftools path: %s", cfg->path_bcftools);
+			fprintf( stderr, "bcftools path: %s\n", cfg->path_bcftools);
 		}
 
 		if( cfg->path_mrfast == NULL)
@@ -95,7 +95,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "mrfast path: %s", cfg->path_mrfast);
+			fprintf( stderr, "mrfast path: %s\n", cfg->path_mrfast);
 		}
 
 		if( cfg->path_gnuplot == NULL)
@@ -104,7 +104,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "gnuplot path: %s", cfg->path_gnuplot);
+			fprintf( stderr, "gnuplot path: %s\n", cfg->path_gnuplot);
 		}
 
 		if( cfg->path_megablast == NULL)
@@ -113,7 +113,7 @@ void load_config( configuration* cfg)
 		}
 		else
 		{
-			fprintf( stderr, "megablast path: %s", cfg->path_megablast);
+			fprintf( stderr, "megablast path: %s\n", cfg->path_megablast);
 		}
 	}
 }

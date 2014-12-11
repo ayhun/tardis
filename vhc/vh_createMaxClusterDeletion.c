@@ -73,7 +73,6 @@ void vh_initializeReadMapping_Deletion (char *chroName, int chroSize)
 		}
 
 	//Initing the List of begin and end of right side break point ranges - make sure to free
-	printf ("Deletion %i\n", g_maxListBrkPointIntr);
 	g_listRightBrkPointIntr =
 		(RightBrkPointInterval *) malloc (g_maxListBrkPointIntr *
 							sizeof (RightBrkPointInterval));
@@ -133,9 +132,6 @@ int vh_reevaluate_Deletion (int id, int brkPointLeft)
 			g_tempListRightBrkPointIntr[id].locBrkPointRight = brkRightTemp;
 
 		}
-//printf("%i %i %i %i\n", id, brkLeftTemp, brkRightTemp, brkPointLeft);
-
-
 
 }
 

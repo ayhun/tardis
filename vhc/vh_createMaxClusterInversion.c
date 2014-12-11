@@ -101,7 +101,6 @@ void vh_initializeReadMapping_Inversion (char *chroName, int chroSize)
       g_genomeIndexStart[genomeIndexId] = NULL;
       g_genomeIndexEnd[genomeIndexId] = NULL;
     }
-  printf ("Inversion\n");
   //Initing the List of begin and end of right side break point ranges - make sure to free
   g_listRightBrkPointIntr =
     (RightBrkPointInterval *) malloc (g_maxListBrkPointIntr *
@@ -304,7 +303,6 @@ int vh_createBreakPointIntervals_Inversion (int brkPointLeft)
 		 (brkPointLeft -
 		  ptrMappingOnGenome->readMappingPtr->locMapLeftEnd),
 		 0) + ptrMappingOnGenome->readMappingPtr->locMapRightEnd;
-	  //      printf("L214 %i %i\n",locBrkPointRightTemp, locBrkPointLeftTemp);
 	}
       else if (ptrMappingOnGenome->readMappingPtr->orientationLeft == 'R'
 	       && ptrMappingOnGenome->readMappingPtr->orientationRight == 'R')
@@ -321,7 +319,6 @@ int vh_createBreakPointIntervals_Inversion (int brkPointLeft)
 		      (ptrMappingOnGenome->readMappingPtr->locMapLeftStart -
 		       brkPointLeft), 0),
 		 ptrMappingOnGenome->readMappingPtr->locMapLeftStart);
-	  //      printf("L219 %i %i %i \n", brkPointLeft, locBrkPointRightTemp, locBrkPointLeftTemp);
 	}
 
       g_tempListRightBrkPointIntr

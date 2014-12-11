@@ -1246,7 +1246,7 @@ void readMobileElements(FILE *fp)
 }
 int vh_setcover(char* divetadd, char* outputread, char* outputfile, char* svfile){
 	FILE *readFp=NULL, *clusterFp=NULL, *libFp=NULL, *weightsFp=NULL, *fpOut=NULL, *fpMobile=NULL, *coverageFp=NULL;
-	numCallsRequsted = 100;
+	numCallsRequsted = 10000;
 	// for (count=0; count<argv; count++)
 	// {	
 		libFp=fopen(divetadd,"r");
