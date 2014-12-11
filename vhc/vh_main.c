@@ -8,11 +8,6 @@
 FILE *fileOutput = NULL;
 char **allReadNameList;
 
-void vh_printVersion ()
-{
-  vh_logOutput ("Variation Hunter 3.0 New Version\r\n");
-}
-
 void vh_quitProgram (int exitCode)
 {
   if (exitCode != 0)
@@ -292,39 +287,3 @@ int vh_isValid (struct MainOptions o)
   return 1;
 }
 
-// int main(){
-//   return 0;
-// }
-#ifdef MAIN_MAIN
-int main (int argc, char **argv)
-{
-  vh_initLogger (stdout, LOG_LEVEL_ALL);
-
-  //overMapLimit = 1000; // default value. The user can change this value.
-
-  struct MainOptions mainOptions = { 0, 0, "", "", "", "", "", "", "", 0, 0 };
-
-  int errorCode = vh_parseCommand (argc, argv, &mainOptions);
-  if (errorCode != 0)
-    vh_quitProgram (EXIT_CODE_ARG_ERROR);
-  else if (mainOptions.helpWanted)
-    vh_printHelp ();
-  else if (mainOptions.versionWanted)
-    vh_printVersion ();
-  else
-    {
-      if (!vh_isValid (mainOptions))
-	{
-	  strcpy (g_error_message, "Error in arguments!");
-	  vh_quitProgram (EXIT_CODE_ARG_ERROR);
-	}
-      //TODO: Test the arguments are OK and the input is valid
-      vh_clustering (mainOptions.libFileAdrs, mainOptions.chroFileName,
-	      mainOptions.gapFileName, mainOptions.repeatFileName,
-	      mainOptions.initializeFileName, mainOptions.prunProb,
-	      mainOptions.svSup, mainOptions.outputFile,
-	      mainOptions.outputRead, mainOptions.overMapLimit);
-      vh_quitProgram (EXIT_CODE_SUCCESS);
-    }
-}
-#endif
