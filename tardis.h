@@ -1,8 +1,6 @@
 #ifndef __TARDIS
 #define __TARDIS
 
-#define VERSION "0.1"
-#define LAST_UPDATE "March 17, 2014"
 
 #include <stdio.h>
 #include <string.h>
@@ -17,7 +15,7 @@
 #include "config.h"
 
 #include "external.h"
-#include "VHtoVCF.h"
+#include "vh2vcf.h"
 #include "clustering.h"
 
 #endif
