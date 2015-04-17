@@ -232,12 +232,12 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
 
 }
 
-int vh_isValid (struct MainOptions o)
+
+int vh_isValid ()
 {
   //TODO: To be completed. Check for files to exists, etc.
-  if (!strcmp (o.libFileAdrs, "") || !strcmp (o.initializeFileName, "")
-      || !strcmp (o.chroFileName, ""))
-    return 0;
+
   return 1;
 }
+
 

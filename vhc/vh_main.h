@@ -2,7 +2,7 @@
 #define MAIN_H__
 
 #include "vh_common.h"
-#include "vh_commandlineparser.h"
+
 #include "vh_gaphandler.h"
 
 #include <math.h>
