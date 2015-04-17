@@ -32,7 +32,10 @@ Create a temp directory to make things easier to cleanup:
 
 Concetanate all out files and get rid of unneeded information:
 
-	cat `find rmasker -name *.out` | grep -v "matching\|begin" | awk '{OFS="\t"; if ($1 ~ /./) print $5,$6-1,$7,$9,$10,$11}' | sed s/chr// | sort -k 1,1 -k 2,2n > build37.reps.bed
+	cat `find rmasker -name *.out` \
+		| grep -v "matching\|begin"\
+		| awk '{OFS="\t"; if ($1 ~ /./) print $5,$6-1,$7,$9,$10,$11}'\
+		| sed s/chr// | sort -k 1,1 -k 2,2n > build37.reps.bed
 
 Remove unnecessary files:
 
