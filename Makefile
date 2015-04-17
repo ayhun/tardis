@@ -1,5 +1,5 @@
 TARDIS_VERSION := "0.1"
-TARDIS_UPDATE := "April 16, 2015"
+TARDIS_UPDATE := "April 17, 2015"
 BUILD_DATE := "$(shell date)"
 CC=gcc
 CFLAGS =  -O2 -g -I htslib -I vhc -I vhsc -DTARDIS_VERSION=\"$(TARDIS_VERSION)\" -DBUILD_DATE=\"$(BUILD_DATE)\" -DTARDIS_UPDATE=\"$(TARDIS_UPDATE)\"

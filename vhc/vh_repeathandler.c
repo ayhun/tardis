@@ -3,9 +3,10 @@
 #include "vh_repeathandler.h"
 #include "vh_divethandler.h"
 
-Repeat g_repeatTable[500000];
+Repeat *g_repeatTable;
 int g_repeatTableSize;
 int g_maxRepeatLength = 0;
+#define STRMAX 50
 
 int vh_compareInt_Repeat (const void *a, const void *b)
 {
@@ -16,6 +17,10 @@ int vh_compareInt_Repeat (const void *a, const void *b)
 void vh_readRepeatTable (char *repeatFileName)
 {
 
+  int satellites;
+  char chrom[STRMAX], strand[2], type[STRMAX], class[STRMAX];
+  int start, end;
+  int res;
 
   FILE *repeatFile = fopen (repeatFileName, "r");
   if (repeatFile == NULL)
@@ -25,41 +30,67 @@ void vh_readRepeatTable (char *repeatFileName)
       exit (-1);
     }
 
-  int index = 0;
+  /* need to implement file format check */
+  satellites = 0;
   while (!feof (repeatFile))
     {
-      //int res = fscanf(gapFile,"%s%d%d", chroName, &(g_gapTable[index].start), &(g_gapTable[index].end));
-
-      int res = fscanf (repeatFile, "%s%d%d\n", g_repeatTable[index].chroName,
-			&(g_repeatTable[index].start),
-			&(g_repeatTable[index].end));
+      res = fscanf(repeatFile, "%s\t%d\t%d\t%s\t%s\t%s\n", chrom, &start, &end, strand, type, class);
 
       if (feof (repeatFile))
 	break;
 
-      //g_gapTable[index].chroName = (char *) malloc((strlen(chroName)+1)*sizeof(char));
-      //strcpy(g_gapTable[index].chroName, chroName);
-      //printf("RepTable: %s %i %i\n",g_repeatTable[index].chroName, g_repeatTable[index].start, g_repeatTable[index].end);
+      if (res != 6)
+	{
+	  // todo: global exit function
+	  fprintf(stderr, "The repeats file %s is not in the correct BED6 format. Consult the manual on how to generate a valid file.\n");
+	  exit(-1);
+	}
+    
+      if (!strstr(class, "Satellite") != NULL)
+	satellites++;
+    }
 
+  if (satellites == 0)
+    {
+      fprintf(stderr, "No satellites found\n");
+    }
+  else
+    {    
+      fprintf(stderr, "Reading %d satellites.\n", satellites);
+    }
 
-      if (res != 3)
+  g_repeatTable = (Repeat *) malloc(sizeof(Repeat) * satellites);
+  
+  rewind(repeatFile);
+
+  satellites = 0;
+  while (!feof (repeatFile))
+    {
+
+      res =  fscanf(repeatFile, "%s\t%d\t%d\t%s\t%s\t%s\n", chrom, &start, &end, strand, type, class);
+      if (!strstr(class, "Satellite") != NULL)
+	{
+	  g_repeatTable[satellites].chroName = (char *) malloc(sizeof(char) * (strlen(chrom)+1));
+	  strcpy(g_repeatTable[satellites].chroName, chrom);
+	  g_repeatTable[satellites].start = start;
+	  g_repeatTable[satellites].end = end;
+	  if (g_maxRepeatLength < g_repeatTable[satellites].end - g_repeatTable[satellites].start)
+	    g_maxRepeatLength =  g_repeatTable[satellites].end - g_repeatTable[satellites].start;
+	  satellites++;
+	}
+      
+      if (feof (repeatFile))
 	break;
 
-      if (g_maxRepeatLength < g_repeatTable[index].end - g_repeatTable[index].start)
-	g_maxRepeatLength =  g_repeatTable[index].end - g_repeatTable[index].start;
-      //logDebug(g_gapTable[index].chroName); 
-      //g_chroTable[index].chroName = (char *) malloc((strlen(chrName)+1)*sizeof(char));
-      //strcpy(g_chroTable[index].chroName, chrName);
+      if (res != 6)
+	break;
 
-      index++;
     }
-  g_repeatTableSize = index;
+  g_repeatTableSize = satellites;
 
   qsort (g_repeatTable, g_repeatTableSize, sizeof (Repeat),vh_compareInt_Repeat);
 
 
-//      for (int i=0; i<g_repeatTableSize; i++)
-//              printf("%i\n", g_repeatTable[i].start);
   fclose (repeatFile);
 }
 

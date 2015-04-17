@@ -5,12 +5,12 @@
 
 typedef struct Repeat
 {
-  char chroName[500];
+  char *chroName;
   int start;
   int end;
 } Repeat;
 
-extern struct Repeat g_repeatTable[500000];	//TODO: Malloc instead
+extern struct Repeat *g_repeatTable;	
 extern int g_repeatTableSize;
 extern int g_maxRepeatLength;
 

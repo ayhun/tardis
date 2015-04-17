@@ -21,7 +21,7 @@ char header2[1000]= "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO";
 
 
 FILE *divet;
-FILE *vcf;
+FILE *vcffile;
 FILE *rep;
 FILE *dupfile;
 
@@ -112,7 +112,7 @@ int conversion(parameters *params, bam_info ** in_bams, int i, int j){
   
   
       divet = fopen (fname, "r");
-      vcf = fopen (outfname, "w");
+      vcffile = fopen (outfname, "w");
       rep = fopen (params->reps, "r");
       dupfile = fopen (params->dups, "r");
   
@@ -120,7 +120,7 @@ int conversion(parameters *params, bam_info ** in_bams, int i, int j){
         fprintf(stderr, "VH_calls file %s not found.\n", fname); return -1;
       }
   
-      if (vcf==NULL){
+      if (vcffile==NULL){
         fprintf(stderr, "Output file %s cannot be created.\n", outfname); return -1;
       }
   
@@ -134,11 +134,11 @@ int conversion(parameters *params, bam_info ** in_bams, int i, int j){
   
   
   
-      fprintf(vcf, "%s", header);
+      fprintf(vcffile, "%s", header);
   
-      fprintf(vcf, "##fileDate=%d%s%d%s%d\n", timeinfo->tm_year+1900, (timeinfo->tm_mon+1<10 ? "0" : ""), timeinfo->tm_mon+1, (timeinfo->tm_mday<10 ? "0" : ""), timeinfo->tm_mday);
+      fprintf(vcffile, "##fileDate=%d%s%d%s%d\n", timeinfo->tm_year+1900, (timeinfo->tm_mon+1<10 ? "0" : ""), timeinfo->tm_mon+1, (timeinfo->tm_mday<10 ? "0" : ""), timeinfo->tm_mday);
   
-      fprintf(vcf, "%s\n", header2);
+      fprintf(vcffile, "%s\n", header2);
       
       for (i=1; i<=22; i++){
   
@@ -311,35 +311,35 @@ void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, flo
 		if( (ie-is+1) < 0) continue;
 
 		/* note: the 'N' below should change to the actual basepair divet the reference. See the TODO list at the top of this code */
-		fprintf(vcf, "%s\t%d\t%s_%d\t%c\t%s\t.\t.\t", thischrom+strlen("chr"), is, samplename, id++, 'N', _svtype);
+		fprintf(vcffile, "%s\t%d\t%s_%d\t%c\t%s\t.\t.\t", thischrom+strlen("chr"), is, samplename, id++, 'N', _svtype);
 
-		fprintf(vcf, "CIEND=%d,%d;", 0, (oe-ie));
-		fprintf(vcf, "CIPOS=%d,%d;", (os-is), 0);
-		fprintf(vcf, "END=%d;", ie);
+		fprintf(vcffile, "CIEND=%d,%d;", 0, (oe-ie));
+		fprintf(vcffile, "CIPOS=%d,%d;", (os-is), 0);
+		fprintf(vcffile, "END=%d;", ie);
 		if (is != ie)
-		fprintf(vcf, "IMPRECISE;");
+		fprintf(vcffile, "IMPRECISE;");
 
-		fprintf(vcf, "SVLEN=%d;", (ie-is+1));
+		fprintf(vcffile, "SVLEN=%d;", (ie-is+1));
 		if (type=='D'){
-		fprintf(vcf, "SVTYPE=DEL;");
+		fprintf(vcffile, "SVTYPE=DEL;");
 		total_del_bp += (ie-is+1);
 		if (min_del > ie-is+1) min_del = ie-is+1;
 		if (max_del < ie-is+1) max_del = ie-is+1;
 		del_cnt++;
 		}
 		else if (type=='I'){
-		fprintf(vcf, "SVTYPE=INS;");
+		fprintf(vcffile, "SVTYPE=INS;");
 		total_ins_bp += (ie-is+1);
 		ins_cnt++;
 		}
 		else if (type=='V'){
-		fprintf(vcf, "SVTYPE=INV;");
+		fprintf(vcffile, "SVTYPE=INV;");
 		inv_cnt++;
 		}
 
 		if (strcmp(samplename, "VHcall_"))
-		fprintf(vcf, "SAMPLE=%s;", samplename);
-		fprintf(vcf, "SVMETHOD=RP;SVALG=VariationHunter;SUP=%d\n", support);
+		fprintf(vcffile, "SAMPLE=%s;", samplename);
+		fprintf(vcffile, "SVMETHOD=RP;SVALG=VariationHunter;SUP=%d\n", support);
 	}
 }
 
