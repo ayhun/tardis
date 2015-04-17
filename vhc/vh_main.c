@@ -46,92 +46,6 @@ void vh_quitProgram (int exitCode)
     }
 }
 
-//Gets the adrs to a library info file,reads the file and loads the contents into a linkedlist of LibraryInfo objects
-//ALSO, sets the g_libInfo reference 
-LibraryInfo *vh_readLibraryInfos (char *libFileAdrs)
-{
-  FILE *libFile = fopen (libFileAdrs, "r");
-  int lineNumber;
-
-  if (libFile == NULL)
-    {
-      sprintf (g_error_message, "Lib file cannot be opened: %s", libFileAdrs);
-      vh_quitProgram (EXIT_CODE_DIVET_ERROR);
-      return NULL;
-    }
-
-  int NUM_OF_FIELDS = 6;
-  int numOfLines = 0;
-  fscanf (libFile, "%d", &numOfLines);
-  for (lineNumber = 0; lineNumber < numOfLines; lineNumber++)
-    {
-      char nameStr[100];
-      char indName[100];
-      char adrsStr[200];
-      int min, max, readLen, i;
-      int numRead =
-	fscanf (libFile, "%s %s %s %d %d %d", nameStr, indName, adrsStr, &min,
-		&max, &readLen);
-      if (numRead == NUM_OF_FIELDS)
-	{
-	  FILE *testfile = fopen (adrsStr, "r");
-	  if (testfile == NULL)
-	    {
-	      sprintf (g_error_message, "File %s cannot be opened!", adrsStr);
-	      vh_quitProgram (EXIT_CODE_DIVET_ERROR);
-	    }
-	  else
-	    {
-	      fclose (testfile);
-	    }
-	  //create new LibInfo object
-	  struct LibraryInfo *newLibInfo =
-	    (struct LibraryInfo *) malloc (sizeof (struct LibraryInfo));
-	  strcpy (newLibInfo->libName, nameStr);
-	  strcpy (newLibInfo->libFileAdrs, adrsStr);
-	  printf ("%s %s\n", newLibInfo->libName, newLibInfo->libFileAdrs);
-	  newLibInfo->minDelta = min - 2 * readLen;
-	  newLibInfo->maxDelta = max - 2 * readLen;
-	  if (newLibInfo->minDelta < 0)
-	    newLibInfo->minDelta = 0;
-	  if (newLibInfo->maxDelta < 0)
-	    newLibInfo->maxDelta = 0;
-	  newLibInfo->readLen = readLen;
-	  newLibInfo->hash =(struct ReadName **) malloc (NHASH * sizeof (struct ReadName *));
-	  for (i = 0; i < NHASH; i++)
-	    newLibInfo->hash[i] = NULL;
-	  newLibInfo->head = NULL;
-	  newLibInfo->tail = NULL;
-	  newLibInfo->size = 0;
-	  newLibInfo->next = NULL;
-
-	  //If first one in the linkedlist
-	  if (g_libInfo == NULL)
-	    {
-	      g_libInfo = newLibInfo;
-	    }
-	  else			//add to the end of the linked list
-	    {
-	      struct LibraryInfo *t;
-	      for (t = g_libInfo; t->next != NULL; t = t->next);	//Skip till end of LinkedList
-
-	      t->next = newLibInfo;
-	    }
-	}
-      if (feof (libFile))
-	break;
-      if (numRead != NUM_OF_FIELDS)	//Error in reading from file
-	{
-	  sprintf (g_error_message, "Error in lib file - around line: %d",
-		   lineNumber);
-	  vh_logError (g_error_message);
-	  vh_quitProgram (EXIT_CODE_DIVET_ERROR);
-	  break;
-	}
-    }
-
-  return g_libInfo;
-}
 
 void vh_pruneAndNormalizeDivets (struct LibraryInfo *lib, double preProsPrune,
 			 int overMapLimit)
@@ -194,9 +108,8 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
   vh_readInitFile ();
   vh_readChros (in_bam);
   vh_readGapTable (gapFileName);
-
   vh_readRepeatTable (repeatFileName);
-  //vh_readLibraryInfos (libFileAdrs);
+
 
   g_libInfo = NULL;
 
