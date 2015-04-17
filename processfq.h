@@ -31,6 +31,7 @@ struct library_properties
   	int conc_max; /* max cutoff for concordants */
 	char* fastq1; /* file name for the FASTQ file of the /1 reads */
 	char* fastq2; /* file name for the FASTQ file of the /2 reads */
+        char *divet; /* file name for the DIVET file post mrfast mapping */
 	int read_length; /* length of reads for the current library */
 	int num_sequences; /* number of paired-end sequences for this library */
 };

@@ -8,6 +8,7 @@
 #include <math.h>
 #include <string.h>
 
-void vh_clustering (char *, bam_info* , char *, char *, double , char *, char *, int );
+//void vh_clustering (char *, bam_info* , char *, char *, double , char *, char *, int );
+void vh_clustering (bam_info* , char *, char *, double , char *, char *, int );
 
 #endif

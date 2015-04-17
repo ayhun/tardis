@@ -178,7 +178,11 @@ static int vh_cmprReadNameStr (const void *a, const void *b)
 
 
 //We assume that the arguments are valid at this point and the file exists
-void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
+//void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
+//  char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
+//{
+
+void vh_clustering (bam_info* in_bam, char *gapFileName,
   char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 {
 
@@ -192,7 +196,44 @@ void vh_clustering (char *libFileAdrs, bam_info* in_bam, char *gapFileName,
   vh_readGapTable (gapFileName);
 
   vh_readRepeatTable (repeatFileName);
-  vh_readLibraryInfos (libFileAdrs);
+  //vh_readLibraryInfos (libFileAdrs);
+
+  g_libInfo = NULL;
+
+  for (i=0;i<in_bam->num_libraries;i++)
+    {
+      struct LibraryInfo *newLibInfo = (struct LibraryInfo *) malloc (sizeof (struct LibraryInfo));
+      strcpy (newLibInfo->libName, in_bam->libraries[i]->libname);
+      strcpy (newLibInfo->libFileAdrs, in_bam->libraries[i]->divet);
+      newLibInfo->minDelta = in_bam->libraries[i]->conc_min - 2 * in_bam->libraries[i]->read_length;
+      newLibInfo->maxDelta = in_bam->libraries[i]->conc_max - 2 * in_bam->libraries[i]->read_length;
+      if (newLibInfo->minDelta < 0)
+	newLibInfo->minDelta = 0;
+      if (newLibInfo->maxDelta < 0)
+	newLibInfo->maxDelta = 0;
+      newLibInfo->readLen = in_bam->libraries[i]->read_length;
+      newLibInfo->hash =(struct ReadName **) malloc (NHASH * sizeof (struct ReadName *));
+      for (j = 0; j < NHASH; j++)
+	newLibInfo->hash[j] = NULL;
+      newLibInfo->head = NULL;
+      newLibInfo->tail = NULL;
+      newLibInfo->size = 0;
+      newLibInfo->next = NULL;
+      
+      //If first one in the linkedlist                                                                                                                                                                          
+      if (g_libInfo == NULL)
+	{
+	  g_libInfo = newLibInfo;
+	}
+      else                  //add to the end of the linked list                                                                                                                                                 
+	{
+	  struct LibraryInfo *t;
+	  for (t = g_libInfo; t->next != NULL; t = t->next)
+	    ;        //Skip till end of LinkedList                                                                                                             	  
+	  t->next = newLibInfo;
+	}
+    }
+  
 
   struct LibraryInfo *cursor = g_libInfo;
   fileOutput = fopen (outputFile, "w");

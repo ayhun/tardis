@@ -46,7 +46,7 @@ void vh_readRepeatTable (char *repeatFileName)
 	  exit(-1);
 	}
     
-      if (!strstr(class, "Satellite") != NULL)
+      if (strstr(class, "Satellite"))
 	satellites++;
     }
 
@@ -68,7 +68,7 @@ void vh_readRepeatTable (char *repeatFileName)
     {
 
       res =  fscanf(repeatFile, "%s\t%d\t%d\t%s\t%s\t%s\n", chrom, &start, &end, strand, type, class);
-      if (!strstr(class, "Satellite") != NULL)
+      if (strstr(class, "Satellite"))
 	{
 	  g_repeatTable[satellites].chroName = (char *) malloc(sizeof(char) * (strlen(chrom)+1));
 	  strcpy(g_repeatTable[satellites].chroName, chrom);
