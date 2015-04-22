@@ -1,11 +1,10 @@
 CC=gcc
 CFLAGS = -O2 -g -w
 LDFLAGS =  -lz -lm -lpthread
-SOURCES = multiInd_SetCover.c buffer.c
+SOURCES = vh_setcover.c vh_buffer.c
 
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = set_cover
-INSTALLPATH = /usr/local/bin/
 
 all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o

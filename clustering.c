@@ -30,7 +30,6 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 			  sprintf(outputfile,"%s-%s.cluster.out",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			  sprintf(outputread,"%s-%s.name",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			  sprintf(svfile,"%s-%s.out.sv",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-			  //			  vh_clustering (divetadd, in_bams[i], params->gaps, params->reps, preProsPrune, outputfile, outputread, overMapLimit);
 			  vh_clustering (in_bams[i], params->gaps, params->reps, preProsPrune, outputfile, outputread, overMapLimit);
 			  vh_setcover(divetadd, outputread, outputfile, svfile);
 			}

@@ -11,8 +11,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
-//#include <buffer.h>
+//#include <stdbool.h>
+
 
 
 #define  maxChroSize 1000000000

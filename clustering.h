@@ -3,7 +3,7 @@
 
 #include "tardis.h"
 #include <vh_main.h>
-#include <multiInd_SetCover.h>
+#include <vh_setcover.h>
 int vhclustering(parameters *params, bam_info ** in_bams);
 
 #endif

@@ -218,7 +218,7 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
     {
       fprintf(stderr, "Processing chromosome %s\n", g_chroTable[i].chroName);
       vh_initializeReadMapping_Deletion (g_chroTable[i].chroName,
-				      g_chroTable[i].size);
+					 g_chroTable[i].size);
       vh_createDeletionClusters (g_chroTable[i].size);
       vh_finalizeReadMapping (g_chroTable[i].chroName, g_chroTable[i].size);
       vh_initializeReadMapping_Inversion (g_chroTable[i].chroName,g_chroTable[i].size);

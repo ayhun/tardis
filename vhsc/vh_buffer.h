@@ -3,8 +3,6 @@
 
 #define maxSizeOfBuffer 100
 
-//#include <stdio.h>
-
 /*Buffer keeps a list of top score (minimim score) picked from previous calculation of
 scores for each cluster (in an array named listClusterInBuffer). 
 We also keep the largest score in the listClusterInBuffer as upperbound (in a variable names maxScoreInBuffer), so
@@ -26,9 +24,9 @@ function bestFromBuffer() should not be used, and we need to recalculate the top
 typedef struct clusterInBuffer{
 	int clusterId;// id of the cluster;
 	float score;//the score of picking this cluster
-//	bool valid; //true : it is oay to use this index
 }clusterInBuffer;
-// const int maxSizeOfBuffer=100;
+
+
 extern struct clusterInBuffer listClusterInBuffer[maxSizeOfBuffer];
 extern int countInBuffer;
 extern float maxScoreInBuffer;
