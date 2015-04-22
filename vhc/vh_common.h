@@ -20,7 +20,7 @@
 #define EXIT_CODE_MEMORY_ERROR 3	//3 is for memory allocation problems
 #define EXIT_CODE_GAP_ERROR	4
 
-extern char g_error_message[500];	//Defined in vh_commandlineparser.cpp
+char g_error_message[500];
 extern int g_maxListBrkPointIntr;	//defined in vh_createMaxClusterDeletion.cpp
 
 extern struct LibraryInfo *g_libInfo;	//Defined in vh_divethandler.cpp

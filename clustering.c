@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "clustering.h"
+
 int vhclustering(parameters *params, bam_info ** in_bams){
 	int i, j;
 	double preProsPrune= 0.001;
@@ -31,7 +32,8 @@ int vhclustering(parameters *params, bam_info ** in_bams){
 			  sprintf(outputread,"%s-%s.name",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			  sprintf(svfile,"%s-%s.out.sv",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			  vh_clustering (in_bams[i], params->gaps, params->reps, preProsPrune, outputfile, outputread, overMapLimit);
-			  vh_setcover(divetadd, outputread, outputfile, svfile);
+			  vh_setcover(in_bams[i], outputread, outputfile, svfile);
+			  //vh_setcover(divetadd, outputread, outputfile, svfile);
 			}
 			remove(divetadd);
 			//remove(outputfile);

@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "../processbam.h"
 //#include <stdbool.h>
 
 
@@ -24,7 +25,7 @@
 #define  strSize 100 //maximum size of a constant string, such as readName length
 #define  maxNumSV 1000000 //maximum number of SV's allowed to be reported.
 #define  totalNumInd 100
-#define  maxTotalNumLibs 200
+//#define  maxTotalNumLibs 200
 #define  TRUE 1
 #define FALSE 0
 #define true 1
@@ -38,8 +39,8 @@ typedef struct multiLib{
 	int readLen;
 }multiLib;
 
-multiLib multiLibs[maxTotalNumLibs];
-int multiLibsCount;
+multiLib *multiLibs; ///[maxTotalNumLibs];
+//int multiLibsCount;
 
 typedef struct SV_selected{ // SVs which are selected for output are kept here for conflict resolution 
 	char chroName[strSize];
@@ -127,16 +128,8 @@ typedef struct clusterElRead{// the cluster which is being read and processed be
 	int sizeOfCluster;
 	struct readMappingEl readMappingElArray[maxListClusterSize];
 }clusterElRead;
-int vh_setcover(char* divetadd, char* outputread, char* outputfile, char* svfile);
-////////////////////////////////////
 
-/*typedef struct clusterInBuffer{
-	int clusterId;// id of the cluster;
-	float score;//the score of picking this cluster
-	int valid; //true : it is oay to use this index
-}clusterInBuffer;
-const int maxSizeOfBuffer=100;
-clusterInBuffer listClusterInBuffer[maxSizeOfBuffer];
-int countInBuffer;
-float maxScoreInBuffer;*/
+int vh_setcover(bam_info *in_bam, char* outputread, char* outputfile, char* svfile);
+
+
 #endif

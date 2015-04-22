@@ -25,7 +25,6 @@ int bestFromBuffer()
     }
   printf("The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet].clusterId);
 
-
   return listClusterInBuffer[bestSet].clusterId;
 
 }

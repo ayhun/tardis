@@ -42,7 +42,7 @@ void vh_readRepeatTable (char *repeatFileName)
       if (res != 6)
 	{
 	  // todo: global exit function
-	  fprintf(stderr, "The repeats file %s is not in the correct BED6 format. Consult the manual on how to generate a valid file.\n");
+	  fprintf(stderr, "The repeats file %s is not in the correct BED6 format. Consult the manual on how to generate a valid file.\n", repeatFileName);
 	  exit(-1);
 	}
     

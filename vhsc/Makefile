@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS = -O2 -g -w
-LDFLAGS =  -lz -lm -lpthread
+CFLAGS = -O2 -g -w -I ../htslib
+LDFLAGS =  -lz -lm -lpthread ../htslib/libhts.a
 SOURCES = vh_setcover.c vh_buffer.c
 
 OBJECTS = $(SOURCES:.c=.o)
