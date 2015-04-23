@@ -56,7 +56,7 @@ void vh_pruneAndNormalizeDivets (struct LibraryInfo *lib, double preProsPrune,
 
   if (cursor == NULL)
     return;
-  printf ("%f\n", preProsPrune);
+  //  printf ("%f\n", preProsPrune);
 
 
   //We are not checking the first and last one
@@ -104,6 +104,7 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
   int indexStart = 0;
   int count;
   int i,j;
+  struct LibraryInfo *newLibInfo, *cursor, *t;
 
   vh_readInitFile ();
   vh_readChros (in_bam);
@@ -115,7 +116,7 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
 
   for (i=0;i<in_bam->num_libraries;i++)
     {
-      struct LibraryInfo *newLibInfo = (struct LibraryInfo *) malloc (sizeof (struct LibraryInfo));
+      newLibInfo = (struct LibraryInfo *) malloc (sizeof (struct LibraryInfo));
       strcpy (newLibInfo->libName, in_bam->libraries[i]->libname);
       strcpy (newLibInfo->libFileAdrs, in_bam->libraries[i]->divet);
       newLibInfo->minDelta = in_bam->libraries[i]->conc_min - 2 * in_bam->libraries[i]->read_length;
@@ -140,7 +141,6 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
 	}
       else                  //add to the end of the linked list                                                                                                                                                 
 	{
-	  struct LibraryInfo *t;
 	  for (t = g_libInfo; t->next != NULL; t = t->next)
 	    ;        //Skip till end of LinkedList                                                                                                             	  
 	  t->next = newLibInfo;
@@ -148,9 +148,9 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
     }
   
 
-  struct LibraryInfo *cursor = g_libInfo;
+  cursor = g_libInfo;
   fileOutput = fopen (outputFile, "w");
-  printf ("prune %f\n", preProsPrune);
+  //printf ("prune %f\n", preProsPrune);
 
   for (; cursor; cursor = cursor->next)
     {
@@ -216,19 +216,57 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
    */
   for (i = 0; i < g_chroTableSize; i++)
     {
-      fprintf(stderr, "Processing chromosome %s\n", g_chroTable[i].chroName);
+      fprintf(stderr, "\r                                                        ");
+      fflush(stderr);
+      fprintf(stderr, "\rProcessing chromosome %s ", g_chroTable[i].chroName);
+      fflush(stderr);
       vh_initializeReadMapping_Deletion (g_chroTable[i].chroName,
 				      g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_createDeletionClusters (g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_finalizeReadMapping (g_chroTable[i].chroName, g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_initializeReadMapping_Inversion (g_chroTable[i].chroName,g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_createInversionClusters (g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_finalizeReadMapping (g_chroTable[i].chroName, g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_initializeReadMapping_Insertion (g_chroTable[i].chroName,g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_createInsertionClusters (g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
       vh_finalizeReadMapping (g_chroTable[i].chroName, g_chroTable[i].size);
+      fprintf(stderr, ".");
+      fflush(stderr);      
     }
+  fprintf(stderr, "\n");
   fclose (fileOutput);
+
+
+  /* free g_libInfo */
+  cursor = g_libInfo;
+  t = cursor;
+  while (t != NULL)
+  {
+    t = cursor->next;
+    /* FEREYDOUN: Free the hash as well. This is likely a linked list */
+    for (i = 0; i < NHASH; i++)
+      if (cursor->hash != NULL)
+	free(cursor->hash[i]);
+    free(cursor->hash);
+    free(cursor);
+  }  
+
 
 }
 

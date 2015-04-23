@@ -40,10 +40,18 @@ int main( int argc, char** argv)
 		load_bam( in_bams[i], params->bam_file_list[i]);
 
 	/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
-		create_fastq( in_bams[i], params->bam_file_list[i], params);		
+		if ( params->skip_fastq == 0)
+	        {
+		  create_fastq( in_bams[i], params->bam_file_list[i], params);		
+		}
+		else
+		  {
+		    /* TODO: check if the FASTQ files indeed exist, so it is safe to skip */
+		    fprintf( stderr, "Skipping FASTQ extraction step.\n");
+		}
 	}
   
-        fprintf( stderr, "\nAll FASTQ files ready for remapping.\n");
+        fprintf( stderr, "All FASTQ files ready for remapping.\n");
 
 	/* Remap with mrFAST */
 
@@ -55,7 +63,13 @@ int main( int argc, char** argv)
 		if (return_value != RETURN_SUCCESS)
 			return EXIT_EXTERNAL_PROG_ERROR;
 	}
+	else
+	{
+	  /* TODO: check if the remapping output indeed exists, so it is safe to skip */
+	        fprintf( stderr, "Skipping remapping step.\n");
+	}
 	
+	/*
 	if ( params->skip_remap == 0)
 	{
 		return_value=divettovcf(params, in_bams);
@@ -64,11 +78,12 @@ int main( int argc, char** argv)
 			return EXIT_EXTERNAL_PROG_ERROR;
 		}
 	}
-
+	*/
 
 	if ( params->run_vh == 1)
 	{
-		return_value = vhclustering( params, in_bams );
+	        fprintf( stderr, "Now running VariationHunter...\n");
+		return_value = run_vh( params, in_bams );
 		if (return_value != RETURN_SUCCESS)
 			return EXIT_EXTERNAL_PROG_ERROR;
 	}

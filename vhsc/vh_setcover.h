@@ -129,7 +129,7 @@ typedef struct clusterElRead{// the cluster which is being read and processed be
 	struct readMappingEl readMappingElArray[maxListClusterSize];
 }clusterElRead;
 
-int vh_setcover(bam_info *in_bam, char* outputread, char* outputfile, char* svfile);
+int vh_setcover(bam_info **in_bam, int num_bams, char* outputread, char* outputfile, char* svfile);
 
 
 #endif

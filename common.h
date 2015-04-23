@@ -36,6 +36,7 @@ typedef struct _params
 	char skip_fastq; /* boolean stand-in to skip FASTQ dump */
 	char skip_sort; /* boolean stand-in to skip FASTQ sort */
 	char skip_remap; /* boolean stand-in to skip FASTQ remap */
+	char skip_vhcluster; /* boolean stand-in to skip VH clustering */
 	int  threads; /* number of threads to use for parallel mrFAST, and maybe future parallelization of TARDIS */
 	int num_bams; /* number of input BAM files */
 } parameters;

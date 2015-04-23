@@ -133,7 +133,7 @@ DivetRow *vh_loadDivetFile (LibraryInfo * libInfo)
 {
   FILE *divetFile = fopen (libInfo->libFileAdrs, "r");
   int i;
-
+  
   if (divetFile == NULL)
     {
       sprintf (g_error_message, "Divet file '%s' could not be opened!",
@@ -154,7 +154,8 @@ DivetRow *vh_loadDivetFile (LibraryInfo * libInfo)
   while (!feof (divetFile))
     {
 
-      fgets (line, 400, divetFile);
+      if (fgets (line, 400, divetFile) > 0)
+	;
 
       if (line == NULL)
 	continue;

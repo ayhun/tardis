@@ -12,7 +12,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	int o;
 	static int is_male = 0, is_female = 0;
 	static int run_vh = 0, run_ns = 0, run_sr = 0, run_all = 0;
-	static int skip_fastq = 0, skip_sort = 0, skip_remap = 0;
+	static int skip_fastq = 0, skip_sort = 0, skip_remap = 0, skip_cluster = 0;
 
 	static struct option long_options[] = 
 	{
@@ -35,6 +35,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"skip-fastq", no_argument, &skip_fastq,  1 },
 		{"skip-sort" , no_argument, &skip_sort,  1 },
 		{"skip-remap" , no_argument, &skip_remap,  1 },
+		{"skip-cluster" , no_argument, &skip_cluster,  1 },
 		{0        , 0,                   0,  0 }
 	};
   
@@ -198,6 +199,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	params->skip_fastq = skip_fastq;
 	params->skip_sort = skip_sort;
 	params->skip_remap = skip_remap;
+	params->skip_vhcluster = skip_cluster;
 
 	if( is_male)
 	{

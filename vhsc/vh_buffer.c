@@ -23,8 +23,10 @@ int bestFromBuffer()
 	  bestSet=count;
 	}
     }
-  printf("The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet].clusterId);
-
+  /* FEREYDOUN: do we need the fprintf below? Disabling for now */
+  /*
+  fprintf( stderr, "The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet].clusterId);
+  */
   return listClusterInBuffer[bestSet].clusterId;
 
 }
@@ -63,12 +65,12 @@ int addToBuffer(float score, int clusterId)
       return 0;
     }
 	
-  //printf("%f %f\n", score, maxScoreInBuffer);
+  //fprintf( stderr, "%f %f\n", score, maxScoreInBuffer);
 	
   if (score<maxScoreInBuffer)
     {
       int count;
-      //	printf("L66 %f %f %i\n", score, maxScoreInBuffer, clusterId);
+      //	fprintf( stderr, "L66 %f %f %i\n", score, maxScoreInBuffer, clusterId);
       for (count=0; count<maxSizeOfBuffer; count++)
 	{
 	  if (listClusterInBuffer[count].score==maxScoreInBuffer)

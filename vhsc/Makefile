@@ -4,7 +4,7 @@ LDFLAGS =  -lz -lm -lpthread ../htslib/libhts.a
 SOURCES = vh_setcover.c vh_buffer.c
 
 OBJECTS = $(SOURCES:.c=.o)
-EXECUTABLE = set_cover
+EXECUTABLE = libvhsc.a
 
 all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o

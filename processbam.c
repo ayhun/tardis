@@ -183,7 +183,7 @@ void load_bam( bam_info* in_bam, char* path)
 	{
 		variance[i] = ( float) variance[i] / ( float) second_test_pass[i];
 		( in_bam->libraries)[i]->frag_std = sqrt( variance[i]);
-		fprintf( stderr, "\nLibrary %s\n\tMean: %f\n\tStdev: %f\n", ( in_bam->libraries)[i]->libname, ( in_bam->libraries)[i]->frag_avg, ( in_bam->libraries)[i]->frag_std);
+		fprintf( stderr, "\nLibrary %s\n\tMean: %f\n\tStdev: %f\n\n", ( in_bam->libraries)[i]->libname, ( in_bam->libraries)[i]->frag_avg, ( in_bam->libraries)[i]->frag_std);
 		set_library_min_max( ( in_bam->libraries)[i]);
 	}
 	

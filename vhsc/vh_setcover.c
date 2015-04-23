@@ -245,12 +245,12 @@ int freeLinkList(readMappingEl *ptr)
 
 
 //int init(FILE *fpLib, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE *fpCoverage)
-int init(bam_info *in_bam, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE *fpCoverage)
+int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE *fpCoverage)
 {
 
   char orient1, orient2, readNameStr[strSize], chroName1[strSize], libName[strSize], indName[strSize], filePath[strSize], chroName2[strSize];
   int startPos, stopPos, SVtype, listReadElId=0, listClusterElId=0, readId, minInstSize, maxInstSize, readLen, combinationId, indId, editDist, indCov;
-  int i;
+  int i,j; int multiLibsCount;
   float editProbDist, weight;
   clusterIdEl *clusterIdElNew;
   readMappingEl *readMappingElNew;
@@ -258,22 +258,31 @@ int init(bam_info *in_bam, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE 
   fscanf(fpRead, "%i\n",	&sizeListReadEl);
   listReadEl = (readEl *) malloc(sizeListReadEl*sizeof(readEl));
   
-  //multiLibsCount=0;
+  multiLibsCount=0;
 
-  multiLibs = (multiLib *) malloc(sizeof (multiLib) * in_bam->num_libraries);
+  for (i=0; i< num_bams; i++)
+    multiLibsCount = in_bams[i]->num_libraries;
 
-  for (i=0;i<in_bam->num_libraries;i++)
-    {
-      /* fix here. indname, readlen, etc. */
-      multiLibs[i].indId=addNewInd(indName);    
-      multiLibs[i].maxInstSize=maxInstSize-2*readLen;
-      multiLibs[i].minInstSize=minInstSize-2*readLen;
-      if (multiLibs[i].maxInstSize<0)
-	multiLibs[i].maxInstSize=0;
-      if (multiLibs[i].minInstSize<0)
-	multiLibs[i].minInstSize=0;
-      multiLibs[i].readLen=readLen;
-    }
+  multiLibs = (multiLib *) malloc(sizeof (multiLib) * multiLibsCount);
+
+  multiLibsCount=0;
+
+  for (j=0; j<num_bams; j++)
+  {
+    for (i=0; i<in_bams[j]->num_libraries; i++)
+      {
+	strcpy(multiLibs[multiLibsCount].libName, in_bams[j]->libraries[i]->libname);
+	multiLibs[multiLibsCount].indId=addNewInd(in_bams[j]->sample_name);    
+	multiLibs[multiLibsCount].maxInstSize = in_bams[j]->libraries[i]->conc_max - 2 * in_bams[j]->libraries[i]->read_length; 
+	multiLibs[multiLibsCount].minInstSize = in_bams[j]->libraries[i]->conc_min - 2 * in_bams[j]->libraries[i]->read_length; 
+	if (multiLibs[multiLibsCount].maxInstSize < 0)
+	  multiLibs[multiLibsCount].maxInstSize = 0;
+	if (multiLibs[multiLibsCount].minInstSize < 0)
+	  multiLibs[multiLibsCount].minInstSize = 0;
+	multiLibs[multiLibsCount].readLen = in_bams[j]->libraries[i]->read_length; 
+	multiLibsCount++;
+      }
+  }
   
   /*
   while(fscanf(fpLib, "%s %s %s %i %i %i\n", libName, indName, filePath, &minInstSize, &maxInstSize, &readLen)!=EOF)
@@ -439,17 +448,17 @@ int init(bam_info *in_bam, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE 
 	{//For Mobile Insertions (chrN) the startPos is for reference genome and stopPos is for chrN
 	  /////////////////////////////ADD THE CLUSTER TO THE READ////////////////////////
 	  readId=findReadName(readNameStr);
-	  listReadEl[readId].indId=findIndId(in_bam->num_libraries, libName);
-	  listReadEl[readId].libId=findLibId(in_bam->num_libraries, libName);
+	  listReadEl[readId].indId=findIndId(multiLibsCount, libName);
+	  listReadEl[readId].libId=findLibId(multiLibsCount, libName);
 	  clusterIdElNew = (clusterIdEl *) malloc(sizeof(clusterIdEl));
 	  clusterIdElNew->clusterId=listClusterElId;
 	  clusterIdElNew->next=listReadEl[readId].next;
 	  listReadEl[readId].next=clusterIdElNew;
-	  listReadEl[readId].indId=findIndId(in_bam->num_libraries, libName);
+	  listReadEl[readId].indId=findIndId(multiLibsCount, libName);
 	  //////////////////////////////ADD THE READ TO THE CLUSTER/////////////////////////
 	  listClusterEl[listClusterElId].clusterId=listClusterElId;
 	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].readId=readId;
-	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].indId=findIndId(in_bam->num_libraries, libName);
+	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].indId=findIndId(multiLibsCount, libName);
 	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].editDistance=editDist;
 	  if (weightedHeuristicFlag==1)
 	    clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].probEditDist=editProbDist;
@@ -1221,7 +1230,9 @@ int pickSet()
 	}
       else 
 	{
-	  printf("%f\n", bestWeight);
+	  /*
+	  printf("aaaaaaa%f\n", bestWeight);
+	  */
 	  return 0;
 	}
 		
@@ -1269,7 +1280,7 @@ void readMobileElements(FILE *fp)
 }
 
 //int vh_setcover(char* divetadd, char* outputread, char* outputfile, char* svfile){
-int vh_setcover(bam_info *in_bam, char* outputread, char* outputfile, char* svfile){
+int vh_setcover(bam_info **in_bams, int num_bams, char* outputread, char* outputfile, char* svfile){
   FILE *readFp=NULL, *clusterFp=NULL, *libFp=NULL, *weightsFp=NULL, *fpOut=NULL, *fpMobile=NULL, *coverageFp=NULL;
   numCallsRequsted = 10000; // have to fix
   // for (count=0; count<argv; count++)
@@ -1280,7 +1291,7 @@ int vh_setcover(bam_info *in_bam, char* outputread, char* outputfile, char* svfi
   fpOut=fopen(svfile,"w");
 
   //init(libFp, readFp, clusterFp, weightsFp, coverageFp);
-  init(in_bam, readFp, clusterFp, weightsFp, coverageFp);
+  init(in_bams, num_bams, readFp, clusterFp, weightsFp, coverageFp);
   if (fpMobile!=NULL)
     readMobileElements(fpMobile);
   pickSet();	

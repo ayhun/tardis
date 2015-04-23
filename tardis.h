@@ -16,6 +16,6 @@
 
 #include "external.h"
 #include "vh2vcf.h"
-#include "clustering.h"
+#include "vh.h"
 
 #endif

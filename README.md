@@ -60,8 +60,8 @@ Also download the reference genome from the UCSC Genome Browser. For GRCh37, thi
 Running TARDIS
 ==============
 
-	tardis -i myinput.bam --ref human_g1k_v37.fasta --gaps build37.gap.bed --reps build37.reps.bed \\
-		--dups build37_dups.bed --xy --vh 
+	tardis -i myinput.bam --ref human_g1k_v37.fasta --gaps build37.gap.bed \
+		--reps build37.reps.bed --dups build37_dups.bed --xy --vh 
 
 Additional parameters, helpful when debugging:
 
