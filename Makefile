@@ -1,4 +1,4 @@
-TARDIS_VERSION := "0.1"
+TARDIS_VERSION := "0.1-alpha"
 TARDIS_UPDATE := "April 17, 2015"
 BUILD_DATE := "$(shell date)"
 CC=gcc
