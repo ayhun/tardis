@@ -15,11 +15,18 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 	int num_matched;
 	int i;
 	int j;
-	
+
+	/*	
 	FILE* f1;
 	FILE* f2;
 	FILE* of1;
 	FILE* of2;
+	*/
+
+	gzFile  f1;
+	gzFile f2;
+	gzFile of1;
+	gzFile of2;
 
 	int loaded;
 	char* ofilename1;
@@ -28,11 +35,11 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 	ofilename1 = ( char*) malloc ( sizeof( char) * ( strlen( filename1) + 10));
 	ofilename2 = ( char*) malloc ( sizeof( char) * ( strlen( filename2) + 10));
   
-	sprintf( ofilename1, "%s.sorted", filename1);
-	sprintf( ofilename2, "%s.sorted", filename2);
+	sprintf( ofilename1, "%s.sorted.gz", filename1);
+	sprintf( ofilename2, "%s.sorted.gz", filename2);
   
-	of1 = fopen( ofilename1, "w");
-	of2 = fopen( ofilename2, "w");
+	of1 = gzopen( ofilename1, "w");
+	of2 = gzopen( ofilename2, "w");
 
 	num_batch = MEMUSE / ( read_length * 3 * 2); /* 3 comes from qname,seq,qual. 2 comes from pairs */
 
@@ -46,8 +53,8 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 
 	num_matched = 0;
 
-	f1 = fopen( filename1, "r"); //replace with gfOpen
-	f2 = fopen( filename2, "r");
+	f1 = gzopen( filename1, "r"); //replace with gfOpen
+	f2 = gzopen( filename2, "r");
 
 	while( num_matched < num_seq)
 	{
@@ -84,8 +91,8 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 				res = ( struct read**) bsearch( &( reads2[i]), reads1, num_batch, sizeof( struct read*), fastq_qname_comp);
 				if( res != NULL)
 				{
-					fprintf( of1, "@%s/1\n%s\n+\n%s\n", ( *res)->qname, ( *res)->seq, ( *res)->qual);
-					fprintf( of2, "@%s/2\n%s\n+\n%s\n", reads2[i]->qname, reads2[i]->seq, reads2[i]->qual);
+				        gzprintf( of1, "%s/1\n%s\n+\n%s\n", ( *res)->qname, ( *res)->seq, ( *res)->qual);
+					gzprintf( of2, "%s/2\n%s\n+\n%s\n", reads2[i]->qname, reads2[i]->seq, reads2[i]->qual);
 					( *res)->empty = 1;
 					reads2[i]->empty = 1;
 					num_matched++;
@@ -94,16 +101,17 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 		}
 	}
   
-	fclose(of1);
-	fclose(of2);
-	fclose(f1);
-	fclose(f2);
+	gzclose(of1);
+	gzclose(of2);
+	gzclose(f1);
+	gzclose(f2);
 
 	/* 
-		add code here to REMOVE the old files (filename1, filename2)
+		remove the old files (filename1, filename2)
 		and rename the ofilename1 with filename1 and ofilename2 with filename2 
 		so everything seems to be in-place & temp files are discarded
 	*/
+	
 	int retval = unlink( filename1);
 	if( retval == -1)
 	{
@@ -127,7 +135,7 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 	{
 		perror( "Failed to rename outfile2");
 	}
-
+	
 	free( ofilename1);
 	free( ofilename2);
 
@@ -149,27 +157,38 @@ static int fastq_qname_comp( const void* p1, const void* p2)
 	return strcmp( a->qname, b->qname);
 }
 
-int load_reads( FILE* f1, struct read** reads, int num_batch)
+int load_reads( gzFile f1, struct read** reads, int num_batch)
 {
 	int i;
 	int items_read;
-	char qname[STRLEN];
-	char seq[STRLEN];
-	char qual[STRLEN];
+	char qname[MAX_SEQ];
+	char seq[MAX_SEQ];
+	char qual[MAX_SEQ];
+	char plus[MAX_SEQ];
 	int cnt=0;
 
 	for( i = 0; i < num_batch; i++)
 	{
 		if( reads[i]->empty == 1)
 		{
-			if( !feof( f1))
+			if( !gzeof( f1))
 			{
-				items_read = fscanf( f1, "@%s\n%s\n+\n%s\n", qname, seq, qual);
+			  //items_read = fscanf( f1, "@%s\n%s\n+\n%s\n", qname, seq, qual);
+ 			        gzgets(f1, qname, MAX_SEQ);
+				if (gzeof( f1))
+				  return cnt;
+ 			        gzgets(f1, seq, MAX_SEQ);
+ 			        gzgets(f1, plus, MAX_SEQ);
+ 			        gzgets(f1, qual, MAX_SEQ);
+				/*
+				items_read = sscanf( read_line, "@%s\n%s\n+\n%s\n", qname, seq, qual);
 				if( items_read != 3)
 				{
 					perror( "Invalid number of fields read");
-				}
-				qname[strlen( qname) - 2] = 0; // get rid of /1 /2
+					}*/
+				qname[strlen( qname) - 3] = 0; // get rid of /1 /2 and \n
+				seq[strlen( seq) - 1] = 0; // get rid of \n
+				qual[strlen( qual) - 1] = 0; // get rid of \n
 				set_str( &( reads[i]->qname), qname);
 				set_str( &( reads[i]->seq), seq);
 				set_str( &( reads[i]->qual), qual);
@@ -235,9 +254,14 @@ void free_reads( struct read*** reads, int num_batch)
 
 void create_fastq_library( struct library_properties* in_lib, char* sample_name, char* bam_path, parameters* params)
 {
+  /*
 	FILE* fastq;
 	FILE* fastq2;
 	FILE* outfastq;
+  */
+	gzFile fastq;
+	gzFile fastq2;
+	gzFile outfastq;
 	htsFile* bam_file;
 	bam1_core_t bam_alignment_core;
 	bam1_t*	bam_alignment;
@@ -255,8 +279,8 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	int i;
 
 	/* Set FASTQ file names */
-	sprintf( filename, "%s_%s_remap_1.fastq", sample_name, in_lib->libname);
-	sprintf( filename2, "%s_%s_remap_2.fastq", sample_name, in_lib->libname);
+	sprintf( filename, "%s_%s_remap_1.fastq.gz", sample_name, in_lib->libname);
+	sprintf( filename2, "%s_%s_remap_2.fastq.gz", sample_name, in_lib->libname);
 
 	set_str( &( in_lib->fastq1), filename);
 	set_str( &( in_lib->fastq2), filename2);
@@ -264,11 +288,13 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	/* if skip-fastq is set, return */
 	if( params->skip_fastq)
 	{
+	  /* check if it is safe to skip */
 		return;
 	}
 
 	/* Open FASTQ file for writing */
-	fastq = fopen( filename, "w");
+	//fastq = fopen( filename, "w");
+	fastq = gzopen( filename, "w");
 	if( !fastq)
 	{
 		fprintf( stderr, "Error opening the first FASTQ file\n");
@@ -276,7 +302,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	}
 
 	/* Open the second FASTQ file for writing */	
-	fastq2 = fopen( filename2, "w");
+	fastq2 = gzopen( filename2, "w");
 	if( !fastq2)
 	{
 		fprintf( stderr, "Error opening the second FASTQ file\n");
@@ -323,13 +349,13 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 			if( ( flag & BAM_FREAD1) != 0)
 			{
 				outfastq = fastq;
-				fprintf( outfastq, "@%s/1\n", qname);
+				gzprintf( outfastq, "@%s/1\n", qname);
 			}
 			else if( ( flag & BAM_FREAD2) != 0)
 			{
 				/* Read 2 goes to /2 */
 				outfastq = fastq2;
-				fprintf( outfastq, "@%s/2\n", qname);
+				gzprintf( outfastq, "@%s/2\n", qname);
 			}
 
 			/* Line 2: Sequence */
@@ -343,7 +369,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 				for( i = 0; i < strlen( sequence); i++)
 				{
 					next_char = base_as_char( bam_seqi( sequence, i));
-					fprintf( outfastq, "%c", next_char);
+					gzprintf( outfastq, "%c", next_char);
 				}		       
 			}
 			else
@@ -352,12 +378,12 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 				for( i = strlen( sequence) - 1; i >= 0; i--)
 				{
 					next_char = complement_char( base_as_char( bam_seqi( sequence, i)));
-					fprintf( outfastq, "%c", next_char);
+					gzprintf( outfastq, "%c", next_char);
 				}		       
 			}
 			
 			/* Line 3: "+" */
-			fprintf( outfastq, "\n+\n");
+			gzprintf( outfastq, "\n+\n");
 
 			/* Line 4: Quality String */
 			strncpy( qual, bam_get_qual( bam_alignment), bam_alignment_core.l_qseq);
@@ -371,7 +397,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 			{
 			  	reverse_string( qual);
 			}
-			fprintf( outfastq, "%s\n", qual);
+			gzprintf( outfastq, "%s\n", qual);
 		}
 
 		/* Read next alignment */
@@ -394,14 +420,14 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	}
 
 	/* Close the FASTQ file */
-	return_value = fclose( fastq);
+	return_value = gzclose( fastq);
 	if( return_value != 0)
 	{
 		fprintf( stderr, "Error closing the first FASTQ file\n");
 	}
 
 	/* Close the second FASTQ file */
-	return_value = fclose( fastq2);
+	return_value = gzclose( fastq2);
 	if( return_value != 0)
 	{
 		fprintf( stderr, "Error closing the second FASTQ file\n");

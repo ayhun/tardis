@@ -3,21 +3,26 @@ tardis
 
 Toolkit for Automated and Rapid DIscovery of Structural variants
 
-Developers:
+Requirements
+============
 
-Can Alkan	calkan@gmail.com
+ * zlib   (http://www.zlib.net)
+ * mrfast (https://github.com/BilkentCompGen/mrfast)
+ * htslib (included as submodule; http://htslib.org/)
 
-Fereydoun Hormozdiari	hormozdiari.fereydoun@gmail.com
+Fetching tardis
+===============
 
-Emre Karakoç	ekarakoc@gmail.com
+	git clone https://github.com/calkan/tardis.git --recursive
 
-Iman Hajirasouliha	iman.ha@gmail.com
+Compilation
+===========
 
-Can Koçkan	cankockan92@gmail.com
+Type:
 
-Vineet Bhakhar	vineet3692@gmail.com
-
-Sina Jafarzadeh	jafarzadeh91@gmail.com
+	make libs
+	make
+	cp tardis /path/to/your/favorite/binaries
 
 
 Building the repeats file
@@ -67,3 +72,26 @@ Running tardis
 Additional parameters, helpful when debugging:
 
 	--skip-fastq --skip-sort --skip-remap
+
+All parameters
+==============
+
+	--bamlist   [bamlist file] : A text file that lists input BAM files one file per line.
+	--input [BAM files]        : Input files in sorted and indexed BAM format. You can pass multiple BAMs using multiple --input parameters.
+	--ref   [reference genome] : Reference genome in FASTA format.
+	--gaps  [gaps file]        : Assembly gap coordinates in BED3 format.
+	--dups  [dups file]        : Segmental duplication coordinates in BED3 format.
+	--reps  [reps file]        : RepeatMasker annotation coordinates in BED6 format. See manual for details.
+	--mei   ["Alu:L1Hs:SVA"]   : List of mobile element names.
+	--xx                       : Sample is male.
+	--xy                       : Sample is female.
+	--vh                       : Run VariationHunter (read pair + read depth).
+	--ns                       : Run NovelSeq (read pair + assembly).
+	--sr                       : Run SPLITREAD (split read).
+	--all                      : Run all three algorithms above [DEFAULT].
+	--skip-fastq               : Skip FASTQ dump for discordants. Use this only if you are regenerating the calls.
+	--skip-sort                : Skip FASTQ sort for discordants. Use this only if you are regenerating the calls.
+	--skip-remap               : Skip FASTQ remapping for discordants. Use this only if you are regenerating the calls.
+	--version                  : Print version and exit.
+	--help                     : Print this help screen and exit.
+

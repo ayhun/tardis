@@ -124,7 +124,7 @@ int vh_binarySearchInterval (DivetRow * newRow, int pos)	// return 1 if one of t
 	}
       //      printf("%i %i %i %i %i %i %i\n", minId, maxId, midId, g_repeatTable[minId].start, g_repeatTable[maxId].start, g_repeatTable[midId].start, pos);
     }
-//      printf("%i\n", pos);
+  //      printf("%i\n", pos);
   stopId = maxId + 23;
   if (stopId > g_repeatTableSize)
     stopId = g_repeatTableSize;
@@ -166,7 +166,7 @@ int vh_binarySearchInterval (DivetRow * newRow, int pos)	// return 1 if one of t
     }
 
 
-//printf("%i %i %i %i %i %i %i\n", startId, stopId, g_repeatTable[startId].start, g_repeatTable[stopId].start, pos, newRow->locMapLeftEnd, newRow->locMapRightStart);
+  //printf("%i %i %i %i %i %i %i\n", startId, stopId, g_repeatTable[startId].start, g_repeatTable[stopId].start, pos, newRow->locMapLeftEnd, newRow->locMapRightStart);
   return 0;
 
 

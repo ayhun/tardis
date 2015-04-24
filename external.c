@@ -15,7 +15,7 @@ int remap_mrfast( parameters *params, bam_info ** in_bams, configuration *cfg)
 		for ( j = 0; j < in_bams[i]->num_libraries; j++)
 	        {
 			fprintf( stderr, "\nRemapping:\n\t\tSample: %s\n\t\tLibrary: %s\n", in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-			sprintf( cmdline, "%s --search %s --pe --min %d --max %d --sample %s --lib %s --rg %s --seq1 %s --seq2 %s -o %s-%s.sam -u %s-%s.unmapped.fastq", 
+			sprintf( cmdline, "%s --search %s --pe --min %d --max %d --sample %s --lib %s --rg %s --seq1 %s --seq2 %s -o %s-%s.sam.gz -u %s-%s.unmapped.fastq --seqcomp --outcomp", 
 				cfg->path_mrfast, params->ref_genome, in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max,
 				in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname, in_bams[i]->libraries[j]->libname, 
 				in_bams[i]->libraries[j]->fastq1, in_bams[i]->libraries[j]->fastq2,

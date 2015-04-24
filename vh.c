@@ -34,7 +34,7 @@ int run_vh(parameters *params, bam_info ** in_bams){
 	fprintf(stderr, "Applying SET-COVER approximation to find putative structural variation.\n");
 	vh_setcover(in_bams, params->num_bams, outputread, outputfile, svfile); 
 
-	fprintf(stderr, "VariationHunter/CommonLAW run is complete.\n");
+	fprintf(stderr, "VariationHunter/CommonLAW run is complete. Results are in the %s file.\n", svfile);
 
 	if (! TARDIS_DEBUG)
 	{

@@ -22,7 +22,7 @@ typedef struct ReadName
 
 unsigned int vh_hash (char *p);
 ReadName *vh_addReadName (ReadName * hash[], char *s, double newEdit,
-		       double newPhredValue);
+			  double newPhredValue);
 ReadName *getReadNameFromHash (ReadName * hash[], char *readName);
 int vh_exportToArray (ReadName * hash[], char *array[], int indexStart);
 int vh_countNumReads (ReadName * hash[]);

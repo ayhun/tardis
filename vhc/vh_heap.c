@@ -37,7 +37,7 @@ int vh_push_heap (Heap * heapName, HeapEl * newEl)
     {
       vh_copyHeapEl (&tempEl, &heapName->heapArray[heapIndex]);
       vh_copyHeapEl (&(heapName->heapArray[heapIndex]),
-		  &(heapName->heapArray[(heapIndex + 1) / 2 - 1]));
+		     &(heapName->heapArray[(heapIndex + 1) / 2 - 1]));
       vh_copyHeapEl (&(heapName->heapArray[(heapIndex + 1) / 2 - 1]), &tempEl);
       heapIndex = (heapIndex + 1) / 2 - 1;
     }
@@ -70,7 +70,7 @@ int vh_heapBubleDown (Heap * heapName)
 	    {
 	      vh_copyHeapEl (&tempEl, &(heapName->heapArray[heapIndex]));
 	      vh_copyHeapEl (&(heapName->heapArray[heapIndex]),
-			  &(heapName->heapArray[heapIndex * 2 + 2]));
+			     &(heapName->heapArray[heapIndex * 2 + 2]));
 	      vh_copyHeapEl (&(heapName->heapArray[heapIndex * 2 + 2]), &tempEl);
 	      heapIndex = heapIndex * 2 + 2;
 
@@ -79,7 +79,7 @@ int vh_heapBubleDown (Heap * heapName)
 	    {
 	      vh_copyHeapEl (&tempEl, &(heapName->heapArray[heapIndex]));
 	      vh_copyHeapEl (&(heapName->heapArray[heapIndex]),
-			  &(heapName->heapArray[heapIndex * 2 + 1]));
+			     &(heapName->heapArray[heapIndex * 2 + 1]));
 	      vh_copyHeapEl (&(heapName->heapArray[heapIndex * 2 + 1]), &tempEl);
 	      heapIndex = heapIndex * 2 + 1;
 	    }
@@ -88,7 +88,7 @@ int vh_heapBubleDown (Heap * heapName)
 	{
 	  vh_copyHeapEl (&tempEl, &(heapName->heapArray[heapIndex]));
 	  vh_copyHeapEl (&(heapName->heapArray[heapIndex]),
-		      &(heapName->heapArray[heapIndex * 2 + 1]));
+			 &(heapName->heapArray[heapIndex * 2 + 1]));
 	  vh_copyHeapEl (&(heapName->heapArray[heapIndex * 2 + 1]), &tempEl);
 	  heapIndex = heapIndex * 2 + 1;
 	}
@@ -102,7 +102,7 @@ int vh_heap_remove_top (Heap * heapName)
   if (heapName->heapSize > 0)
     {
       vh_copyHeapEl (&(heapName->heapArray[0]),
-		  &(heapName->heapArray[heapName->heapSize - 1]));
+		     &(heapName->heapArray[heapName->heapSize - 1]));
       vh_heapBubleDown (heapName);
       heapName->heapSize--;
     }

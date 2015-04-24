@@ -73,7 +73,7 @@ struct DivetRow *createDivetRow (struct ReadName *hash[],
 				 struct LibraryInfo *libInfo, int id);
 
 struct DivetRow *vh_loadDivetRowFromString (struct ReadName *hash[], char *line,
-					 struct LibraryInfo *libInfo, int id);
+					    struct LibraryInfo *libInfo, int id);
 void vh_freeDivets ();
 struct DivetRow *vh_loadDivetFile (struct LibraryInfo *libInfo);
 void vh_printDivet (struct DivetRow *divetRow);

@@ -25,7 +25,7 @@ int bestFromBuffer()
     }
   /* FEREYDOUN: do we need the fprintf below? Disabling for now */
   /*
-  fprintf( stderr, "The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet].clusterId);
+    fprintf( stderr, "The Best From Buffer %g %i\n", bestSetScore, listClusterInBuffer[bestSet].clusterId);
   */
   return listClusterInBuffer[bestSet].clusterId;
 

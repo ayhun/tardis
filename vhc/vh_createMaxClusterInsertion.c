@@ -27,7 +27,7 @@ int vh_addToGenomeIndex_Insertion (char *chroName)
 	      && (divetReadMappingPtr->locMapRightStart -
 		  divetReadMappingPtr->locMapLeftEnd < libInfo->minDelta)
 	      && vh_noGap (chroName, divetReadMappingPtr->locMapLeftEnd,
-			divetReadMappingPtr->locMapRightStart)
+			   divetReadMappingPtr->locMapRightStart)
 	      && (divetReadMappingPtr->locMapRightStart >
 		  divetReadMappingPtr->locMapLeftEnd))
 	    {
@@ -123,7 +123,7 @@ int vh_createBreakPointIntervals_Insertion (int brkPointLeft)
 	  else
 	    {
 	      vh_copyElBrkPointIntr (tempListRightBrkPointIntrId,
-				  listRightBrkPointIntrId);
+				     listRightBrkPointIntrId);
 	      //                      increaseByOneRightBrkPointIntr(tempListRightBrkPointIntrId);
 	      //reevaluate_Deletion(tempListRightBrkPointIntrId, brkPointLeft);
 	      listRightBrkPointIntrId++;

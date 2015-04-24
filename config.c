@@ -38,7 +38,8 @@ void load_config( configuration* cfg)
 			/* Ignore comments, which begin with the '#' character */
 			if( next_line[0] != '#')
 			{
-				next_line[strlen(next_line)-1] = 0; // get rid of \n
+			        next_line[strlen(next_line)-1] = 0; // get rid of \n
+				
 				if( strstr( next_line, "SAMTOOLS"))
 				{
 					set_str( &( cfg->path_samtools), next_line + strlen("SAMTOOLS = "));
@@ -54,7 +55,7 @@ void load_config( configuration* cfg)
 				else if( strstr( next_line, "GNUPLOT"))
 				{
 					set_str( &( cfg->path_gnuplot), next_line + strlen("GNUPLOT = "));
-				}
+				}				
 				else if( strstr( next_line, "MEGABLAST"))
 				{
 					set_str( &( cfg->path_megablast), next_line + strlen("MEGABLAST = "));
@@ -71,6 +72,8 @@ void load_config( configuration* cfg)
 		free( next_line);
 
 		/* If the paths are still NULL, then they are either not installed, or not in the PATH. */
+
+		/*
 		if( cfg->path_samtools == NULL)
 		{
 			fprintf( stderr, "Warning: samtools path is not in the configuration file.\n");
@@ -79,7 +82,9 @@ void load_config( configuration* cfg)
 		{
 			fprintf( stderr, "samtools path: %s\n", cfg->path_samtools);
 		}
+		*/
 
+		/*
 		if( cfg->path_bcftools == NULL)
 		{
 			fprintf( stderr, "Warning: bcftools path is not in the configuration file.\n");
@@ -88,6 +93,7 @@ void load_config( configuration* cfg)
 		{
 			fprintf( stderr, "bcftools path: %s\n", cfg->path_bcftools);
 		}
+		*/
 
 		if( cfg->path_mrfast == NULL)
 		{
@@ -107,6 +113,7 @@ void load_config( configuration* cfg)
 			fprintf( stderr, "gnuplot path: %s\n", cfg->path_gnuplot);
 		}
 
+		/*
 		if( cfg->path_megablast == NULL)
 		{
 			fprintf( stderr, "Warning: megablast path is not in the configuration file.\n");
@@ -115,6 +122,7 @@ void load_config( configuration* cfg)
 		{
 			fprintf( stderr, "megablast path: %s\n", cfg->path_megablast);
 		}
+		*/
 	}
 }
 

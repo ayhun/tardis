@@ -12,7 +12,7 @@ struct LibraryInfo *g_libInfo = NULL;
 #define MAX_INV 10000000
 
 struct DivetRow *createDivetRow (struct ReadName *hash[], char *readName, char *chroName, char *locMapLeftStart, char *locMapLeftEnd, char *orientationLeft, char *locMapRightStart, char *locMapRightEnd, char *orientationRight, char *svType, char *editDistance, char *avgQual,	//skip
-		char *phredScore, struct LibraryInfo *libInfo, int id)
+				 char *phredScore, struct LibraryInfo *libInfo, int id)
 {
   struct DivetRow *newRow = (DivetRow *) malloc (sizeof (DivetRow));
   if (newRow == NULL)
@@ -75,7 +75,7 @@ struct DivetRow *createDivetRow (struct ReadName *hash[], char *readName, char *
 }
 
 struct DivetRow *vh_loadDivetRowFromString (struct ReadName *hash[], char *line,
-			struct LibraryInfo *libInfo, int id)
+					    struct LibraryInfo *libInfo, int id)
 {
   char *readName = strtok (line, DIVET_ROW_DELIMITERS);
   char *chroName = strtok (NULL, DIVET_ROW_DELIMITERS);

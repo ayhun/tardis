@@ -40,13 +40,13 @@ int vh_compare (const void *a, const void *b)
     return 1;
   if ((*arg1).key < (*arg2).key)
     return -1;
-/*	if ((*arg1).key==(*arg1).locBrkPointLeft)
+  /*	if ((*arg1).key==(*arg1).locBrkPointLeft)
 	{
-		return 1;
+	return 1;
 	} else {
-		return -1;
+	return -1;
 	}
-*/
+  */
 
   if ((*arg1).key == (*arg2).key)
     {
@@ -169,7 +169,7 @@ int vh_copyElBrkPointIntr (int dest, int src)
 }
 
 int vh_isItSubset (int *querySet, int querySetSize, int *patternSet,
-	    int patternSetSize)
+		   int patternSetSize)
 {
   int idPatternSet = 0;
   int idQuerySet = 0;
@@ -197,7 +197,7 @@ int vh_isItSubset (int *querySet, int querySetSize, int *patternSet,
 }
 
 int vh_flushOut (ClustersFound * listPotClustersFound, int leftBreakPoint,
-	  int SVtype)
+		 int SVtype)
 {
   //printf("%i\n", SVtype);       
   ClustersFound *ptrToOldClusterList;
@@ -284,8 +284,8 @@ int vh_addToPotentialOutput (int leftBreakPoint, Heap * heapName, int SVtype)
       if (newClusterIsMaximal == 1)
 	newClusterIsMaximal =
 	  (!vh_isItSubset(newCluster->readMappingIdArray, newCluster->clusterSize,
-	    ptrToOldClusterList->readMappingIdArray,
-	    ptrToOldClusterList->clusterSize));
+			  ptrToOldClusterList->readMappingIdArray,
+			  ptrToOldClusterList->clusterSize));
       if (newClusterIsMaximal == 0)
 	ptrToOldClusterList->leftBrkPoint = leftBreakPoint;
       oldClusterIsMaximal =
@@ -321,15 +321,15 @@ int vh_outputCluster (ClustersFound * cluster, int SVtype)
   int clonalRead = 0;
   int readMapCount;
   int countListOutputed;
-//      printf("Cluster size %i\n", cluster->clusterSize);
+  //      printf("Cluster size %i\n", cluster->clusterSize);
   if (cluster->clusterSize < 2)
     return 0;
-//              printf("Here\n");
+  //              printf("Here\n");
   if (SVtype == 3 && vh_notBothDirections (cluster))
     return 0;
   qsort (cluster->readMappingPtrArray, cluster->clusterSize,
 	 sizeof (DivetRow **), vh_compareReadName);
-//      printf("L229\n");
+  //      printf("L229\n");
   for (readMapCount = 0; readMapCount < cluster->clusterSize; readMapCount++)
     {
       clonalRead = 0;
@@ -392,7 +392,7 @@ int vh_outputCluster (ClustersFound * cluster, int SVtype)
 
 int vh_createIntersectingIntervals (int leftBreakPoint, int SVtype)
 {
-//      printf("l:269\n");
+  //      printf("l:269\n");
   int newElAdded, countIntrEndPoints;
   newElAdded = 0;
   qsort (g_listRightBrkPointIntr, g_listRightBrkPointIntrCount,
@@ -403,20 +403,20 @@ int vh_createIntersectingIntervals (int leftBreakPoint, int SVtype)
     {
       counter++;
       //      if (counter%10000==0)
-//              printf("L302 %i %i %i\n", g_listRightBrkPointIntrCount, g_intersectInterval->heapSize, leftBreakPoint);
+      //              printf("L302 %i %i %i\n", g_listRightBrkPointIntrCount, g_intersectInterval->heapSize, leftBreakPoint);
 
       //if (g_listRightBrkPointIntr[countIntrEndPoints].locBrkPointLeft==g_listRightBrkPointIntr[countIntrEndPoints].key)
       if (g_listRightBrkPointIntr[countIntrEndPoints].keyLorR == 'L')
 	{
 	  newElAdded = 1;
 	  vh_addToHeap (g_listRightBrkPointIntr
-		     [countIntrEndPoints].readMappingPtr,
-		     g_listRightBrkPointIntr
-		     [countIntrEndPoints].locBrkPointRight,
-		     g_intersectInterval);
+			[countIntrEndPoints].readMappingPtr,
+			g_listRightBrkPointIntr
+			[countIntrEndPoints].locBrkPointRight,
+			g_intersectInterval);
 
-//if (leftBreakPoint>500 && leftBreakPoint<1500)
-//      printf("%i %i\n", leftBreakPoint, g_intersectInterval->heapSize);
+	  //if (leftBreakPoint>500 && leftBreakPoint<1500)
+	  //      printf("%i %i\n", leftBreakPoint, g_intersectInterval->heapSize);
 
 	  //for (int testCount=0; testCount<g_intersectInterval->heapSize; testCount++)
 	  //{
@@ -433,7 +433,7 @@ int vh_createIntersectingIntervals (int leftBreakPoint, int SVtype)
 	      if (newElAdded == 1)
 		{
 		  vh_addToPotentialOutput (leftBreakPoint, g_intersectInterval,
-					SVtype);
+					   SVtype);
 		  newElAdded = 0;
 		}
 	      //writeHeap(g_intersectInterval);
@@ -446,9 +446,9 @@ int vh_createIntersectingIntervals (int leftBreakPoint, int SVtype)
 	    }
 	}
     }
-/*if (leftBreakPoint>500 && leftBreakPoint<1500)
-	printf("%i %i\n", leftBreakPoint, g_intersectInterval->heapSize);
-*/
+  /*if (leftBreakPoint>500 && leftBreakPoint<1500)
+    printf("%i %i\n", leftBreakPoint, g_intersectInterval->heapSize);
+  */
   g_intersectInterval->heapSize = 0;
 }
 

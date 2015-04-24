@@ -57,7 +57,7 @@ int vh_addToGenomeIndex_Inversion (char *chroName)
 		{
 		  leftWindowStart =
 		    vh_max (divetReadMappingPtr->locMapLeftStart -
-			 libInfo->maxDelta, 0);
+			    libInfo->maxDelta, 0);
 		  newEl->next = g_genomeIndexStart[leftWindowStart];
 		  newEl2->next =
 		    g_genomeIndexEnd[divetReadMappingPtr->locMapLeftStart];
@@ -66,12 +66,12 @@ int vh_addToGenomeIndex_Inversion (char *chroName)
 		    newEl2;
 
 		}
-/*
-				newEl->next=g_genomeIndexStart[divetReadMappingPtr->locMapLeftEnd];
-				leftWindowEnd=divetReadMappingPtr->locMapLeftEnd+libInfo->maxDelta;
-				newEl2->next=g_genomeIndexEnd[leftWindowEnd];
-				g_genomeIndexStart[divetReadMappingPtr->locMapLeftEnd]=newEl;
-				g_genomeIndexEnd[leftWindowEnd]=newEl2;*/
+	      /*
+		newEl->next=g_genomeIndexStart[divetReadMappingPtr->locMapLeftEnd];
+		leftWindowEnd=divetReadMappingPtr->locMapLeftEnd+libInfo->maxDelta;
+		newEl2->next=g_genomeIndexEnd[leftWindowEnd];
+		g_genomeIndexStart[divetReadMappingPtr->locMapLeftEnd]=newEl;
+		g_genomeIndexEnd[leftWindowEnd]=newEl2;*/
 	    }
 	  divetReadMappingPtr = divetReadMappingPtr->next;
 	}
@@ -133,20 +133,20 @@ void vh_initializeReadMapping_Inversion (char *chroName, int chroSize)
 int vh_reevaluate_rightBrkPoint_FF (int id, int brkPointLeft)
 {
   int brkRightTemp, brkLeftTemp;
-// we need to take the max with locMapRightStart, because it might be possible that (brkPointLeft-g_tempListRightPointIntr[id].readMappingPtr->locMapLeftEnd) be bigger than minDelta.
+  // we need to take the max with locMapRightStart, because it might be possible that (brkPointLeft-g_tempListRightPointIntr[id].readMappingPtr->locMapLeftEnd) be bigger than minDelta.
   brkRightTemp =
     vh_max (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightEnd +
-	 g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->maxDelta -
-	 (brkPointLeft -
-	  g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftEnd),
-	 g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightEnd);
+	    g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->maxDelta -
+	    (brkPointLeft -
+	     g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftEnd),
+	    g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightEnd);
 
   brkLeftTemp =
     vh_max (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightEnd +
-	 g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->minDelta -
-	 (brkPointLeft -
-	  g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftEnd),
-	 g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightEnd);
+	    g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->minDelta -
+	    (brkPointLeft -
+	     g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftEnd),
+	    g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightEnd);
 
   if (g_tempListRightBrkPointIntr[id].keyLorR == 'L')
     {
@@ -170,16 +170,16 @@ int vh_reevaluate_rightBrkPoint_RR (int id, int brkPointLeft)
   int brkRightTemp, brkLeftTemp;
   brkRightTemp =
     vh_min (vh_max	 (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightStart -(g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->minDelta -
-	   (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftEnd -  brkPointLeft)),
-	  g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftStart),
-	 g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightStart);
+											     (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftEnd -  brkPointLeft)),
+			  g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftStart),
+	    g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightStart);
 
   brkLeftTemp =
     vh_max (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapRightStart -
-	 (g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->maxDelta -
-	  (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftStart -
-	   brkPointLeft)),
-	 g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftStart);
+	    (g_tempListRightBrkPointIntr[id].readMappingPtr->libInfo->maxDelta -
+	     (g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftStart -
+	      brkPointLeft)),
+	    g_tempListRightBrkPointIntr[id].readMappingPtr->locMapLeftStart);
 
   if (g_tempListRightBrkPointIntr[id].keyLorR == 'L')
     {
@@ -239,11 +239,11 @@ int vh_createBreakPointIntervals_Inversion (int brkPointLeft)
 	      else
 		{
 		  vh_copyElBrkPointIntr (tempListRightBrkPointIntrId,
-				      listRightBrkPointIntrId);
+					 listRightBrkPointIntrId);
 		  //increaseByOneRightBrkPointIntr(tempListRightBrkPointIntrId);
 		  //decreaseByOneRightBrkPointIntr_FF(tempListRightBrkPointIntrId);
 		  vh_reevaluate_rightBrkPoint_FF (tempListRightBrkPointIntrId,
-					       brkPointLeft);
+						  brkPointLeft);
 		  listRightBrkPointIntrId++;
 		  tempListRightBrkPointIntrId++;
 		}
@@ -256,31 +256,31 @@ int vh_createBreakPointIntervals_Inversion (int brkPointLeft)
 		g_listRightBrkPointIntr
 		[listRightBrkPointIntrId].readMappingPtr->orientationRight ==
 		'R')
-	    {
-	      if ((g_listRightBrkPointIntr
-		   [listRightBrkPointIntrId].readMappingPtr->
-		   locMapLeftStart == brkPointLeft)
-		  ||
-		  (g_listRightBrkPointIntr
-		   [listRightBrkPointIntrId].readMappingPtr->
-		   locMapRightStart - brkPointLeft <
-		   g_listRightBrkPointIntr
-		   [listRightBrkPointIntrId].readMappingPtr->libInfo->
-		   minDelta))
-		{
-		  listRightBrkPointIntrId++;
-		}
-	      else
-		{
-		  vh_copyElBrkPointIntr (tempListRightBrkPointIntrId,
-				      listRightBrkPointIntrId);
-		  //decreaseByOneRightBrkPointIntr_RR(tempListRightBrkPointIntrId);
-		  vh_reevaluate_rightBrkPoint_RR (tempListRightBrkPointIntrId,
-					       brkPointLeft);
-		  listRightBrkPointIntrId++;
-		  tempListRightBrkPointIntrId++;
-		}
-	    }
+	      {
+		if ((g_listRightBrkPointIntr
+		     [listRightBrkPointIntrId].readMappingPtr->
+		     locMapLeftStart == brkPointLeft)
+		    ||
+		    (g_listRightBrkPointIntr
+		     [listRightBrkPointIntrId].readMappingPtr->
+		     locMapRightStart - brkPointLeft <
+		     g_listRightBrkPointIntr
+		     [listRightBrkPointIntrId].readMappingPtr->libInfo->
+		     minDelta))
+		  {
+		    listRightBrkPointIntrId++;
+		  }
+		else
+		  {
+		    vh_copyElBrkPointIntr (tempListRightBrkPointIntrId,
+					   listRightBrkPointIntrId);
+		    //decreaseByOneRightBrkPointIntr_RR(tempListRightBrkPointIntrId);
+		    vh_reevaluate_rightBrkPoint_RR (tempListRightBrkPointIntrId,
+						    brkPointLeft);
+		    listRightBrkPointIntrId++;
+		    tempListRightBrkPointIntrId++;
+		  }
+	      }
 	}
     }
 
@@ -295,30 +295,30 @@ int vh_createBreakPointIntervals_Inversion (int brkPointLeft)
 	{
 	  locBrkPointRightTemp =
 	    vh_max (ptrMappingOnGenome->readMappingPtr->libInfo->maxDelta -
-		 (brkPointLeft -
-		  ptrMappingOnGenome->readMappingPtr->locMapLeftEnd),
-		 0) + ptrMappingOnGenome->readMappingPtr->locMapRightEnd;
+		    (brkPointLeft -
+		     ptrMappingOnGenome->readMappingPtr->locMapLeftEnd),
+		    0) + ptrMappingOnGenome->readMappingPtr->locMapRightEnd;
 	  locBrkPointLeftTemp =
 	    vh_max (ptrMappingOnGenome->readMappingPtr->libInfo->minDelta -
-		 (brkPointLeft -
-		  ptrMappingOnGenome->readMappingPtr->locMapLeftEnd),
-		 0) + ptrMappingOnGenome->readMappingPtr->locMapRightEnd;
+		    (brkPointLeft -
+		     ptrMappingOnGenome->readMappingPtr->locMapLeftEnd),
+		    0) + ptrMappingOnGenome->readMappingPtr->locMapRightEnd;
 	}
       else if (ptrMappingOnGenome->readMappingPtr->orientationLeft == 'R'
 	       && ptrMappingOnGenome->readMappingPtr->orientationRight == 'R')
 	{
 	  locBrkPointRightTemp =
 	    vh_max (ptrMappingOnGenome->readMappingPtr->locMapRightStart -
-		 vh_max (ptrMappingOnGenome->readMappingPtr->libInfo->minDelta -
-		      (ptrMappingOnGenome->readMappingPtr->locMapLeftStart -
-		       brkPointLeft), 0),
-		 ptrMappingOnGenome->readMappingPtr->locMapLeftStart);
+		    vh_max (ptrMappingOnGenome->readMappingPtr->libInfo->minDelta -
+			    (ptrMappingOnGenome->readMappingPtr->locMapLeftStart -
+			     brkPointLeft), 0),
+		    ptrMappingOnGenome->readMappingPtr->locMapLeftStart);
 	  locBrkPointLeftTemp =
 	    vh_max (ptrMappingOnGenome->readMappingPtr->locMapRightStart -
-		 vh_max (ptrMappingOnGenome->readMappingPtr->libInfo->maxDelta -
-		      (ptrMappingOnGenome->readMappingPtr->locMapLeftStart -
-		       brkPointLeft), 0),
-		 ptrMappingOnGenome->readMappingPtr->locMapLeftStart);
+		    vh_max (ptrMappingOnGenome->readMappingPtr->libInfo->maxDelta -
+			    (ptrMappingOnGenome->readMappingPtr->locMapLeftStart -
+			     brkPointLeft), 0),
+		    ptrMappingOnGenome->readMappingPtr->locMapLeftStart);
 	}
 
       g_tempListRightBrkPointIntr

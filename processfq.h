@@ -4,11 +4,11 @@
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
+#include <zlib.h>
 #include "common.h"
 
 #define MEMUSE 2047483648
 #define MEMSCALE 1.5
-#define STRLEN 256
 
 /* Maximum sequence/quality length */
 #define MAX_SEQ 1000
@@ -38,7 +38,7 @@ struct library_properties
 
 /* Function Prototypes */
 void fastq_match( char*, char*, int, int);
-int load_reads( FILE*, struct read**, int);
+int load_reads( gzFile, struct read**, int);
 static int fastq_qname_comp( const void*, const void*);
 void alloc_reads( struct read***, int);
 void realloc_reads( struct read***, int, int);

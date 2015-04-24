@@ -268,37 +268,37 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
   multiLibsCount=0;
 
   for (j=0; j<num_bams; j++)
-  {
-    for (i=0; i<in_bams[j]->num_libraries; i++)
-      {
-	strcpy(multiLibs[multiLibsCount].libName, in_bams[j]->libraries[i]->libname);
-	multiLibs[multiLibsCount].indId=addNewInd(in_bams[j]->sample_name);    
-	multiLibs[multiLibsCount].maxInstSize = in_bams[j]->libraries[i]->conc_max - 2 * in_bams[j]->libraries[i]->read_length; 
-	multiLibs[multiLibsCount].minInstSize = in_bams[j]->libraries[i]->conc_min - 2 * in_bams[j]->libraries[i]->read_length; 
-	if (multiLibs[multiLibsCount].maxInstSize < 0)
-	  multiLibs[multiLibsCount].maxInstSize = 0;
-	if (multiLibs[multiLibsCount].minInstSize < 0)
-	  multiLibs[multiLibsCount].minInstSize = 0;
-	multiLibs[multiLibsCount].readLen = in_bams[j]->libraries[i]->read_length; 
-	multiLibsCount++;
-      }
-  }
+    {
+      for (i=0; i<in_bams[j]->num_libraries; i++)
+	{
+	  strcpy(multiLibs[multiLibsCount].libName, in_bams[j]->libraries[i]->libname);
+	  multiLibs[multiLibsCount].indId=addNewInd(in_bams[j]->sample_name);    
+	  multiLibs[multiLibsCount].maxInstSize = in_bams[j]->libraries[i]->conc_max - 2 * in_bams[j]->libraries[i]->read_length; 
+	  multiLibs[multiLibsCount].minInstSize = in_bams[j]->libraries[i]->conc_min - 2 * in_bams[j]->libraries[i]->read_length; 
+	  if (multiLibs[multiLibsCount].maxInstSize < 0)
+	    multiLibs[multiLibsCount].maxInstSize = 0;
+	  if (multiLibs[multiLibsCount].minInstSize < 0)
+	    multiLibs[multiLibsCount].minInstSize = 0;
+	  multiLibs[multiLibsCount].readLen = in_bams[j]->libraries[i]->read_length; 
+	  multiLibsCount++;
+	}
+    }
   
   /*
-  while(fscanf(fpLib, "%s %s %s %i %i %i\n", libName, indName, filePath, &minInstSize, &maxInstSize, &readLen)!=EOF)
+    while(fscanf(fpLib, "%s %s %s %i %i %i\n", libName, indName, filePath, &minInstSize, &maxInstSize, &readLen)!=EOF)
     {
-      //printf("%s %s %s %i %i %i\n", libName, indName, filePath, minInstSize, maxInstSize, readLen);
-      strcpy(multiLibs[multiLibsCount].libName, libName);
-      multiLibs[multiLibsCount].indId=addNewInd(indName);
-      //	printf("%s %i\n", indName, multiLibs[multiLibsCount].indId);
-      multiLibs[multiLibsCount].maxInstSize=maxInstSize-2*readLen;
-      multiLibs[multiLibsCount].minInstSize=minInstSize-2*readLen;
-      if (multiLibs[multiLibsCount].maxInstSize<0)
-	multiLibs[multiLibsCount].maxInstSize=0;
-      if (multiLibs[multiLibsCount].minInstSize<0)
-	multiLibs[multiLibsCount].minInstSize=0;
-      multiLibs[multiLibsCount].readLen=readLen;
-      multiLibsCount++;
+    //printf("%s %s %s %i %i %i\n", libName, indName, filePath, minInstSize, maxInstSize, readLen);
+    strcpy(multiLibs[multiLibsCount].libName, libName);
+    multiLibs[multiLibsCount].indId=addNewInd(indName);
+    //	printf("%s %i\n", indName, multiLibs[multiLibsCount].indId);
+    multiLibs[multiLibsCount].maxInstSize=maxInstSize-2*readLen;
+    multiLibs[multiLibsCount].minInstSize=minInstSize-2*readLen;
+    if (multiLibs[multiLibsCount].maxInstSize<0)
+    multiLibs[multiLibsCount].maxInstSize=0;
+    if (multiLibs[multiLibsCount].minInstSize<0)
+    multiLibs[multiLibsCount].minInstSize=0;
+    multiLibs[multiLibsCount].readLen=readLen;
+    multiLibsCount++;
     }	
   */
 
@@ -1231,7 +1231,7 @@ int pickSet()
       else 
 	{
 	  /*
-	  printf("aaaaaaa%f\n", bestWeight);
+	    printf("aaaaaaa%f\n", bestWeight);
 	  */
 	  return 0;
 	}
