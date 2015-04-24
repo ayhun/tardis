@@ -26,6 +26,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"help"   , no_argument,         0, 'h'},
 		{"version", no_argument,         0, 'v'},
 		{"bamlist", no_argument,	 0, 'b'},
+		{"out"    , required_argument,	 0, 'o'},
 		{"vh"     , no_argument, &run_vh,     1 },
 		{"ns"     , no_argument, &run_ns,     1 },
 		{"sr"     , no_argument, &run_sr,     1 },
@@ -45,7 +46,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		return 0;
 	}
   
-	while( ( o = getopt_long( argc, argv, "hvb:i:f:g:d:r:m:", long_options, &index)) != -1)
+	while( ( o = getopt_long( argc, argv, "hvb:i:f:g:d:r:o:m:", long_options, &index)) != -1)
 	{
 		switch( o)
 		{
@@ -83,6 +84,10 @@ int parse_command_line( int argc, char** argv, parameters* params)
 				set_str( &( params->mei), optarg);
 			break;
 			
+			case 'o':
+				set_str( &( params->outprefix), optarg);
+			break;
+			
 			case 't':
 				params->threads = atoi( optarg);
 			break;
@@ -112,6 +117,14 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	{
 		run_vh = 1; run_sr = 1; run_ns = 1;
 	}
+
+	/* check if outprefix is given */
+	if( params->outprefix == NULL)
+	{
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the output file name prefix using the --out option.\n");
+		return EXIT_PARAM_ERROR;
+	}
+	else  fprintf(stderr, "out: %s\n", params->outprefix);
   
 	/* check if --xx or --xy is invoked. */
 	if( !is_male && !is_female)
@@ -138,7 +151,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	{
 		if( params->bam_list_path == NULL)
 		{
-			fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter list of input BAM files through the --input or --bamlist option.\n");
+			fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter list of input BAM files using the --input or --bamlist option.\n");
 			return EXIT_PARAM_ERROR;
 		}
 	}
@@ -146,28 +159,28 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	/* check if --ref   is invoked */
 	if( params->ref_genome == NULL)
 	{
-		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter reference genome file (FASTA) through the --ref option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter reference genome file (FASTA) using the --ref option.\n");
 		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --gaps  is invoked */
 	if( params->gaps == NULL)
 	{
-		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the assembly gaps file (BED) through the --gaps option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the assembly gaps file (BED) using the --gaps option.\n");
 		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --reps  is invoked */
 	if( params->reps == NULL)
 	{
-		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the repeats file (RepeaMasker) through the --reps option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the repeats file (RepeaMasker) using the --reps option.\n");
 		return EXIT_PARAM_ERROR;
 	}
 
 	/* check if --dups  is invoked */
 	if( params->dups == NULL)
 	{
-		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the segmental duplications file (BED) through the --dups option.\n");
+		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please enter the segmental duplications file (BED) using the --dups option.\n");
 		return EXIT_PARAM_ERROR;
 	}
 

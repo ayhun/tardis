@@ -29,6 +29,7 @@ typedef struct _params
 	char** bam_file_list; /* the actual list that holds all bam file paths after tokenization */
 	char* gaps; /* path to assembly gaps file - bed */
 	char* mei;  /* regular expression-like MEI list */
+        char* outprefix; /* prefix for the output files */
 	enum gender sample_gender; /* gender of the sample */
 	char run_vh; /* boolean stand-in to run VariationHunter */
 	char run_ns; /* boolean stand-in to run NovelSeq */

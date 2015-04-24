@@ -13,6 +13,10 @@ int run_vh(parameters *params, bam_info ** in_bams){
 	char outputread[MAX_SEQ];
 	char svfile[MAX_SEQ];
 
+	sprintf(outputfile,"%s.clusters", params->outprefix);
+	sprintf(outputread,"%s.name", params->outprefix);
+	sprintf(svfile,"%s.sv", params->outprefix);
+
 	for( i = 0; i < params->num_bams; i++)
 	{
 		
@@ -21,22 +25,22 @@ int run_vh(parameters *params, bam_info ** in_bams){
 		        sprintf(divetfile, "%s-%s.sam_DIVET.vh",  in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
 			set_str(&(in_bams[i]->libraries[j]->divet), divetfile);
 		}
-		for ( j = 0; j < in_bams[i]->num_libraries; j++)
-		{
-		  fprintf(stderr, "Calculating maximal clusters for sample: %s, library: %s.\n", in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-		  sprintf(outputfile,"%s-%s.cluster.out",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-		  sprintf(outputread,"%s-%s.name",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-		  sprintf(svfile,"%s-%s.out.sv",in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-		  if ( !params->skip_vhcluster)
-		    vh_clustering (in_bams[i], params->gaps, params->reps, preProsPrune, outputfile, outputread, overMapLimit);
-		}
-		//remove(outputfile);
-		//remove(outputread);
 	}  
-	
-	fprintf(stderr, "Applying SET-COVER to find putative structural variation.\n");
+
+	fprintf( stderr, "Now running VariationHunter/CommonLAW...\n");	
+	fprintf( stderr, "Calculating maximal clusters.\n");
+	if ( TARDIS_DEBUG && !params->skip_vhcluster) // this parameter is only intended for debugging purposes. End users shouldn't use this
+	  vh_clustering (in_bams, params->num_bams, params->gaps, params->reps, preProsPrune, outputfile, outputread, overMapLimit);
+	fprintf(stderr, "Applying SET-COVER approximation to find putative structural variation.\n");
 	vh_setcover(in_bams, params->num_bams, outputread, outputfile, svfile); 
-	fprintf(stderr, "VariationHunter run is complete.\n");
+
+	fprintf(stderr, "VariationHunter/CommonLAW run is complete.\n");
+
+	if (! TARDIS_DEBUG)
+	{
+	  remove(outputfile);
+	  remove(outputread);
+	}
 	
 	return RETURN_SUCCESS;
 }

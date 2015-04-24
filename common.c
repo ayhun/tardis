@@ -19,6 +19,7 @@ void init_params( parameters** params)
 	( *params)->dups = NULL;
 	( *params)->bam_files = NULL;
 	( *params)->bam_list_path = NULL;
+	( *params)->outprefix = NULL;
 	( *params)->bam_file_list = ( char**) malloc( sizeof( char*) * MAX_BAMS);
 	( *params)->gaps = NULL;
 	( *params)->mei = NULL;

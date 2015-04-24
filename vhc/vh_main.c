@@ -48,7 +48,7 @@ void vh_quitProgram (int exitCode)
 
 
 void vh_pruneAndNormalizeDivets (struct LibraryInfo *lib, double preProsPrune,
-			 int overMapLimit)
+				 int overMapLimit)
 {
   struct DivetRow *cursor = lib->head->next;
 
@@ -96,57 +96,59 @@ static int vh_cmprReadNameStr (const void *a, const void *b)
 //  char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 //{
 
-void vh_clustering (bam_info* in_bam, char *gapFileName,
-  char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
+void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
+		    char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 {
 
   int totalNumUniqueReads = 0;
   int indexStart = 0;
   int count;
-  int i,j;
+  int i,j,k;
   struct LibraryInfo *newLibInfo, *cursor, *t;
 
   vh_readInitFile ();
-  vh_readChros (in_bam);
+  vh_readChros (in_bams[0]);
   vh_readGapTable (gapFileName);
   vh_readRepeatTable (repeatFileName);
 
 
   g_libInfo = NULL;
 
-  for (i=0;i<in_bam->num_libraries;i++)
+  for (k = 0; k < num_bams; k++)
     {
-      newLibInfo = (struct LibraryInfo *) malloc (sizeof (struct LibraryInfo));
-      strcpy (newLibInfo->libName, in_bam->libraries[i]->libname);
-      strcpy (newLibInfo->libFileAdrs, in_bam->libraries[i]->divet);
-      newLibInfo->minDelta = in_bam->libraries[i]->conc_min - 2 * in_bam->libraries[i]->read_length;
-      newLibInfo->maxDelta = in_bam->libraries[i]->conc_max - 2 * in_bam->libraries[i]->read_length;
-      if (newLibInfo->minDelta < 0)
-	newLibInfo->minDelta = 0;
-      if (newLibInfo->maxDelta < 0)
-	newLibInfo->maxDelta = 0;
-      newLibInfo->readLen = in_bam->libraries[i]->read_length;
-      newLibInfo->hash =(struct ReadName **) malloc (NHASH * sizeof (struct ReadName *));
-      for (j = 0; j < NHASH; j++)
-	newLibInfo->hash[j] = NULL;
-      newLibInfo->head = NULL;
-      newLibInfo->tail = NULL;
-      newLibInfo->size = 0;
-      newLibInfo->next = NULL;
-      
-      //If first one in the linkedlist                                                                                                                                                                          
-      if (g_libInfo == NULL)
+      for (i = 0; i < in_bams[k]->num_libraries; i++)
 	{
-	  g_libInfo = newLibInfo;
-	}
-      else                  //add to the end of the linked list                                                                                                                                                 
-	{
-	  for (t = g_libInfo; t->next != NULL; t = t->next)
-	    ;        //Skip till end of LinkedList                                                                                                             	  
-	  t->next = newLibInfo;
+	  newLibInfo = (struct LibraryInfo *) malloc (sizeof (struct LibraryInfo));
+	  strcpy (newLibInfo->libName, in_bams[k]->libraries[i]->libname);
+	  strcpy (newLibInfo->libFileAdrs, in_bams[k]->libraries[i]->divet);
+	  newLibInfo->minDelta = in_bams[k]->libraries[i]->conc_min - 2 * in_bams[k]->libraries[i]->read_length;
+	  newLibInfo->maxDelta = in_bams[k]->libraries[i]->conc_max - 2 * in_bams[k]->libraries[i]->read_length;
+	  if (newLibInfo->minDelta < 0)
+	    newLibInfo->minDelta = 0;
+	  if (newLibInfo->maxDelta < 0)
+	    newLibInfo->maxDelta = 0;
+	  newLibInfo->readLen = in_bams[k]->libraries[i]->read_length;
+	  newLibInfo->hash =(struct ReadName **) malloc (NHASH * sizeof (struct ReadName *));
+	  for (j = 0; j < NHASH; j++)
+	    newLibInfo->hash[j] = NULL;
+	  newLibInfo->head = NULL;
+	  newLibInfo->tail = NULL;
+	  newLibInfo->size = 0;
+	  newLibInfo->next = NULL;
+	  
+	  //If first one in the linkedlist                                                                                                                                                                          
+	  if (g_libInfo == NULL)
+	    {
+	      g_libInfo = newLibInfo;
+	    }
+	  else                  //add to the end of the linked list                                                                                                                                                 
+	    {
+	      for (t = g_libInfo; t->next != NULL; t = t->next)
+		;        //Skip till end of LinkedList                                                                                                             	  
+	      t->next = newLibInfo;
+	    }
 	}
     }
-  
 
   cursor = g_libInfo;
   fileOutput = fopen (outputFile, "w");
@@ -196,24 +198,24 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
 
   //Just for test
   /*LibraryInfo* l = g_libInfo;
-     for (; l; l = l->next)
-     {
-     printf("Lib: %s, Adrs: %s, Min: %d, Max: %d, Len: %d, size: %d\n", l->libName, l->libFileAdrs, l->minDelta, l->maxDelta, l->readLen, l->size);
-     DivetRow* tmp = l->head;
-     for (int counter = 0;tmp != NULL && counter < 10; tmp = tmp->next, counter++)
-     printDivet(tmp);
-     printf("--------\n");
+    for (; l; l = l->next)
+    {
+    printf("Lib: %s, Adrs: %s, Min: %d, Max: %d, Len: %d, size: %d\n", l->libName, l->libFileAdrs, l->minDelta, l->maxDelta, l->readLen, l->size);
+    DivetRow* tmp = l->head;
+    for (int counter = 0;tmp != NULL && counter < 10; tmp = tmp->next, counter++)
+    printDivet(tmp);
+    printf("--------\n");
 
-     char* nameToSearch = "IL22_348:5:285:83:287";
-     ReadName* r = getReadNameFromHash(l->hash, nameToSearch);
-     if (r != NULL)
-     sprintf(g_loggerMsgBuffer, "%s\t%d\t%f\t%f\n", r->readName, r->occurrences, r->minEdit, r->meanPhredValue);
-     else
-     sprintf(g_loggerMsgBuffer, "%s Not Found!\n", nameToSearch);
-     logOutput(g_loggerMsgBuffer);
-     printf("=============\n");
-     }
-   */
+    char* nameToSearch = "IL22_348:5:285:83:287";
+    ReadName* r = getReadNameFromHash(l->hash, nameToSearch);
+    if (r != NULL)
+    sprintf(g_loggerMsgBuffer, "%s\t%d\t%f\t%f\n", r->readName, r->occurrences, r->minEdit, r->meanPhredValue);
+    else
+    sprintf(g_loggerMsgBuffer, "%s Not Found!\n", nameToSearch);
+    logOutput(g_loggerMsgBuffer);
+    printf("=============\n");
+    }
+  */
   for (i = 0; i < g_chroTableSize; i++)
     {
       fprintf(stderr, "\r                                                        ");
@@ -221,7 +223,7 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
       fprintf(stderr, "\rProcessing chromosome %s ", g_chroTable[i].chroName);
       fflush(stderr);
       vh_initializeReadMapping_Deletion (g_chroTable[i].chroName,
-				      g_chroTable[i].size);
+					 g_chroTable[i].size);
       fprintf(stderr, ".");
       fflush(stderr);      
       vh_createDeletionClusters (g_chroTable[i].size);
@@ -257,15 +259,15 @@ void vh_clustering (bam_info* in_bam, char *gapFileName,
   cursor = g_libInfo;
   t = cursor;
   while (t != NULL)
-  {
-    t = cursor->next;
-    /* FEREYDOUN: Free the hash as well. This is likely a linked list */
-    for (i = 0; i < NHASH; i++)
-      if (cursor->hash != NULL)
-	free(cursor->hash[i]);
-    free(cursor->hash);
-    free(cursor);
-  }  
+    {
+      t = cursor->next;
+      /* FEREYDOUN: Free the hash as well. This is likely a linked list */
+      for (i = 0; i < NHASH; i++)
+	if (cursor->hash != NULL)
+	  free(cursor->hash[i]);
+      free(cursor->hash);
+      free(cursor);
+    }  
 
 
 }

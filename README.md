@@ -23,7 +23,7 @@ Sina Jafarzadeh	jafarzadeh91@gmail.com
 Building the repeats file
 =========================
 
-Download the RepeatMasker out files from the UCSC Genome Browser. For GRCh37, this file is at: http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromOut.tar.gz
+Download the RepeatMasker out files from the UCSC Genome Browser. For GRCh37 (hg19), this file is at: http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromOut.tar.gz
 
 Create a temp directory to make things easier to cleanup:
 
@@ -50,18 +50,19 @@ Auxiliary files
 
 GRCh37 annotations available under aux/
 
- * build37.dups.bed: Segmental duplication coordinates
- * build37.gaps.bed: Assembly gap coordinates
- * build37.reps.bed: RepeatMasker annotations (as described above)
+ * build37.dups.bed: Segmental duplication coordinates.
+ * build37.gaps.bed: Assembly gap coordinates.
+ * build37.reps.bed: RepeatMasker annotations (as described above). This file is provided as compressed. Unzip it before use.
 
 Also download the reference genome from the UCSC Genome Browser. For GRCh37, this file is at: http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz. Merge all FASTA files into a single file. Make sure that the same reference was used to align the reads beforehand (BAM file).
 
 
-Running TARDIS
+Running tardis
 ==============
 
 	tardis -i myinput.bam --ref human_g1k_v37.fasta --gaps build37.gap.bed \
-		--reps build37.reps.bed --dups build37_dups.bed --xy --vh 
+		--reps build37.reps.bed --dups build37_dups.bed --xy --vh \
+		--out myoutput
 
 Additional parameters, helpful when debugging:
 

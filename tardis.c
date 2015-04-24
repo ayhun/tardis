@@ -82,7 +82,6 @@ int main( int argc, char** argv)
 
 	if ( params->run_vh == 1)
 	{
-	        fprintf( stderr, "Now running VariationHunter...\n");
 		return_value = run_vh( params, in_bams );
 		if (return_value != RETURN_SUCCESS)
 			return EXIT_EXTERNAL_PROG_ERROR;

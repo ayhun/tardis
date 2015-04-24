@@ -8,6 +8,8 @@
 //int g_divetRowLinkedListSize = 0;
 struct LibraryInfo *g_libInfo = NULL;
 
+#define MAX_DEL 100000
+#define MAX_INV 10000000
 
 struct DivetRow *createDivetRow (struct ReadName *hash[], char *readName, char *chroName, char *locMapLeftStart, char *locMapLeftEnd, char *orientationLeft, char *locMapRightStart, char *locMapRightEnd, char *orientationRight, char *svType, char *editDistance, char *avgQual,	//skip
 		char *phredScore, struct LibraryInfo *libInfo, int id)
