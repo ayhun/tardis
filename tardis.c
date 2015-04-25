@@ -7,6 +7,7 @@ int main( int argc, char** argv)
 	parameters* params;
 	configuration* cfg;
 	int return_value;
+	char username[MAX_SEQ];
 	int i;
 	int j;
 
@@ -87,6 +88,9 @@ int main( int argc, char** argv)
 			return EXIT_EXTERNAL_PROG_ERROR;
 	}
 	
+	
+	getlogin_r(username, MAX_SEQ);
+	fprintf( stderr, "\n%s, before I go, I just want to tell you: you were fantastic. Absolutely fantastic. And you know what? So was I.\n", username);
 
 	return EXIT_SUCCESS;
 }

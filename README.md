@@ -25,6 +25,19 @@ Type:
 	cp tardis /path/to/your/favorite/binaries
 
 
+Auxiliary files
+===============
+
+GRCh37 annotations available under aux/
+
+ * build37.dups.bed: Segmental duplication coordinates.
+ * build37.gaps.bed: Assembly gap coordinates.
+ * build37.reps.bed: RepeatMasker annotations (as described below). This file is provided as compressed. Unzip it before use.
+
+Also download the reference genome from the UCSC Genome Browser. For GRCh37, this file is at: http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz. Merge all FASTA files into a single file. Make sure that the same reference was used to align the reads beforehand (BAM file).
+
+** Reference genome and its annotations should use the EXACT same names for the chromosomes. The example provided below use the 1000 Genomes Project naming convention. **
+
 Building the repeats file
 =========================
 
@@ -50,17 +63,6 @@ Remove unnecessary files:
 	rm chromOut.tar.gz
 	rm -fr rmasker
 
-Auxiliary files
-===============
-
-GRCh37 annotations available under aux/
-
- * build37.dups.bed: Segmental duplication coordinates.
- * build37.gaps.bed: Assembly gap coordinates.
- * build37.reps.bed: RepeatMasker annotations (as described above). This file is provided as compressed. Unzip it before use.
-
-Also download the reference genome from the UCSC Genome Browser. For GRCh37, this file is at: http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz. Merge all FASTA files into a single file. Make sure that the same reference was used to align the reads beforehand (BAM file).
-
 
 Running tardis
 ==============
@@ -78,6 +80,7 @@ All parameters
 
 	--bamlist   [bamlist file] : A text file that lists input BAM files one file per line.
 	--input [BAM files]        : Input files in sorted and indexed BAM format. You can pass multiple BAMs using multiple --input parameters.
+	--out   [output prefix]    : Prefix for the output file names.
 	--ref   [reference genome] : Reference genome in FASTA format.
 	--gaps  [gaps file]        : Assembly gap coordinates in BED3 format.
 	--dups  [dups file]        : Segmental duplication coordinates in BED3 format.
@@ -85,7 +88,7 @@ All parameters
 	--mei   ["Alu:L1Hs:SVA"]   : List of mobile element names.
 	--xx                       : Sample is male.
 	--xy                       : Sample is female.
-	--vh                       : Run VariationHunter (read pair + read depth).
+	--vh                       : Run VariationHunter/CommonLAW (read pair + read depth).
 	--ns                       : Run NovelSeq (read pair + assembly).
 	--sr                       : Run SPLITREAD (split read).
 	--all                      : Run all three algorithms above [DEFAULT].

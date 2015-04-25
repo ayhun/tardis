@@ -1,5 +1,5 @@
-#ifndef _VHtoVCF_
-#define _VHtoVCF_
+#ifndef __VHtoVCF
+#define __VHtoVCF
 // #include "tardis.h"
 
 void do_chrom(char *thischrom, int i, int minsup, int maxsup, int mininvsup, float maxdup, float prune);

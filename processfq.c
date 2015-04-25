@@ -16,13 +16,6 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 	int i;
 	int j;
 
-	/*	
-	FILE* f1;
-	FILE* f2;
-	FILE* of1;
-	FILE* of2;
-	*/
-
 	gzFile  f1;
 	gzFile f2;
 	gzFile of1;
@@ -160,7 +153,6 @@ static int fastq_qname_comp( const void* p1, const void* p2)
 int load_reads( gzFile f1, struct read** reads, int num_batch)
 {
 	int i;
-	int items_read;
 	char qname[MAX_SEQ];
 	char seq[MAX_SEQ];
 	char qual[MAX_SEQ];
@@ -173,19 +165,12 @@ int load_reads( gzFile f1, struct read** reads, int num_batch)
 		{
 			if( !gzeof( f1))
 			{
-			  //items_read = fscanf( f1, "@%s\n%s\n+\n%s\n", qname, seq, qual);
  			        gzgets(f1, qname, MAX_SEQ);
 				if (gzeof( f1))
 				  return cnt;
  			        gzgets(f1, seq, MAX_SEQ);
  			        gzgets(f1, plus, MAX_SEQ);
  			        gzgets(f1, qual, MAX_SEQ);
-				/*
-				items_read = sscanf( read_line, "@%s\n%s\n+\n%s\n", qname, seq, qual);
-				if( items_read != 3)
-				{
-					perror( "Invalid number of fields read");
-					}*/
 				qname[strlen( qname) - 3] = 0; // get rid of /1 /2 and \n
 				seq[strlen( seq) - 1] = 0; // get rid of \n
 				qual[strlen( qual) - 1] = 0; // get rid of \n
@@ -254,11 +239,6 @@ void free_reads( struct read*** reads, int num_batch)
 
 void create_fastq_library( struct library_properties* in_lib, char* sample_name, char* bam_path, parameters* params)
 {
-  /*
-	FILE* fastq;
-	FILE* fastq2;
-	FILE* outfastq;
-  */
 	gzFile fastq;
 	gzFile fastq2;
 	gzFile outfastq;
@@ -270,6 +250,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	char qual[MAX_SEQ];
 	char filename[255];
 	char filename2[255];
+	char next_char;
 	char* current_lib_name = NULL;
 	int num_seq;
 	int flag;
@@ -293,7 +274,6 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	}
 
 	/* Open FASTQ file for writing */
-	//fastq = fopen( filename, "w");
 	fastq = gzopen( filename, "w");
 	if( !fastq)
 	{
@@ -362,7 +342,6 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 			strncpy( sequence, bam_get_seq( bam_alignment), bam_alignment_core.l_qseq);
 			sequence[bam_alignment_core.l_qseq] = '\0';
 
-			char next_char;
 			/* Read mapped to the + strand */
 			if( ( flag & BAM_FREVERSE) == 0)
 			{
@@ -438,7 +417,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 
 	if( !( params->skip_sort))
         {
-	        fprintf( stderr, "Sorting FASTQ files for library: %s.\n", in_lib->libname);
+	        fprintf( stderr, "Sorting FASTQ files for library: %s.\nDemons run when a good man goes to war.\n", in_lib->libname);
 	        fastq_match( in_lib->fastq1, in_lib->fastq2, in_lib->num_sequences, in_lib->read_length);
 	}	    
 	

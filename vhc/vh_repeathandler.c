@@ -56,7 +56,7 @@ void vh_readRepeatTable (char *repeatFileName)
     }
   else
     {    
-      fprintf(stderr, "Reading %d satellites.\n", satellites);
+      fprintf(stderr, "Loaded %d satellite regions.\n", satellites);
     }
 
   g_repeatTable = (Repeat *) malloc(sizeof(Repeat) * satellites);
