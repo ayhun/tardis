@@ -3,13 +3,7 @@
 #include "vh_gaphandler.h"
 #include "vh_repeathandler.h"
 
-//DivetRow* g_headDivet = NULL;
-//DivetRow* g_tailDivet = NULL;
-//int g_divetRowLinkedListSize = 0;
 struct LibraryInfo *g_libInfo = NULL;
-
-#define MAX_DEL 100000
-#define MAX_INV 10000000
 
 struct DivetRow *createDivetRow (struct ReadName *hash[], char *readName, char *chroName, char *locMapLeftStart, char *locMapLeftEnd, char *orientationLeft, char *locMapRightStart, char *locMapRightEnd, char *orientationRight, char *svType, char *editDistance, char *avgQual,	//skip
 				 char *phredScore, struct LibraryInfo *libInfo, int id)
@@ -28,9 +22,6 @@ struct DivetRow *createDivetRow (struct ReadName *hash[], char *readName, char *
 
   len = strlen (chroName);
   newRow->chroName = (char *) malloc (sizeof (char) * len + 1);
-
-  //if (strcmp(readName, "C004LACXX_84:2:1101:14011:103362:1#0")==0)
-  //      printf("%s\n", chroName);
 
   strcpy (newRow->chroName, chroName);
 
@@ -133,7 +124,7 @@ void vh_freeDivets (struct LibraryInfo *libInfo)
  */
 DivetRow *vh_loadDivetFile (LibraryInfo * libInfo)
 {
-  FILE *divetFile = fopen (libInfo->libFileAdrs, "r");
+  FILE *divetFile = safe_fopen (libInfo->libFileAdrs, "r");
   int i;
   
   if (divetFile == NULL)
@@ -176,7 +167,7 @@ DivetRow *vh_loadDivetFile (LibraryInfo * libInfo)
 	continue;
 
       DivetRow *newRow = vh_loadDivetRowFromString (libInfo->hash, line, libInfo, counterDivetRow);
-      //printf("%s\n", newRow->readName->readName);
+
       //fixOrientation(newRow);
 
       if (vh_notInRepeat (newRow) == 1)

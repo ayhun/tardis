@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include "vh_logger.h"
+#include "../common.h"
 
 #define EXIT_CODE_SUCCESS 0	//Exit code for exitting program successfully
 #define EXIT_CODE_ARG_ERROR 1	//Exit code 1 is for error in main's argument list
@@ -26,11 +27,8 @@ extern int g_maxListBrkPointIntr;	//defined in vh_createMaxClusterDeletion.cpp
 extern struct LibraryInfo *g_libInfo;	//Defined in vh_divethandler.cpp
 extern FILE *fileOutput;	//Defined in vh_main.cpp
 
-//const int maxInversionLen=2000000;
-//const int maxDeletionLen=500000;
-
-#define maxInversionLen 2000000
-#define maxDeletionLen 500000
+#define maxInversionLen 5000000
+#define maxDeletionLen 100000
 
 void quitProgram (int exitCode);
 

@@ -23,7 +23,7 @@ void load_config( configuration* cfg)
 	sprintf( config_filename, "%s/%s", getenv( "HOME"), CONFIG_FILE);
 
 	/* Open the configuration file for reading */
-	config = fopen( config_filename, "r");
+	config = safe_fopen( config_filename, "r");
 	if( config == NULL)
 	{
 		/* Create new config file */
@@ -225,7 +225,7 @@ void create_config( configuration* cfg, char* config_filename)
 		pclose( pipe);
 	}
 
-	config = fopen( config_filename, "w");
+	config = safe_fopen( config_filename, "w");
 	if( cfg->path_samtools != NULL)
 	{
 		fprintf( config, "SAMTOOLS = %s", cfg->path_samtools);

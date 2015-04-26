@@ -12,7 +12,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../processbam.h"
-//#include <stdbool.h>
+#include "../common.h"
+
 
 
 

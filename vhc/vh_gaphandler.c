@@ -16,7 +16,7 @@ void vh_readGapTable (char *gapFileName)
 {
 
 
-  FILE *gapFile = fopen (gapFileName, "r");
+  FILE *gapFile = safe_fopen (gapFileName, "r");
   if (!gapFile);
   //TODO: handle me
   
@@ -49,21 +49,11 @@ void vh_readGapTable (char *gapFileName)
 
 void vh_readInitFile ()
 {
-  // FILE *initFile = fopen (fileName, "r");
+
   int i = 10000000;
-  //  while (!feof (initFile))
-  //    {
-  //      int i = 0;
-  //      char str[50];
-  //      int res = fscanf (initFile, "%s%d", str, &i);
-  //      if (res != 2)
-  // break;
 
-  //      if (!strcmp (str, "max_potential_cluster_size"))	//TODO: Move as a constant to gap_handler.c
   g_maxListBrkPointIntr = i;
-  // }
 
-  // fclose (initFile);
 }
 
 void vh_readChros (bam_info* in_bam){

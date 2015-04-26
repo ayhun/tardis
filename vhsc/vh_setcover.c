@@ -34,7 +34,7 @@ int listMobileElSize;
 
 
 //////////////////////////////////////////
-int numCallsRequsted; //maximum number of SVs the users wants to us to output
+int numCallsRequested; //maximum number of SVs the users wants to us to output
 
 int tempClusterId;
 
@@ -244,7 +244,6 @@ int freeLinkList(readMappingEl *ptr)
 
 
 
-//int init(FILE *fpLib, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE *fpCoverage)
 int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *fpWeights, FILE *fpCoverage)
 {
 
@@ -284,23 +283,6 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	}
     }
   
-  /*
-    while(fscanf(fpLib, "%s %s %s %i %i %i\n", libName, indName, filePath, &minInstSize, &maxInstSize, &readLen)!=EOF)
-    {
-    //printf("%s %s %s %i %i %i\n", libName, indName, filePath, minInstSize, maxInstSize, readLen);
-    strcpy(multiLibs[multiLibsCount].libName, libName);
-    multiLibs[multiLibsCount].indId=addNewInd(indName);
-    //	printf("%s %i\n", indName, multiLibs[multiLibsCount].indId);
-    multiLibs[multiLibsCount].maxInstSize=maxInstSize-2*readLen;
-    multiLibs[multiLibsCount].minInstSize=minInstSize-2*readLen;
-    if (multiLibs[multiLibsCount].maxInstSize<0)
-    multiLibs[multiLibsCount].maxInstSize=0;
-    if (multiLibs[multiLibsCount].minInstSize<0)
-    multiLibs[multiLibsCount].minInstSize=0;
-    multiLibs[multiLibsCount].readLen=readLen;
-    multiLibsCount++;
-    }	
-  */
 
   weightsForCombination = (float *) malloc( (int) pow(2,multiIndCount)*sizeof(float));
   //	printf("%i \n", multiIndCount);
@@ -1175,7 +1157,7 @@ int pickSet()
   int setToCheckId=0;
   int bestReadCovered;
   maxScoreInBuffer=inf-1;
-  while(numCallsRequsted>0)
+  while(numCallsRequested>0)
     {
       bestWeight=inf;
       bestWeightSet=-1;
@@ -1223,7 +1205,7 @@ int pickSet()
 		if (conflictResFlag==1)
 		  addToConflict(bestWeightSet, bestReads);
 	
-		numCallsRequsted--;
+		numCallsRequested--;
 		listClusterEl[bestWeightSet].oldBestIsGood=0;
 	      }
 	    }
@@ -1279,18 +1261,15 @@ void readMobileElements(FILE *fp)
     }
 }
 
-//int vh_setcover(char* divetadd, char* outputread, char* outputfile, char* svfile){
+
 int vh_setcover(bam_info **in_bams, int num_bams, char* outputread, char* outputfile, char* svfile){
   FILE *readFp=NULL, *clusterFp=NULL, *libFp=NULL, *weightsFp=NULL, *fpOut=NULL, *fpMobile=NULL, *coverageFp=NULL;
-  numCallsRequsted = 10000; // have to fix
-  // for (count=0; count<argv; count++)
-  // {	
-  //  libFp=fopen(divetadd,"r");
-  readFp=fopen(outputread,"r");
-  clusterFp=fopen(outputfile,"r");
-  fpOut=fopen(svfile,"w");
+  numCallsRequested = 10000; // have to fix
 
-  //init(libFp, readFp, clusterFp, weightsFp, coverageFp);
+  readFp=safe_fopen(outputread,"r");
+  clusterFp=safe_fopen(outputfile,"r");
+  fpOut=safe_fopen(svfile,"w");
+
   init(in_bams, num_bams, readFp, clusterFp, weightsFp, coverageFp);
   if (fpMobile!=NULL)
     readMobileElements(fpMobile);

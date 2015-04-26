@@ -3,6 +3,7 @@
 
 #include <htslib/sam.h>
 #include <htslib/hts.h>
+#include <zlib.h>
 
 /* Exit Codes */
 #define EXIT_SUCCESS 0
@@ -10,6 +11,7 @@
 #define EXIT_MAXBAMS 2
 #define EXIT_PARAM_ERROR 3
 #define EXIT_EXTERNAL_PROG_ERROR 4
+#define EXIT_FILE_OPEN_ERROR 5
 
 /* Return Codes */
 #define RETURN_SUCCESS 0
@@ -50,6 +52,7 @@ void print_params( parameters*);
  files safely */
 void print_error( char*);
 FILE* safe_fopen( char* path, char* mode);
+gzFile safe_fopen_gz( char* path, char* mode);
 htsFile* safe_hts_open( char* path, char* mode);
 
 /* General bioinformatics functions */
@@ -64,5 +67,6 @@ void reverse_string( char* str);
 
 /* Misc. Utility */
 int compare_size_int( const void* p, const void* q);
+
 
 #endif

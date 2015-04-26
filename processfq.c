@@ -31,8 +31,8 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 	sprintf( ofilename1, "%s.sorted.gz", filename1);
 	sprintf( ofilename2, "%s.sorted.gz", filename2);
   
-	of1 = gzopen( ofilename1, "w");
-	of2 = gzopen( ofilename2, "w");
+	of1 = safe_fopen_gz( ofilename1, "w");
+	of2 = safe_fopen_gz( ofilename2, "w");
 
 	num_batch = MEMUSE / ( read_length * 3 * 2); /* 3 comes from qname,seq,qual. 2 comes from pairs */
 
@@ -46,8 +46,8 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 
 	num_matched = 0;
 
-	f1 = gzopen( filename1, "r"); //replace with gfOpen
-	f2 = gzopen( filename2, "r");
+	f1 = safe_fopen_gz( filename1, "r"); 
+	f2 = safe_fopen_gz( filename2, "r");
 
 	while( num_matched < num_seq)
 	{
@@ -274,7 +274,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	}
 
 	/* Open FASTQ file for writing */
-	fastq = gzopen( filename, "w");
+	fastq = safe_fopen_gz( filename, "w");
 	if( !fastq)
 	{
 		fprintf( stderr, "Error opening the first FASTQ file\n");
@@ -282,7 +282,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	}
 
 	/* Open the second FASTQ file for writing */	
-	fastq2 = gzopen( filename2, "w");
+	fastq2 = safe_fopen_gz( filename2, "w");
 	if( !fastq2)
 	{
 		fprintf( stderr, "Error opening the second FASTQ file\n");

@@ -5,9 +5,6 @@
 #include "vh_gaphandler.h"
 #include "vh_maximalCluster.h"
 
-//#define NAME_STR_LEN 100
-
-
 int vh_addToGenomeIndex_Insertion (char *chroName)
 {
   LibraryInfo *libInfo;

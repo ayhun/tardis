@@ -22,7 +22,7 @@ void vh_readRepeatTable (char *repeatFileName)
   int start, end;
   int res;
 
-  FILE *repeatFile = fopen (repeatFileName, "r");
+  FILE *repeatFile = safe_fopen (repeatFileName, "r");
   if (repeatFile == NULL)
     {
       //TODO: handle me

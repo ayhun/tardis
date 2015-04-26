@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 
+
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
@@ -60,7 +61,7 @@ void print_error( char* msg)
 	/* print error message and exit */
 	fprintf( stderr, "\n%s\n", msg);
 	fprintf( stderr, "Invoke parameter -h for help.\n");
-	exit( 1);
+	exit( EXIT_COMMON);
 }
 
 FILE* safe_fopen( char* path, char* mode)
@@ -74,6 +75,22 @@ FILE* safe_fopen( char* path, char* mode)
 	{
 		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", path, mode[0]=='w' ? "write" : "read");
 		print_error( err);
+		
+	}
+	return file;
+}
+
+gzFile safe_fopen_gz( char* path, char* mode)
+{
+	/* Safe file open. Try to open a file; exit if file does not exist */
+        gzFile file;
+	char err[500];
+
+	file = gzopen( path, mode);  
+	if( !file)
+	{
+		sprintf( err, "[TARDIS INPUT ERROR] Unable to open file %s in %s mode.", path, mode[0]=='w' ? "write" : "read");
+		print_error( err);		
 	}
 	return file;
 }

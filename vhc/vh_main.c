@@ -151,7 +151,7 @@ void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
     }
 
   cursor = g_libInfo;
-  fileOutput = fopen (outputFile, "w");
+  fileOutput = safe_fopen (outputFile, "w");
   //printf ("prune %f\n", preProsPrune);
 
   for (; cursor; cursor = cursor->next)
@@ -170,7 +170,7 @@ void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
       vh_logInfo ("Writing ReadName Sorted");
       cursor = g_libInfo;
       FILE *fileOutputReadName;
-      fileOutputReadName = fopen (outputRead, "w");
+      fileOutputReadName = safe_fopen (outputRead, "w");
       while (cursor != NULL)
 
 	{
