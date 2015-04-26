@@ -9,6 +9,7 @@
 #include <htslib/hts.h>
 
 #include "common.h"
+#include "quotes.h"
 
 void init_params( parameters** params)
 {
