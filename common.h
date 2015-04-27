@@ -67,6 +67,6 @@ void reverse_string( char* str);
 
 /* Misc. Utility */
 int compare_size_int( const void* p, const void* q);
-
+void print_quote( void);
 
 #endif

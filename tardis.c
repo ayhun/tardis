@@ -11,6 +11,7 @@ int main( int argc, char** argv)
 	int i;
 	int j;
 
+	print_quote();
 	/* Load configuration file (created if it does not exist) */
 	cfg = ( configuration*) malloc( sizeof( configuration));
 	load_config( cfg);
@@ -32,6 +33,8 @@ int main( int argc, char** argv)
 	#ifdef DEBUGMODE
 		print_params( params);
 	#endif
+
+	print_quote();
 
 	/* Read BAM files and calculate the median/avg/std of fragment sizes per library */
 	in_bams = ( bam_info**) malloc( sizeof( bam_info*));
@@ -69,6 +72,8 @@ int main( int argc, char** argv)
 	  /* TODO: check if the remapping output indeed exists, so it is safe to skip */
 	        fprintf( stderr, "Skipping remapping step.\n");
 	}
+
+	print_quote();
 	
 	/*
 	if ( params->skip_remap == 0)

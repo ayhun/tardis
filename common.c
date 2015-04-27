@@ -65,6 +65,17 @@ void print_error( char* msg)
 	exit( EXIT_COMMON);
 }
 
+void print_quote( void)
+{
+        /* print a quote by the Doctor */
+  
+        int quotenum;
+  
+	srand(time(NULL));
+	quotenum = rand() % NUM_QUOTES;
+	fprintf( stderr, "\n\t%s\n\n", quotes[quotenum]);
+}
+
 FILE* safe_fopen( char* path, char* mode)
 {
 	/* Safe file open. Try to open a file; exit if file does not exist */
