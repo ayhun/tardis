@@ -1,5 +1,4 @@
 #include "tardis.h"
-#define DEBUGMODE
 
 int main( int argc, char** argv)
 {
@@ -30,9 +29,10 @@ int main( int argc, char** argv)
 		exit( return_value);
 	}
 
-	#ifdef DEBUGMODE
-		print_params( params);
-	#endif
+	if ( TARDIS_DEBUG)
+        {
+ 	        print_params( params);
+	}
 
 	print_quote();
 
