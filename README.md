@@ -68,7 +68,7 @@ Running tardis
 ==============
 
 	tardis -i myinput.bam --ref human_g1k_v37.fasta --gaps build37.gap.bed \
-		--reps build37.reps.bed --dups build37_dups.bed --xy --vh \
+		--reps build37.reps.bed --dups build37_dups.bed --vh \
 		--out myoutput
 
 Additional parameters, helpful when debugging:
@@ -86,12 +86,7 @@ All parameters
 	--dups  [dups file]        : Segmental duplication coordinates in BED3 format.
 	--reps  [reps file]        : RepeatMasker annotation coordinates in BED6 format. See manual for details.
 	--mei   ["Alu:L1Hs:SVA"]   : List of mobile element names.
-	--xx                       : Sample is male.
-	--xy                       : Sample is female.
 	--vh                       : Run VariationHunter/CommonLAW (read pair + read depth).
-	--ns                       : Run NovelSeq (read pair + assembly).
-	--sr                       : Run SPLITREAD (split read).
-	--all                      : Run all three algorithms above [DEFAULT].
 	--skip-fastq               : Skip FASTQ dump for discordants. Use this only if you are regenerating the calls.
 	--skip-sort                : Skip FASTQ sort for discordants. Use this only if you are regenerating the calls.
 	--skip-remap               : Skip FASTQ remapping for discordants. Use this only if you are regenerating the calls.

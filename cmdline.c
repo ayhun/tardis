@@ -127,7 +127,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	}
 	else  fprintf(stderr, "out: %s\n", params->outprefix);
   
-	/* check if --xx or --xy is invoked. */
+	/* check if --xx or --xy is invoked.  Disabled for now 
 	if( !is_male && !is_female)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please select --xx [female] or --xy [male] to specify sample gender.\n");
@@ -138,7 +138,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	{
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please select either --xx [female] or --xy [male] to specify sample gender. Not both!\n");
 		return EXIT_PARAM_ERROR;
-	}
+		} */
 
 	/* check if --num-bams > 0 */
 	if( params->num_bams <= 0 && params->bam_list_path == NULL)
@@ -215,6 +215,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	params->skip_remap = skip_remap;
 	params->skip_vhcluster = skip_cluster;
 
+	/*
 	if( is_male)
 	{
 		params->sample_gender = MALE;
@@ -222,7 +223,7 @@ int parse_command_line( int argc, char** argv, parameters* params)
 	else if( is_female)
 	{
 		params->sample_gender = FEMALE;
-	}
+		}*/
 
 	return 1;
 
@@ -240,12 +241,16 @@ void print_help( void)
 	fprintf( stdout, "\t--dups  [dups file]        : Segmental duplication coordinates in BED3 format.\n");
 	fprintf( stdout, "\t--reps  [reps file]        : RepeatMasker annotation coordinates in BED6 format. See manual for details.\n");
 	fprintf( stdout, "\t--mei   [\"Alu:L1Hs:SVA\"]   : List of mobile element names.\n");
+	/*
 	fprintf( stdout, "\t--xx                       : Sample is male.\n");
 	fprintf( stdout, "\t--xy                       : Sample is female.\n");
+	*/
 	fprintf( stdout, "\t--vh                       : Run VariationHunter/CommonLAW (read pair + read depth).\n");
+	/* not  yet implemented, hide the parameters
 	fprintf( stdout, "\t--ns                       : Run NovelSeq (read pair + assembly).\n");
 	fprintf( stdout, "\t--sr                       : Run SPLITREAD (split read).\n");
 	fprintf( stdout, "\t--all                      : Run all three algorithms above [DEFAULT].\n");
+	*/
 	fprintf( stdout, "\t--skip-fastq               : Skip FASTQ dump for discordants. Use this only if you are regenerating the calls.\n");
 	fprintf( stdout, "\t--skip-sort                : Skip FASTQ sort for discordants. Use this only if you are regenerating the calls.\n");
 	fprintf( stdout, "\t--skip-remap               : Skip FASTQ remapping for discordants. Use this only if you are regenerating the calls.\n");
