@@ -23,15 +23,15 @@ struct strvar
      Sum_Weight:0 
      Lib:NA11930 LibSup:5 LibHurScore:5 
   */
-}
+};
 
 /* functions */
 
 /*
-  init_vars(struct strvar **, int num_chroms);
-  add_strvar
-  remove_strvar
-  edit_strvar
+struct strvar ** init_vars(int num_chroms);
+int  add_strvar
+int  remove_strvar
+int  edit_strvar
  */
 
 #endif
