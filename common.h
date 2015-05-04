@@ -32,7 +32,9 @@ typedef struct _params
 	char* gaps; /* path to assembly gaps file - bed */
 	char* mei;  /* regular expression-like MEI list */
         char* outprefix; /* prefix for the output files */
-	enum gender sample_gender; /* gender of the sample */
+  /* move the gender to a new samples data structure, and add a pointer to sample 
+        enum gender sample_gender; /* gender of the sample 
+  */
 	char run_vh; /* boolean stand-in to run VariationHunter */
 	char run_ns; /* boolean stand-in to run NovelSeq */
 	char run_sr; /* boolean stand-in to run SPLITREAD */

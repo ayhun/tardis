@@ -25,7 +25,6 @@ void init_params( parameters** params)
 	( *params)->bam_file_list = ( char**) malloc( sizeof( char*) * MAX_BAMS);
 	( *params)->gaps = NULL;
 	( *params)->mei = NULL;
-	( *params)->sample_gender = MALE;
 	( *params)->run_vh = 0; 
 	( *params)->run_ns = 0;
 	( *params)->run_sr = 0;

@@ -69,6 +69,7 @@ void load_bam( bam_info* in_bam, char* path)
 		( in_bam->libraries)[i]->libname = NULL;
 		( in_bam->libraries)[i]->fastq1 = NULL;
 		( in_bam->libraries)[i]->fastq2 = NULL;
+		( in_bam->libraries)[i]->divet = NULL;
 	}
 
 	/* Extract the ids/names for the libraries. A single Sample with multiple 

@@ -40,7 +40,8 @@ int main( int argc, char** argv)
 	in_bams = ( bam_info**) malloc( sizeof( bam_info*));
 	for( i = 0; i < params->num_bams; i++)
 	{
-		in_bams[i] = ( bam_info*) malloc( sizeof( bam_info));  
+		in_bams[i] = ( bam_info*) malloc( sizeof( bam_info));
+		in_bams[i]->sample_name = NULL;
 		load_bam( in_bams[i], params->bam_file_list[i]);
 
 	/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
