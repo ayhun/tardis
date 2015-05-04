@@ -262,7 +262,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	/* Set FASTQ file names */
 	sprintf( filename, "%s_%s_remap_1.fastq.gz", sample_name, in_lib->libname);
 	sprintf( filename2, "%s_%s_remap_2.fastq.gz", sample_name, in_lib->libname);
-
+	
 	set_str( &( in_lib->fastq1), filename);
 	set_str( &( in_lib->fastq2), filename2);
 

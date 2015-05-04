@@ -49,6 +49,7 @@ void load_bam( bam_info* in_bam, char* path)
 	for( i = 0; i < in_bam->num_chrom; i++)
 	{
 	        in_bam->chrom_lengths[i] = (int) ( bam_header->target_len)[i];
+		in_bam->chrom_names[i] = NULL;
 		set_str( ( &( in_bam->chrom_names)[i]), ( bam_header->target_name)[i]);
 	}
 
@@ -65,6 +66,9 @@ void load_bam( bam_info* in_bam, char* path)
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
 		( in_bam->libraries)[i] = ( struct library_properties*) malloc( sizeof( struct library_properties));
+		( in_bam->libraries)[i]->libname = NULL;
+		( in_bam->libraries)[i]->fastq1 = NULL;
+		( in_bam->libraries)[i]->fastq2 = NULL;
 	}
 
 	/* Extract the ids/names for the libraries. A single Sample with multiple 
