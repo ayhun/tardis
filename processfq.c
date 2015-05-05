@@ -84,7 +84,7 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 				res = ( struct read**) bsearch( &( reads2[i]), reads1, num_batch, sizeof( struct read*), fastq_qname_comp);
 				if( res != NULL)
 				{
-				        gzprintf( of1, "%s/1\n%s\n+\n%s\n", ( *res)->qname, ( *res)->seq, ( *res)->qual);
+					gzprintf( of1, "%s/1\n%s\n+\n%s\n", ( *res)->qname, ( *res)->seq, ( *res)->qual);
 					gzprintf( of2, "%s/2\n%s\n+\n%s\n", reads2[i]->qname, reads2[i]->seq, reads2[i]->qual);
 					( *res)->empty = 1;
 					reads2[i]->empty = 1;
@@ -165,12 +165,15 @@ int load_reads( gzFile f1, struct read** reads, int num_batch)
 		{
 			if( !gzeof( f1))
 			{
- 			        gzgets(f1, qname, MAX_SEQ);
-				if (gzeof( f1))
-				  return cnt;
- 			        gzgets(f1, seq, MAX_SEQ);
- 			        gzgets(f1, plus, MAX_SEQ);
- 			        gzgets(f1, qual, MAX_SEQ);
+				gzgets(f1, qname, MAX_SEQ);
+				if( gzeof( f1))
+				{
+					return cnt;
+				}
+				
+				gzgets( f1, seq, MAX_SEQ);
+				gzgets( f1, plus, MAX_SEQ);
+				gzgets( f1, qual, MAX_SEQ);
 				qname[strlen( qname) - 3] = 0; // get rid of /1 /2 and \n
 				seq[strlen( seq) - 1] = 0; // get rid of \n
 				qual[strlen( qual) - 1] = 0; // get rid of \n
@@ -252,12 +255,15 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	char filename2[255];
 	char next_char;
 	char* current_lib_name = NULL;
-	int num_seq;
 	int flag;
 	int min;
 	int max;
 	int return_value;
 	int i;
+
+	// Statistics
+	int num_seq_total = 0; // Total number of rps
+	int num_seq; // Number of rps for remapping
 
 	/* Set FASTQ file names */
 	sprintf( filename, "%s_%s_remap_1.fastq.gz", sample_name, in_lib->libname);
@@ -302,6 +308,9 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	bam_alignment = bam_init1();
 	return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
 	bam_alignment_core = bam_alignment->core;
+
+	// Count the first alignment
+	num_seq_total = num_seq_total + 1;
 
 	/* Set the read length for the current library */
 	in_lib->read_length = bam_alignment_core.l_qseq;
@@ -382,7 +391,13 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 		/* Read next alignment */
 		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
 		bam_alignment_core = bam_alignment->core;
+
+		// Count next alignment
+		num_seq_total = num_seq_total + 1;
 	}
+
+	// Divide by 2 to get the total number of rps before filtering out the concordant pairs
+	num_seq_total = num_seq_total / 2;
 
 	/* We should divide num_seq by 2 as the reads are paired and half of the total will be written to each FASTQ file */
 	num_seq = num_seq / 2;
