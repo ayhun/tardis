@@ -3,13 +3,15 @@
 #include <stdarg.h>
 #include <string.h>
 
-
 /* htslib headers */
 #include <htslib/sam.h>
 #include <htslib/hts.h>
 
 #include "common.h"
 #include "quotes.h"
+
+// Track memory usage
+long long memUsage = 0;
 
 void init_params( parameters** params)
 {
@@ -297,3 +299,28 @@ int compare_size_int( const void* p, const void* q)
 	}
 }
 
+void* getMem( size_t size)
+{
+	void* ret;
+
+	ret = malloc( size);
+	if( ret == NULL)
+	{
+		fprintf( stderr, "Cannot allocate memory. Currently addressed memory = %0.2f MB, requested memory = %0.2f MB.\nCheck the available main memory.\n", getMemUsage(), ( float) ( size / 1048576.0));
+		exit( 0);
+	}
+
+	memUsage = memUsage + size;
+	return ret;
+}
+
+void freeMem( void* ptr, size_t size)
+{
+	memUsage = memUsage - size;
+	free( ptr);
+}
+
+double getMemUsage()
+{
+	return memUsage / 1048576.0;
+}
