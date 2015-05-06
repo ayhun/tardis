@@ -19,6 +19,9 @@
 
 #define MAX_BAMS 256
 
+// Track memory usage
+extern long long memUsage;
+
 enum gender{ MALE, FEMALE};
 
 typedef struct _params
@@ -70,5 +73,10 @@ void reverse_string( char* str);
 /* Misc. Utility */
 int compare_size_int( const void* p, const void* q);
 void print_quote( void);
+
+// Memory allocation/tracking functions
+void* getMem( size_t size);
+void freeMem( void* ptr, size_t size);
+double getMemUsage();
 
 #endif

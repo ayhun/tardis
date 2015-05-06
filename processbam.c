@@ -48,7 +48,7 @@ void load_bam( bam_info* in_bam, char* path)
 	 and store the names as well */
 	for( i = 0; i < in_bam->num_chrom; i++)
 	{
-	        in_bam->chrom_lengths[i] = (int) ( bam_header->target_len)[i];
+		in_bam->chrom_lengths[i] = (int) ( bam_header->target_len)[i];
 		in_bam->chrom_names[i] = NULL;
 		set_str( ( &( in_bam->chrom_names)[i]), ( bam_header->target_name)[i]);
 	}
@@ -219,7 +219,7 @@ void load_bam( bam_info* in_bam, char* path)
 void get_sample_name( bam_info* in_bam, char* header_text)
 {
 	/* Delimit the BAM header text with tabs and newlines */
-        char tmp_header[32768];
+	char tmp_header[32768];
 	strcpy( tmp_header, header_text);
 	char* p = strtok( tmp_header, "\t\n");
 	char sample_name_buffer[1024];
@@ -250,7 +250,7 @@ void get_library_count( bam_info* in_bam, char* header_text)
 	int number_of_libraries = 0;
 
 	/* Delimit the BAM header text with newlines */
-        char tmp_header[32768];
+	char tmp_header[32768];
 	strcpy( tmp_header, header_text);
 	char* p = strtok( tmp_header, "\n");
 
@@ -277,7 +277,7 @@ void get_library_names( bam_info* in_bam, char* header_text)
 	/* Delimit the BAM header text with newlines */
 	i = 0;
 
-        char tmp_header[32768];
+	char tmp_header[32768];
 	strcpy( tmp_header, header_text);
 	char* p = strtok( tmp_header, "\n");
 
@@ -364,7 +364,7 @@ void create_fastq( bam_info* in_bam, char* bam_path, parameters* params)
 	int i;
 	for( i = 0; i < in_bam->num_libraries; i++)
 	{
- 	        fprintf( stderr, "Creating FASTQ files for the library: %s.\n", ( in_bam->libraries)[i]->libname);
+		fprintf( stderr, "Creating FASTQ files for the library: %s.\n", ( in_bam->libraries)[i]->libname);
 		create_fastq_library( ( in_bam->libraries)[i], in_bam->sample_name, bam_path, params);
 	}
 }
@@ -373,6 +373,8 @@ void set_library_min_max( struct library_properties* in_lib)
 {
 	in_lib->conc_min = in_lib->frag_avg - ( 4 * in_lib->frag_std);
 	if ( in_lib->conc_min < 0)
+	{
 		in_lib->conc_min = 0;
+	}
 	in_lib->conc_max = in_lib->frag_avg + ( 4 * in_lib->frag_std);
 }
