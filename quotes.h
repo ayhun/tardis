@@ -14,7 +14,7 @@ char *quotes[] =
     /*  7 */  "Do what I do. Hold tight and pretend it's a plan!",
     /*  8 */  "In 900 years of time and space, I've never met anyone who wasn't important.",
     /*  9 */  "900 years of time and space, and I've never been slapped by someone's mother.",
-    /* 10 */  "Never ignore coincidence. Unless, of course, you're busy. In which case, always ignore coincidence.",
+    /* 10 */  "Never ignore coincidence. Unless, of course, you're busy.\n\tIn which case, always ignore coincidence.",
     /* 11 */  "I am and always will be the optimist. The hoper of far-flung hopes and the dreamer of improbable dreams.",
     /* 12 */  "We're all stories, in the end. Just make it a good one, eh?",
     /* 13 */  "Letting it get to you. You know what that's called? Being alive. Best thing there is.\n\tBeing alive right now is all that counts.",

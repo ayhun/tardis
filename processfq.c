@@ -22,6 +22,7 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 	gzFile of2;
 
 	int loaded;
+	int loaded2;
 	char* ofilename1;
 	char* ofilename2;
 
@@ -36,6 +37,7 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 
 	num_batch = MEMUSE / ( read_length * 3 * 2); /* 3 comes from qname,seq,qual. 2 comes from pairs */
 
+	
 	if( num_batch > num_seq)
 	{
 		num_batch = num_seq;
@@ -74,7 +76,7 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 		qsort( reads1, num_batch, sizeof( struct read*), fastq_qname_comp); 
 
 		/* load the /2 reads */
-		loaded = load_reads( f2, reads2, num_batch);
+		loaded2 = load_reads( f2, reads2, num_batch);
     
 		/* search for the /2 reads within the sorted array of /1 reads */
 		for( i = 0; i < num_batch; i++)
@@ -91,6 +93,12 @@ void fastq_match( char* filename1, char* filename2, int num_seq, int read_length
 					num_matched++;
 				}
 			}
+		}
+		
+		if (loaded == 0 && loaded2 == 0)
+		{
+		  /* both files are entirely loaded. No more read pairs to match */
+		  break;
 		}
 	}
   
@@ -140,14 +148,13 @@ static int fastq_qname_comp( const void* p1, const void* p2)
 {
 	struct read* a; 
 	struct read* b;
-	int i;
-	int l1;
-	int l2;
 
 	a = *( ( struct read**) p1);
 	b = *( ( struct read**) p2);
 
-	return strcmp( a->qname, b->qname);
+	if (a != NULL && b != NULL && a->qname != NULL && b->qname != NULL)
+	  return strcmp( a->qname, b->qname);
+	return -1;
 }
 
 int load_reads( gzFile f1, struct read** reads, int num_batch)
@@ -200,6 +207,7 @@ void alloc_reads( struct read*** reads, int num_batch)
 	{
 		( *reads)[i] = ( struct read *) malloc( sizeof( struct read));
 		( *reads)[i]->qname = NULL;
+		set_str( &(( *reads)[i]->qname), "TARDIS_X");
 		( *reads)[i]->seq = NULL;
 		( *reads)[i]->qual = NULL;
 		( *reads)[i]->empty = 1;
@@ -216,9 +224,12 @@ void realloc_reads( struct read*** reads, int old_batch, int num_batch)
 
 	for( i = 0; i < old_batch; i++)
 	{
-		set_str( &( tmp_read[i]->qname), ( *reads)[i]->qname);
-		set_str( &( tmp_read[i]->seq), ( *reads)[i]->seq);
-		set_str( &( tmp_read[i]->qual), ( *reads)[i]->qual);
+	        if ( ( *reads)[i]->qname != NULL)
+	        {
+		  set_str( &( tmp_read[i]->qname), ( *reads)[i]->qname);
+		  set_str( &( tmp_read[i]->seq), ( *reads)[i]->seq);
+		  set_str( &( tmp_read[i]->qual), ( *reads)[i]->qual);
+		}
 		tmp_read[i]->empty = ( *reads)[i]->empty;
 	}
 
@@ -264,6 +275,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	// Statistics
 	int num_seq_total = 0; // Total number of rps
 	int num_seq; // Number of rps for remapping
+	int num_seq_f, num_seq_r; // Number of rps of either end extracted from fastq
 
 	/* Set FASTQ file names */
 	sprintf( filename, "%s_%s_remap_1.fastq.gz", sample_name, in_lib->libname);
@@ -303,6 +315,8 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 
 	/* Initialize the number of paired-end sequences that are discordant for the current library to zero */
 	num_seq = 0;
+	num_seq_f = 0;
+	num_seq_r = 0;
 
 	/* Read the BAM file alignment by alignment */
 	bam_alignment = bam_init1();
@@ -339,12 +353,14 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 			{
 				outfastq = fastq;
 				gzprintf( outfastq, "@%s/1\n", qname);
+				num_seq_f = num_seq_f + 1;
 			}
 			else if( ( flag & BAM_FREAD2) != 0)
 			{
 				/* Read 2 goes to /2 */
 				outfastq = fastq2;
 				gzprintf( outfastq, "@%s/2\n", qname);
+				num_seq_r = num_seq_r + 1;
 			}
 
 			/* Line 2: Sequence */
@@ -430,10 +446,12 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	/* Free memory */
 	free( current_lib_name);
 
+	fprintf( stderr, "%d left, %d right reads\n", num_seq_f, num_seq_r);
 	if( !( params->skip_sort))
         {
-	        fprintf( stderr, "Sorting FASTQ files for library: %s.\nDemons run when a good man goes to war.\n", in_lib->libname);
+	        fprintf( stderr, "Sorting FASTQ files for library: %s; %d read pairs.\nDemons run when a good man goes to war.\n", in_lib->libname, in_lib->num_sequences);
 	        fastq_match( in_lib->fastq1, in_lib->fastq2, in_lib->num_sequences, in_lib->read_length);
+	        fprintf( stderr, "Night will fall and drown the sun. When a good man goes to war.\n");
 	}	    
 	
 }

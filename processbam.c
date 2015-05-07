@@ -59,7 +59,7 @@ void load_bam( bam_info* in_bam, char* path)
 	/* Extract the number of libraries within the BAM file */
 	get_library_count( in_bam, bam_header->text);
 
-	fprintf( stderr, "Total of %d libraries found in %s. Sample name is %s.\n", in_bam->num_libraries, path, in_bam->sample_name);
+	fprintf( stderr, "Total %d %s found in %s. Sample name is %s.\n", in_bam->num_libraries, in_bam->num_libraries > 1 ? "libraries":"library", path, in_bam->sample_name);
 
 	/* Initialize the structures for library properties */
 	in_bam->libraries = ( struct library_properties**) malloc( in_bam->num_libraries * sizeof( struct library_properties*));

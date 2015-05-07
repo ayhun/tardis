@@ -127,6 +127,12 @@ int is_concordant( bam1_core_t bam_alignment_core, int min, int max)
 {
 	int flag = bam_alignment_core.flag;
 
+	if( ( flag & BAM_FPAIRED) == 0) 
+	{
+	        /* Read is single-end. Skip this by calling it concordant */
+	        return 1;
+	}
+
 	if( ( flag & BAM_FPROPER_PAIR) == 0) 
 	{
 		/* Not proper pair */
@@ -260,10 +266,18 @@ void set_str( char** target, char* source)
 	{
 		free( ( *target));
 	}
-
-	( *target) = ( char*) malloc( sizeof( char) * ( strlen( source) + 1));
-	strncpy( ( *target), source, ( strlen( source) + 1));
+	
+	if (source != NULL)
+	{
+	        ( *target) = ( char*) malloc( sizeof( char) * ( strlen( source) + 1));
+		strncpy( ( *target), source, ( strlen( source) + 1));
+	}
+	else
+	{
+	        ( *target) = NULL;
+	}
 }
+
 
 /* Reverse a given string */
 void reverse_string( char* str)
