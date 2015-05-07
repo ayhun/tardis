@@ -446,7 +446,11 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	/* Free memory */
 	free( current_lib_name);
 
-	fprintf( stderr, "%d left, %d right reads\n", num_seq_f, num_seq_r);
+	if ( TARDIS_DEBUG == 1)
+	{
+	        fprintf( stderr, "%d left, %d right reads\n", num_seq_f, num_seq_r);
+	}
+
 	if( !( params->skip_sort))
         {
 	        fprintf( stderr, "Sorting FASTQ files for library: %s; %d read pairs.\nDemons run when a good man goes to war.\n", in_lib->libname, in_lib->num_sequences);

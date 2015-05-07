@@ -118,7 +118,6 @@ void load_bam( bam_info* in_bam, char* path)
 
 		/* Read next alignment */
 		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
-		//fprintf (stderr, "sample %d\n", fragments_sampled[0]);
 	}
 
 	fprintf( stderr, "Sampling finished. Now calculating library statistics.\n");
