@@ -22,8 +22,8 @@ void load_config( configuration* cfg)
 	/* Combine the home directory path with the name of the configuration file */
 	sprintf( config_filename, "%s/%s", getenv( "HOME"), CONFIG_FILE);
 
-	/* Open the configuration file for reading */
-	config = safe_fopen( config_filename, "r");
+	/* Open the configuration file for reading. Do not use safe_fopen here, we will create if it doesn't exist */
+	config = fopen( config_filename, "r");
 	if( config == NULL)
 	{
 		/* Create new config file */
