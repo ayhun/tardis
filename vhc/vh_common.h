@@ -8,7 +8,7 @@
 //This define lines selects the main function that should be run
 //#define MAIN_HASH     //For testing the hash file
 //#define MAIN_MAIN     //The main Main function of the program
-//#define MAIN_DIVET_HANDLER    //For testing the divet handler
+
 //#define MAIN_DELETION_CLUSTER
 
 #include <stdlib.h>

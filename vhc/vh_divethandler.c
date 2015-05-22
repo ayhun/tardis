@@ -214,24 +214,3 @@ void vh_printDivet (DivetRow * divetRow)
   vh_logOutput (msg);
 }
 
-#ifdef MAIN_DIVET_HANDLER
-int main (int argc, char **argv)
-{
-  time_t start, end;
-  time (&start);
-
-  DivetRow *divetRow = vh_loadDivetFile ("../divet.IDV");
-  time (&end);
-
-  double diff = difftime (end, start);
-  printf ("Time: %.2lf seconds.\n", diff);
-
-  printf ("Number of rows: %d\n", g_divetRowLinkedListSize);
-  for (; divetRow; divetRow = divetRow->next)
-    {
-      vh_printDivet (divetRow);
-
-    }
-  vh_freeDivets ();
-}
-#endif
