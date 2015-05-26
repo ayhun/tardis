@@ -16,13 +16,10 @@ struct strvar
   int min_svlen; /* lower bound of SV size */
   int max_svlen; /* upper bound of SV size */
   char *samples; /* list of samples that carry the SV. Might need a separate linked list */
-  
+  double conf_score; /* confidence score for the called variant */
+   
   struct strvar *next; /* next pointer for linked list */
-  
-  /* FEREYDOUN: do we need to keep the following: 
-     Sum_Weight:0 
-     Lib:NA11930 LibSup:5 LibHurScore:5 
-  */
+
 };
 
 /* functions */
