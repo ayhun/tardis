@@ -25,7 +25,8 @@ int parse_command_line( int argc, char** argv, parameters* params)
 		{"threads", required_argument,   0, 't'},
 		{"help"   , no_argument,         0, 'h'},
 		{"version", no_argument,         0, 'v'},
-		{"bamlist", no_argument,	 0, 'b'},
+		{"bamlist",               no_argument,	 0, 'b'},
+		{"force-read-length"    , required_argument,	 0, 'l'},
 		{"out"    , required_argument,	 0, 'o'},
 		{"vh"     , no_argument, &run_vh,     1 },
 		{"ns"     , no_argument, &run_ns,     1 },
@@ -90,6 +91,10 @@ int parse_command_line( int argc, char** argv, parameters* params)
 			
 			case 't':
 				params->threads = atoi( optarg);
+			break;
+
+			case 'l':
+				params->force_read_length = atoi( optarg);
 			break;
 
 			case 'h':
@@ -203,6 +208,13 @@ int parse_command_line( int argc, char** argv, parameters* params)
         {
 		fprintf( stderr, "[TARDIS CMDLINE ERROR] Please use either --input or --bamlist parameter. Not both!\n");
 		return EXIT_PARAM_ERROR;	        
+	}
+	
+	/* check forced read length to be a positive integer or zero */
+	if( params->force_read_length <= 0)
+	{
+		fprintf( stderr, "[TARDIS CMDLINE WARNING] Invalid forced read length (%d). Resetted to 0 (disabled).\n", params->force_read_length);
+		params->force_read_length = 0;
 	}
 
 

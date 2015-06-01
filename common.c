@@ -27,6 +27,7 @@ void init_params( parameters** params)
 	( *params)->bam_file_list = ( char**) malloc( sizeof( char*) * MAX_BAMS);
 	( *params)->gaps = NULL;
 	( *params)->mei = NULL;
+	( *params)->force_read_length = 0;
 	( *params)->run_vh = 0; 
 	( *params)->run_ns = 0;
 	( *params)->run_sr = 0;
@@ -121,6 +122,14 @@ htsFile* safe_hts_open( char* path, char* mode)
 	}
 
 	return bam_file;
+}
+
+int is_proper( int flag)
+{
+        if ( (flag & BAM_FPAIRED) != 0 && (flag & BAM_FSECONDARY) == 0 && (flag & BAM_FSUPPLEMENTARY) == 0 && (flag & BAM_FDUP) == 0 && (flag & BAM_FQCFAIL) == 0)
+	         return 1;
+
+	return 0;
 }
 
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max)

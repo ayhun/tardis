@@ -38,6 +38,7 @@ typedef struct _params
   /* move the gender to a new samples data structure, and add a pointer to sample 
         enum gender sample_gender; /* gender of the sample 
   */
+        int  force_read_length; /* force read length to a certain value, discard those that are shorter. Hidden feature due to GIAB */
 	char run_vh; /* boolean stand-in to run VariationHunter */
 	char run_ns; /* boolean stand-in to run NovelSeq */
 	char run_sr; /* boolean stand-in to run SPLITREAD */
@@ -60,7 +61,8 @@ FILE* safe_fopen( char* path, char* mode);
 gzFile safe_fopen_gz( char* path, char* mode);
 htsFile* safe_hts_open( char* path, char* mode);
 
-/* General bioinformatics functions */
+/* General BAM processing functions */
+int is_proper( int flag);
 int is_concordant( bam1_core_t bam_alignment_core, int min, int max);
 char base_as_char( int base_as_int);
 char complement_char( char base);

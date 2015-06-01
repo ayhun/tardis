@@ -276,6 +276,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	int num_seq_total = 0; // Total number of rps
 	int num_seq; // Number of rps for remapping
 	int num_seq_f, num_seq_r; // Number of rps of either end extracted from fastq
+	int skip_read; // skip outputting this read since it is shorter than forced read length
 
 	/* Set FASTQ file names */
 	sprintf( filename, "%s_%s_remap_1.fastq.gz", sample_name, in_lib->libname);
@@ -328,6 +329,11 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 
 	/* Set the read length for the current library */
 	in_lib->read_length = bam_alignment_core.l_qseq;
+	if (params->force_read_length != 0)
+        {
+	        /* overwrite with the forced read length */
+	        in_lib->read_length = params->force_read_length;
+        }
 
 	while( return_value != -1)
 	{		
@@ -340,76 +346,94 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 		set_str( &current_lib_name, bam_aux_get( bam_alignment, "RG") + 1);
 
 		/* If the read is not concordant AND belongs to the current library, write it to the FASTQ file */
-		if( !is_concordant( bam_alignment_core, min, max) && ( flag & BAM_FPAIRED) != 0 && strcmp( in_lib->libname, current_lib_name) == 0)
+		if(!is_concordant( bam_alignment_core, min, max) && is_proper( flag) && strcmp( in_lib->libname, current_lib_name) == 0)
 		{
-			/* Increment the number of sequences written to FASTQs */			
-			num_seq = num_seq + 1;
-			
-			/* Line 1: Read Name */
-			strncpy( qname, bam_get_qname( bam_alignment), bam_alignment_core.l_qname);
 
-			/* Read 1 goes to /1 */
-			if( ( flag & BAM_FREAD1) != 0)
+		       skip_read = 0;			
+		
+		       /* Line 1: Read Name */
+		       strncpy( qname, bam_get_qname( bam_alignment), bam_alignment_core.l_qname);
+		       /* Line 2: Sequence */
+		       strncpy( sequence, bam_get_seq( bam_alignment), bam_alignment_core.l_qseq);
+		       sequence[bam_alignment_core.l_qseq] = '\0';
+		       /* Line 4: Quality String */
+		       strncpy( qual, bam_get_qual( bam_alignment), bam_alignment_core.l_qseq);
+		       qual[bam_alignment_core.l_qseq] = '\0';
+		       
+		        if (params->force_read_length != 0)
 			{
-				outfastq = fastq;
-				gzprintf( outfastq, "@%s/1\n", qname);
-				num_seq_f = num_seq_f + 1;
-			}
-			else if( ( flag & BAM_FREAD2) != 0)
-			{
+			        if (strlen(sequence) > params->force_read_length)
+			        {
+				    sequence[params->force_read_length] = '\0';
+				    qual[params->force_read_length] = '\0';
+				}
+				else if (strlen(sequence) < params->force_read_length)
+				{
+				    skip_read = 1;
+				}
+		        }
+			
+			if ( !skip_read)
+		        {
+			  /* Increment the number of sequences written to FASTQs */			
+			  num_seq = num_seq + 1;
+			  
+			  /* Convert the quality value to ASCII */
+			  qual_to_ascii( qual);
+			  
+			  /* Read 1 goes to /1 */
+			  if( ( flag & BAM_FREAD1) != 0)
+			  {
+			      outfastq = fastq;
+			      gzprintf( outfastq, "@%s/1\n", qname);
+			      num_seq_f = num_seq_f + 1;
+			  }
+			  else if( ( flag & BAM_FREAD2) != 0)
+		 	  {
 				/* Read 2 goes to /2 */
 				outfastq = fastq2;
 				gzprintf( outfastq, "@%s/2\n", qname);
 				num_seq_r = num_seq_r + 1;
-			}
-
-			/* Line 2: Sequence */
-			strncpy( sequence, bam_get_seq( bam_alignment), bam_alignment_core.l_qseq);
-			sequence[bam_alignment_core.l_qseq] = '\0';
+			  }
 
 			/* Read mapped to the + strand */
-			if( ( flag & BAM_FREVERSE) == 0)
-			{
+			  if( ( flag & BAM_FREVERSE) == 0)
+			  {
 				for( i = 0; i < strlen( sequence); i++)
 				{
 					next_char = base_as_char( bam_seqi( sequence, i));
 					gzprintf( outfastq, "%c", next_char);
 				}		       
-			}
-			else
-			{
+			  }
+			  else
+			  {
 				/* Read mapped to the - strand */
 				for( i = strlen( sequence) - 1; i >= 0; i--)
 				{
 					next_char = complement_char( base_as_char( bam_seqi( sequence, i)));
 					gzprintf( outfastq, "%c", next_char);
 				}		       
-			}
+			  }
 			
-			/* Line 3: "+" */
-			gzprintf( outfastq, "\n+\n");
+			  /* Line 3: "+" */
+			  gzprintf( outfastq, "\n+\n");
 
-			/* Line 4: Quality String */
-			strncpy( qual, bam_get_qual( bam_alignment), bam_alignment_core.l_qseq);
-			qual[bam_alignment_core.l_qseq] = '\0';
-
-			/* Convert the quality value to ASCII */
-			qual_to_ascii( qual);
-		
-			/* If the read is mapped to the reverse strand, reverse the quality string */
-			if( bam_is_rev( bam_alignment))
-			{
+			  /* If the read is mapped to the reverse strand, reverse the quality string */
+			  if( bam_is_rev( bam_alignment))
+			  {
 			  	reverse_string( qual);
-			}
-			gzprintf( outfastq, "%s\n", qual);
+			  }
+			  gzprintf( outfastq, "%s\n", qual);
+
+			// Count next alignment
+			  num_seq_total = num_seq_total + 1;
+		        }
 		}
 
 		/* Read next alignment */
 		return_value = bam_read1( ( bam_file->fp).bgzf, bam_alignment);
 		bam_alignment_core = bam_alignment->core;
 
-		// Count next alignment
-		num_seq_total = num_seq_total + 1;
 	}
 
 	// Divide by 2 to get the total number of rps before filtering out the concordant pairs
