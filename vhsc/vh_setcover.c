@@ -283,9 +283,10 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	}
     }
   
+  fprintf( stderr, "Number of individuals: %d \n", multiIndCount);
 
   weightsForCombination = (float *) malloc( (int) pow(2,multiIndCount)*sizeof(float));
-  //	printf("%i \n", multiIndCount);
+  
   int count=0;
 
   for ( count=0; count<pow(2, multiIndCount); count++)
@@ -1262,9 +1263,11 @@ void readMobileElements(FILE *fp)
 }
 
 
-int vh_setcover(bam_info **in_bams, int num_bams, char* outputread, char* outputfile, char* svfile){
+int vh_setcover(bam_info **in_bams, parameters *params, char* outputread, char* outputfile, char* svfile){
   FILE *readFp=NULL, *clusterFp=NULL, *libFp=NULL, *weightsFp=NULL, *fpOut=NULL, *fpMobile=NULL, *coverageFp=NULL;
-  numCallsRequested = 10000; // have to fix
+
+  int num_bams = params->num_bams;
+  numCallsRequested = 15000; // have to fix
 
   readFp=safe_fopen(outputread,"r");
   clusterFp=safe_fopen(outputfile,"r");

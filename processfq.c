@@ -286,7 +286,7 @@ void create_fastq_library( struct library_properties* in_lib, char* sample_name,
 	set_str( &( in_lib->fastq2), filename2);
 
 	/* if skip-fastq is set, return */
-	if( params->skip_fastq)
+	if( params->skip_fastq != 0)
 	{
 	  /* check if it is safe to skip */
 		return;

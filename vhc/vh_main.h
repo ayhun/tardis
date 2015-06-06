@@ -9,6 +9,6 @@
 #include <string.h>
 
 //void vh_clustering (char *, bam_info* , char *, char *, double , char *, char *, int );
-void vh_clustering (bam_info** , int, char *, char *, double , char *, char *, int );
+void vh_clustering (bam_info** , parameters *, double , char *, char *, int );
 
 #endif

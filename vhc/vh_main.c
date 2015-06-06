@@ -96,8 +96,7 @@ static int vh_cmprReadNameStr (const void *a, const void *b)
 //  char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 //{
 
-void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
-		    char *repeatFileName, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
+void vh_clustering (bam_info** in_bams, parameters *params, double preProsPrune, char *outputFile, char *outputRead, int overMapLimit)
 {
 
   int totalNumUniqueReads = 0;
@@ -105,6 +104,11 @@ void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
   int count;
   int i,j,k;
   struct LibraryInfo *newLibInfo, *cursor, *t;
+
+  int num_bams = params->num_bams;
+  char *gapFileName = params->gaps;
+  char *repeatFileName = params->reps;
+
 
   vh_readInitFile ();
   vh_readChros (in_bams[0]);
@@ -141,7 +145,7 @@ void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
 	    {
 	      g_libInfo = newLibInfo;
 	    }
-	  else                  //add to the end of the linked list                                                                                                                                                 
+	  else                  //add to the end of the linked list                                                                                                                                                
 	    {
 	      for (t = g_libInfo; t->next != NULL; t = t->next)
 		;        //Skip till end of LinkedList                                                                                                             	  
@@ -258,17 +262,24 @@ void vh_clustering (bam_info** in_bams, int num_bams, char *gapFileName,
   /* free g_libInfo */
   cursor = g_libInfo;
   t = cursor;
+  /*
   while (t != NULL)
     {
       t = cursor->next;
-      /* FEREYDOUN: Free the hash as well. This is likely a linked list */
-      for (i = 0; i < NHASH; i++)
-	if (cursor->hash != NULL)
-	  free(cursor->hash[i]);
-      free(cursor->hash);
-      free(cursor);
-    }  
 
+      /* FEREYDOUN: Free the hash as well. This is likely a linked list 
+      for (i = 0; i < NHASH; i++)
+	if (cursor->hash != NULL){
+	  if (cursor->hash[i] != NULL)
+	    free(cursor->hash[i]);
+	}
+      if (cursor->hash != NULL)
+	free(cursor->hash);
+      
+      if (cursor != NULL)
+	free(cursor);
+    }  
+  */
 
 }
 

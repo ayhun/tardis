@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS = -O2 -g -w -I ../htslib
+CFLAGS = -O0 -g -w -I ../htslib
 LDFLAGS =  -lz -lm -lpthread ../htslib/libhts.a
 SOURCES = vh_setcover.c vh_buffer.c
 

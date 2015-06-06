@@ -16,12 +16,30 @@ int remap_mrfast( parameters *params, bam_info ** in_bams, configuration *cfg)
 		for ( j = 0; j < in_bams[i]->num_libraries; j++)
 	        {
 			fprintf( stderr, "\nRemapping:\n\t\tSample: %s\n\t\tLibrary: %s\n", in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
-			sprintf( cmdline, "%s --search %s --pe --min %d --max %d --sample %s --lib %s --rg %s --seq1 %s --seq2 %s -o %s-%s.sam -u %s-%s.unmapped.fastq --seqcomp --outcomp", 
-				cfg->path_mrfast, params->ref_genome, in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max,
-				in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname, in_bams[i]->libraries[j]->libname, 
-				in_bams[i]->libraries[j]->fastq1, in_bams[i]->libraries[j]->fastq2,
-				in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname,
-				in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
+			if ( params->threads == 1)
+			{
+			        sprintf( cmdline, "%s --search %s --pe --min %d --max %d --sample %s --lib %s --rg %s --seq1 %s --seq2 %s -o %s-%s.sam -u %s-%s.unmapped.fastq --seqcomp --outcomp", 
+					 cfg->path_mrfast, params->ref_genome, in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max,
+					 in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname, in_bams[i]->libraries[j]->libname, 
+					 in_bams[i]->libraries[j]->fastq1, in_bams[i]->libraries[j]->fastq2,
+					 in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname,
+					 in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname);
+			}
+			else
+			{
+			        sprintf( cmdline, "%s --search %s --pe --min %d --max %d --sample %s --lib %s --rg %s --seq1 %s --seq2 %s -o %s-%s.sam -u %s-%s.unmapped.fastq --seqcomp --outcomp --threads %d", 
+					 cfg->path_mrfast, params->ref_genome, in_bams[i]->libraries[j]->conc_min, in_bams[i]->libraries[j]->conc_max,
+					 in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname, in_bams[i]->libraries[j]->libname, 
+					 in_bams[i]->libraries[j]->fastq1, in_bams[i]->libraries[j]->fastq2,
+					 in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname,
+					 in_bams[i]->sample_name, in_bams[i]->libraries[j]->libname, params->threads);
+			}
+
+			if ( TARDIS_DEBUG == 1)
+			{
+			        fprintf( stderr, "[MRFAST COMMAND LINE] %s\n", cmdline);
+			}
+
 			return_value = system( cmdline);
 				
 			if (WIFSIGNALED(return_value) && (WTERMSIG(return_value) == SIGINT || WTERMSIG(return_value) == SIGQUIT))

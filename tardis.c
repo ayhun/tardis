@@ -45,15 +45,14 @@ int main( int argc, char** argv)
 		load_bam( in_bams[i], params->bam_file_list[i]);
 
 	/* BAM is loaded, min/max/avg/std are calculated. Now, extract FASTQs of discordants, OEAs, and orphans */
-		if ( params->skip_fastq == 0)
+
+		if ( params->skip_fastq != 0)
 	        {
-		  create_fastq( in_bams[i], params->bam_file_list[i], params);		
-		}
-		else
-		  {
 		    /* TODO: check if the FASTQ files indeed exist, so it is safe to skip */
 		    fprintf( stderr, "Skipping FASTQ extraction step.\n");
 		}
+
+		create_fastq( in_bams[i], params->bam_file_list[i], params);		
 	}
   
         fprintf( stderr, "All FASTQ files ready for remapping.\n");
