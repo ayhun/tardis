@@ -9,11 +9,11 @@ EXECUTABLE = libvhsc.a
 all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o
 
-$(EXECUTABLE): $(OBJECTS) 
-	ar -rc libvhsc.a $(OBJECTS)  
+$(EXECUTABLE): $(OBJECTS)
+	ar -rc libvhsc.a $(OBJECTS)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $< -o $@
 
-clean: 
-	rm -f $(EXECUTABLE) *.o *~ 
+clean:
+	rm -f $(EXECUTABLE) *.o *~

@@ -5,7 +5,7 @@ BUILD_DATE := "$(shell date)"
 CC=gcc
 CFLAGS =  -O0 -g -I htslib -I vhc -I vhsc -DTARDIS_VERSION=\"$(TARDIS_VERSION)\" -DBUILD_DATE=\"$(BUILD_DATE)\" -DTARDIS_UPDATE=\"$(TARDIS_UPDATE)\" -DTARDIS_DEBUG=$(TARDIS_DEBUG)
 LDFLAGS = htslib/libhts.a vhc/libvhc.a vhsc/libvhsc.a -lz -lm -lpthread
-SOURCES = tardis.c cmdline.c common.c processbam.c config.c processfq.c external.c vh.c
+SOURCES = tardis.c cmdline.c common.c processbam.c config.c processfq.c external.c vh.c variants.c
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = tardis
 INSTALLPATH = /usr/local/bin/
@@ -13,16 +13,16 @@ INSTALLPATH = /usr/local/bin/
 all: $(SOURCES) $(EXECUTABLE)
 	rm -rf *.o
 
-$(EXECUTABLE): $(OBJECTS) 
+$(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $< -o $@
 
-clean: 
+clean:
 	rm -f $(EXECUTABLE) *.o *~
 
-libs: 
+libs:
 	make -C htslib
 	make -C vhc
 	make -C vhsc

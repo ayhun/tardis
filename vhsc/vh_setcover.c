@@ -1,5 +1,7 @@
 #include "vh_setcover.h"
 #include "vh_buffer.h"
+#include "../variants.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +48,7 @@ int compareReadMappingEl(const void *a, const void *b) // the compare function f
 }
 
 int findLibId(int multiLibsCount, char *libName)
-{	
+{
   int count=0;
   for ( count=0; count<multiLibsCount; count++)
     {
@@ -70,7 +72,7 @@ readMappingEl *addToListOfReads(readMappingEl *linkList, readMappingEl element) 
   newEl->probEditDist = element.probEditDist;
   newEl->next=linkList;
   return newEl;
-} 
+}
 
 
 
@@ -93,18 +95,18 @@ int processTheSV(int clusterId) // each new cluster read (clusterElRead_Single) 
   if (listClusterEl[clusterId].SVtype=='A')
     {
       int count=0;
-		
+
       for (count=0; count<clusterElRead_Single.sizeOfCluster; count++)
 	{
-	  //Move each paired-end read in the cluster (clusterElRead_Single) into 
-	  //the arry of clusters listClusterEl 
+	  //Move each paired-end read in the cluster (clusterElRead_Single) into
+	  //the arry of clusters listClusterEl
 	  if (clusterElRead_Single.readMappingElArray[count].orient1=='F')
 	    {
 	      if (clusterElRead_Single.readMappingElArray[count].posMapLeft > posStartSV)
 		posStartSV = clusterElRead_Single.readMappingElArray[count].posMapLeft;
 	      if (clusterElRead_Single.readMappingElArray[count].posMapLeft < posStartSV_Outer)
 		posStartSV_Outer = clusterElRead_Single.readMappingElArray[count].posMapLeft;
-				
+
 	    }
 	  if (clusterElRead_Single.readMappingElArray[count].orient1=='R')
 	    {
@@ -113,7 +115,7 @@ int processTheSV(int clusterId) // each new cluster read (clusterElRead_Single) 
 	      if (clusterElRead_Single.readMappingElArray[count].posMapLeft > posEndSV_Outer)
 		posEndSV_Outer = clusterElRead_Single.readMappingElArray[count].posMapLeft;
 	    }
-	  listClusterEl[clusterId].next = addToListOfReads(listClusterEl[clusterId].next, clusterElRead_Single.readMappingElArray[count]); 
+	  listClusterEl[clusterId].next = addToListOfReads(listClusterEl[clusterId].next, clusterElRead_Single.readMappingElArray[count]);
 	  if (listClusterEl[clusterId].next==NULL)
 	    printf("L73 Null\n");
 	}
@@ -128,8 +130,8 @@ int processTheSV(int clusterId) // each new cluster read (clusterElRead_Single) 
 
       for ( count=0; count<clusterElRead_Single.sizeOfCluster; count++)
 	{
-	  //Move each paired-end read in the cluster (clusterElRead_Single) into 
-	  //the arry of clusters listClusterEl 
+	  //Move each paired-end read in the cluster (clusterElRead_Single) into
+	  //the arry of clusters listClusterEl
 	  if (clusterElRead_Single.readMappingElArray[count].orient1=='F')
 	    {
 	      if (clusterElRead_Single.readMappingElArray[count].posMapLeft > posStartSV)
@@ -144,7 +146,7 @@ int processTheSV(int clusterId) // each new cluster read (clusterElRead_Single) 
 	      if (clusterElRead_Single.readMappingElArray[count].posMapLeft > posEndSV_Outer)
 		posEndSV_Outer = clusterElRead_Single.readMappingElArray[count].posMapLeft;
 	    }
-	  listClusterEl[clusterId].next = addToListOfReads(listClusterEl[clusterId].next, clusterElRead_Single.readMappingElArray[count]); 
+	  listClusterEl[clusterId].next = addToListOfReads(listClusterEl[clusterId].next, clusterElRead_Single.readMappingElArray[count]);
 	  if (listClusterEl[clusterId].next==NULL)
 	    printf("L73 Null\n");
 	}
@@ -157,11 +159,11 @@ int processTheSV(int clusterId) // each new cluster read (clusterElRead_Single) 
   else
     {
       int count=0;
-      
+
       for ( count=0; count<clusterElRead_Single.sizeOfCluster; count++)
 	{
-	  //Move each paired-end read in the cluster (clusterElRead_Single) into 
-	  //the arry of clusters listClusterEl 
+	  //Move each paired-end read in the cluster (clusterElRead_Single) into
+	  //the arry of clusters listClusterEl
 	  if (clusterElRead_Single.readMappingElArray[count].posMapLeft > posStartSV)
 	    posStartSV = clusterElRead_Single.readMappingElArray[count].posMapLeft;
 	  if (clusterElRead_Single.readMappingElArray[count].posMapLeft < posStartSV_Outer)
@@ -170,9 +172,9 @@ int processTheSV(int clusterId) // each new cluster read (clusterElRead_Single) 
 	    posEndSV = clusterElRead_Single.readMappingElArray[count].posMapRight;
 	  if (clusterElRead_Single.readMappingElArray[count].posMapRight > posEndSV_Outer)
 	    posEndSV_Outer = clusterElRead_Single.readMappingElArray[count].posMapRight;
-	  listClusterEl[clusterId].next = addToListOfReads(listClusterEl[clusterId].next, clusterElRead_Single.readMappingElArray[count]); 
+	  listClusterEl[clusterId].next = addToListOfReads(listClusterEl[clusterId].next, clusterElRead_Single.readMappingElArray[count]);
 	}
-      
+
       listClusterEl[clusterId].posStartSV = posStartSV;
       listClusterEl[clusterId].posStartSV_Outer = posStartSV_Outer;
       listClusterEl[clusterId].posEndSV = posEndSV;
@@ -189,7 +191,7 @@ int findReadName(char *readName)
     return minId;
   if (strcmp(readName, listReadEl[maxId].readName)==0)
     return maxId;
-	
+
   while (strcmp(readName, listReadEl[middleId].readName)!=0)
     {
       if (strcmp(readName, listReadEl[middleId].readName)>0)
@@ -256,7 +258,7 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
   readMappingEl *ptrMapping;
   fscanf(fpRead, "%i\n",	&sizeListReadEl);
   listReadEl = (readEl *) malloc(sizeListReadEl*sizeof(readEl));
-  
+
   multiLibsCount=0;
 
   for (i=0; i< num_bams; i++)
@@ -271,28 +273,28 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
       for (i=0; i<in_bams[j]->num_libraries; i++)
 	{
 	  strcpy(multiLibs[multiLibsCount].libName, in_bams[j]->libraries[i]->libname);
-	  multiLibs[multiLibsCount].indId=addNewInd(in_bams[j]->sample_name);    
-	  multiLibs[multiLibsCount].maxInstSize = in_bams[j]->libraries[i]->conc_max - 2 * in_bams[j]->libraries[i]->read_length; 
-	  multiLibs[multiLibsCount].minInstSize = in_bams[j]->libraries[i]->conc_min - 2 * in_bams[j]->libraries[i]->read_length; 
+	  multiLibs[multiLibsCount].indId=addNewInd(in_bams[j]->sample_name);
+	  multiLibs[multiLibsCount].maxInstSize = in_bams[j]->libraries[i]->conc_max - 2 * in_bams[j]->libraries[i]->read_length;
+	  multiLibs[multiLibsCount].minInstSize = in_bams[j]->libraries[i]->conc_min - 2 * in_bams[j]->libraries[i]->read_length;
 	  if (multiLibs[multiLibsCount].maxInstSize < 0)
 	    multiLibs[multiLibsCount].maxInstSize = 0;
 	  if (multiLibs[multiLibsCount].minInstSize < 0)
 	    multiLibs[multiLibsCount].minInstSize = 0;
-	  multiLibs[multiLibsCount].readLen = in_bams[j]->libraries[i]->read_length; 
+	  multiLibs[multiLibsCount].readLen = in_bams[j]->libraries[i]->read_length;
 	  multiLibsCount++;
 	}
     }
-  
+
   fprintf( stderr, "Number of individuals: %d \n", multiIndCount);
 
   weightsForCombination = (float *) malloc( (int) pow(2,multiIndCount)*sizeof(float));
-  
+
   int count=0;
 
   for ( count=0; count<pow(2, multiIndCount); count++)
     {
       weightsForCombination[count]=0;
-    }	
+    }
   if (fpWeights!=NULL)
     {
       int count=0;
@@ -304,20 +306,20 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	  fscanf(fpWeights,"%s ", indName);
 	  while(strcmp(indName,":")!=0)
 	    {
-	      indId=addNewInd(indName);		
+	      indId=addNewInd(indName);
 	      combinationId = combinationId + (int)pow(2,indId);
 	      fscanf(fpWeights,"%s ", indName);
-			
+
 	    }
 	  fscanf(fpWeights, "%f\n", &weight);
 	  weightsForCombination[combinationId]=weight;
 	}
-    } else {	
+    } else {
     int count=0;
 
     for ( count=1; count<pow(2, multiIndCount); count++)
       {
-	weightsForCombination[count]=1; //THE Defualt weights for SVs for combination of individuals 
+	weightsForCombination[count]=1; //THE Defualt weights for SVs for combination of individuals
       }
   }
 
@@ -335,7 +337,7 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 		  totalCoverage = totalCoverage + indCov;
 		  //	printf("%i\n", totalCoverage);
 		}else ; //printf("%s %s\n", multiInd[count], indName);
-	    }		
+	    }
 	}
 
     }else{
@@ -350,7 +352,7 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
   }
 
   weightsForCombination[0]=0;
-	
+
   while(fscanf(fpRead, "%s\n", readNameStr)!=EOF)
     {
       strcpy(listReadEl[listReadElId].readName, readNameStr);
@@ -372,13 +374,13 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
   for ( count=0; count < multiIndCount; count++)
     listClusterEl[listClusterElId].indIdCount[count]=0;
 
-	
+
 
   while(fscanf(fpCluster, "%s ", readNameStr)!=EOF)
     {
       if (strcmp(readNameStr,"END")==0)
 	{
-	  if (SVtype==3) 
+	  if (SVtype==3)
 	    listClusterEl[listClusterElId].SVtype='V';
 	  if (SVtype==2)
 	    listClusterEl[listClusterElId].SVtype='D';
@@ -390,7 +392,7 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	    listClusterEl[listClusterElId].SVtype='B';
 	  //listClusterEl[listClusterElId].next = (readMappingEl *) malloc(multiIndCount*sizeof(readMappingEl));
 	  ///////////////////If a new cluster is read indicates an SV bigger than what is expection (user defined threshold) it is pruned out
-			
+
 	  processTheSV(listClusterElId);
 	  tempClusterId++;
 	  if ((listClusterEl[listClusterElId].posEndSV-listClusterEl[listClusterElId].posStartSV > maxLengthSV_Del && listClusterEl[listClusterElId].SVtype=='D' )
@@ -399,7 +401,7 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	      //TROW THE LINK LIST OUT
 
 	      ptrMapping=listClusterEl[listClusterElId].next;
-				
+
 	      while(ptrMapping!=NULL)
 		{
 		  listReadEl[ptrMapping->readId].next=listReadEl[ptrMapping->readId].next->next;
@@ -408,12 +410,12 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 		}
 	      ptrMapping=listClusterEl[listClusterElId].next;
 	      freeLinkList(ptrMapping);
-				
-	    } else 
+
+	    } else
 	    {
 	      listClusterElId++;
 	    }
-			
+
 	  listClusterEl[listClusterElId].clusterId=listClusterElId;
 	  int multiIndId;
 	  for (multiIndId=0; multiIndId<totalNumInd; multiIndId++)
@@ -421,9 +423,9 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	      listClusterEl[listClusterElId].indIdCount[multiIndId]=0;
 	    }
 	  clusterElRead_Single.sizeOfCluster=0;
-		
-	
-	  
+
+
+
 	}else{
 
 	//fscanf(fpCluster,"%s %i %i %i %f %i %s %c %c ",chroName1, &startPos, &stopPos, &SVtype, &editProbDist, &editDist, libName, &orient1, &orient2);
@@ -445,7 +447,7 @@ int init(bam_info **in_bams, int num_bams, FILE *fpRead ,FILE *fpCluster, FILE *
 	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].editDistance=editDist;
 	  if (weightedHeuristicFlag==1)
 	    clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].probEditDist=editProbDist;
-	  else 
+	  else
 	    clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].probEditDist=1; // The unweighted verison this score for every mapping is equal to 1
 	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].posMapLeft=startPos;
 	  clusterElRead_Single.readMappingElArray[clusterElRead_Single.sizeOfCluster].posMapRight= stopPos;
@@ -471,21 +473,21 @@ float calWeight(int clusterId, int *countBestSetPicked)
 {
 
   if (listClusterEl[clusterId].oldBestIsGood==1)
-    {		
+    {
       int count=0;
       for ( count=0; count<totalNumInd; count++)
 	countBestSetPicked[count] = listClusterEl[clusterId].bestReadToRemove[count];
       return listClusterEl[clusterId].oldBestScore;
     }
-  int idIndPickedAlready=0; // the id of set of individuals which have been selected in previous rounds to have this SV 
+  int idIndPickedAlready=0; // the id of set of individuals which have been selected in previous rounds to have this SV
   int idIndCanBePicked=0; // the id of individuals which we are considering to have this SV in this round
   int countBestSubset=0; // the number of top set of paired-end reads which had best score till that iteration
   int editDistanceSum[totalNumInd]; // the total sume of edit distance for paired-end reads cconsiderd till now
 
-  //int editDistanceSum; //total sume of edit distance for paired-end reads 
+  //int editDistanceSum; //total sume of edit distance for paired-end reads
 
   int supOfIndSeen[totalNumInd]; //the number of paired-end read supports for each individual seen in this round
-  double weightedSupOfIndSeen[totalNumInd];// a normalized numer of paired-end read supports for each individual seen 
+  double weightedSupOfIndSeen[totalNumInd];// a normalized numer of paired-end read supports for each individual seen
   //int totalSupSeen; // the number of paired-end read supporting the SV
   int totalEditDist=0; // total of edit distance of all paired-end reads for individuals which we are consiering
   float bestScore, weightNew, normalizedSup=0, normalizedWeightedSup=0;
@@ -499,7 +501,7 @@ float calWeight(int clusterId, int *countBestSetPicked)
       editDistanceSum[indCount]=0;
       countBestSetPicked[indCount]=0;
       weightedSupOfIndSeen[indCount]=0;
-	
+
     }
 
 
@@ -510,21 +512,21 @@ float calWeight(int clusterId, int *countBestSetPicked)
 
   //printf("%i %i %f\n", clusterId, idIndPickedAlready, weightsForCombination[idIndPickedAlready]);
 
-  while(ptrReadMapping!=NULL) 
+  while(ptrReadMapping!=NULL)
     {
       if (listReadEl[ptrReadMapping->readId].readCovered==0 && listClusterEl[clusterId].indIdCount[ptrReadMapping->indId]>-1)
 	{
 	  supOfIndSeen[ptrReadMapping->indId]++;
 
 	  //////////////////////////////////////THE HUERISTIC//////////////////////////
-	  //////////////////////////////////////Instead of taking the total support as number of reads in each cluster, we use summation of 
+	  //////////////////////////////////////Instead of taking the total support as number of reads in each cluster, we use summation of
 	  //////////////////////////////////////normalized number of reads. i.e each read contributes as 1/(total number of mappings) it has.
 	  ////////////////////////////////////////////////////////////////////////////
 
 	  weightedSupOfIndSeen[ptrReadMapping->indId]=weightedSupOfIndSeen[ptrReadMapping->indId]+ptrReadMapping->probEditDist;
 	  if (supOfIndSeen[ptrReadMapping->indId]==minimumSupNeeded)
 	    {
-	      idIndCanBePicked=idIndCanBePicked+(int)pow(2, ptrReadMapping->indId);			
+	      idIndCanBePicked=idIndCanBePicked+(int)pow(2, ptrReadMapping->indId);
 	      numReadCanBeCovered=numReadCanBeCovered+supOfIndSeen[ptrReadMapping->indId];
 	      totalEditDist=totalEditDist+editDistanceSum[ptrReadMapping->indId];
 	    } else if (supOfIndSeen[ptrReadMapping->indId]>minimumSupNeeded)
@@ -539,7 +541,7 @@ float calWeight(int clusterId, int *countBestSetPicked)
 
   weightNew = weightsForCombination[idIndCanBePicked]+scoreForEditDistanceFunc(totalEditDist);
   if (numReadCanBeCovered>0)
-    {		
+    {
       int count=0;
       for (count=0; count<multiIndCount; count++)
 	{
@@ -554,12 +556,12 @@ float calWeight(int clusterId, int *countBestSetPicked)
 		  normalizedSup = normalizedSup + supOfIndSeen[count];
 		  normalizedWeightedSup = normalizedWeightedSup +  weightedSupOfIndSeen[count];
 		}
- 
-	    }	
+
+	    }
 	}
       bestScore = ((float)weightNew/(float)normalizedWeightedSup);
     }
-  else 
+  else
     {
       bestScore = inf;
     }
@@ -570,7 +572,7 @@ float calWeight(int clusterId, int *countBestSetPicked)
       if (supOfIndSeen[count]>=minimumSupNeeded)
 	{
 	  countBestSetPicked[count]=supOfIndSeen[count];
-	}	
+	}
     }
   listClusterEl[clusterId].oldBestIsGood=1;
   listClusterEl[clusterId].oldBestScore=bestScore;
@@ -616,7 +618,7 @@ int conflictsBetweenTwoSV_Cord(int startCoord1, int stopCoord1,char SVtype1, int
 
 int conflictsAny(int i, int *supInd) // return the individual that SV_i is in conflict with any of the selected SVs
 {
-  SV_selected *ptrSV;	
+  SV_selected *ptrSV;
   int conflict=0;
   int count=0;
   for (count=0; count<numSV; count++)
@@ -632,10 +634,10 @@ int conflictsAny(int i, int *supInd) // return the individual that SV_i is in co
 		    {
 		      int countInd=0;
 		      for (countInd=0; countInd<multiIndCount; countInd++)
-			{	
+			{
 			  if (ptrSV->sup[countInd] > 0 && listClusterEl[i].indIdCount[countInd] <= 0 && listSelectedSV[count].sup[countInd] > 0 && supInd[countInd]>0)
 			    {
-								
+
 			      removeInd(countInd, i);
 			      conflict=1;
 			    }
@@ -673,7 +675,7 @@ int checkConflictNewSelected(SV_selected *ptr1, SV_selected *ptr2, int NotSelect
 	      listClusterEl[NotSelectedClus].indIdCount[countInd]=-1;
 	      listClusterEl[NotSelectedClus].oldBestIsGood=0;
 	    }
-				
+
 	}
     }
   return 0;
@@ -690,12 +692,12 @@ int conflictsTwoWay(int i, int j) //returns the individual that SV_i and SV_j ar
     {
       if (listSelectedSV[i].sup[count]>0 && listSelectedSV[j].sup[count]>0)
 	return count;
-    } 
+    }
   return -1;
 }
 
 int wasNotInConliftNowIsConflict(int i, int j, int *countReads)
-// add do the two SV selected i and j not in conflict priousvly 
+// add do the two SV selected i and j not in conflict priousvly
 //however with the additional supported given to cluster "j" they will be in conflict
 {
 
@@ -708,7 +710,7 @@ int wasNotInConliftNowIsConflict(int i, int j, int *countReads)
     {
       if (listSelectedSV[i].sup[count]>0 && listSelectedSV[j].sup[count]>0)
 	return -1;
-    } 
+    }
   for (count=0; count<multiIndCount; count++)
     {
       if (listSelectedSV[i].sup[count]>0 && listSelectedSV[j].sup[count]==0 && countReads[count]>0)
@@ -731,7 +733,7 @@ int addToListOfConflicts(int i, int j, int *countReads) // adds SV i to SV j's c
   for ( count=0; count<multiIndCount; count++)
     {
       newSV->sup[count]=listSelectedSV[i].sup[count];
-    }		
+    }
   newSV->conflict_Next=listSelectedSV[j].conflict_Next;
   listSelectedSV[j].conflict_Next=newSV;
   newSV=listSelectedSV[j].conflict_Next;
@@ -773,7 +775,7 @@ void addToConflict(int maxWeightSet, int *countReads)// adds the SV numSV to the
 	    {
 	      addToListOfConflicts(i, numSV, countReads);
 	      addToListOfConflicts(numSV, i, countReads);
-	    }	
+	    }
 	}
 
 
@@ -783,7 +785,7 @@ void addToConflict(int maxWeightSet, int *countReads)// adds the SV numSV to the
 	  if (conflictsBetweenTwoSV_Cord(listSelectedSV[numSV].posStart_SV, listSelectedSV[numSV].posEnd_SV, listSelectedSV[numSV].SVtype, listClusterEl[count].posStartSV, listClusterEl[count].posEndSV, listClusterEl[count].SVtype) && (strcmp(listSelectedSV[numSV].chroName, listClusterEl[count].chroName)==0))
 	    {
 	      while(ptrTmp!=NULL)
-		{	
+		{
 		  checkConflictNewSelected(&listSelectedSV[numSV], ptrTmp, count);
 		  ptrTmp=ptrTmp->conflict_Next;
 		}
@@ -838,7 +840,7 @@ int search_MobileName(int pos)
 float avgEditDistReadSupportingCluster(readMappingEl *list)
 {
   int countTotal=0, editDistanceSum=0;
-	
+
   while(list!=NULL)
     {
       editDistanceSum = editDistanceSum + list->editDistance;
@@ -888,7 +890,7 @@ double * calculateTheHeuristicScore(readMappingEl *list)
   for( count=0; count<multiIndCount; count++)
     {
       result[count]=0;
-    }	
+    }
 
   while(list!=NULL)
     {
@@ -899,7 +901,7 @@ double * calculateTheHeuristicScore(readMappingEl *list)
 
 }
 
-int outputCluster(int set, FILE *fpOut)
+int outputCluster(struct strvar ** vars, int set, FILE *fpOut)
 {
   readMappingEl *ptrReadMappingSelected;
   int outInsLeft=maxChroSize, inInsLeft=0, inInsRight=maxChroSize, outInsRight=0;
@@ -944,7 +946,7 @@ int outputCluster(int set, FILE *fpOut)
       outInsLeft = outInsLeft - listMobileEl[idMobile].startPos;
       inInsLeft = inInsLeft - listMobileEl[idMobile].startPos;
       inInsRight = inInsRight - listMobileEl[idMobile].startPos;
-      outInsRight = outInsRight - listMobileEl[idMobile].startPos; 
+      outInsRight = outInsRight - listMobileEl[idMobile].startPos;
 
 
       if (F_Side == 0)
@@ -954,7 +956,7 @@ int outputCluster(int set, FILE *fpOut)
 	}else if (R_Side==0)
 	{	inInsRight = listMobileEl[idMobile].endPos - listMobileEl[idMobile].startPos;
 	  outInsRight = listMobileEl[idMobile].endPos - listMobileEl[idMobile].startPos;
-			
+
 	}
       if (outInsLeft<0)
 	outInsLeft=0;
@@ -967,7 +969,7 @@ int outputCluster(int set, FILE *fpOut)
 
     }else if (listClusterEl[set].SVtype=='B')
     {
-		
+
       ptrReadMappingSelected = listClusterEl[set].readMappingSelected;
       while(ptrReadMappingSelected!=NULL)
 	{
@@ -989,12 +991,12 @@ int outputCluster(int set, FILE *fpOut)
 	  ptrReadMappingSelected=ptrReadMappingSelected->next;
 	}
       strcpy(mobileName, listMobileEl[search_MobileName(listClusterEl[set].next->posMapRight)].nameMobile);
-      //printf("%s %i\n", mobileName, search_MobileName(listClusterEl[set].next->posMapRight)); 
+      //printf("%s %i\n", mobileName, search_MobileName(listClusterEl[set].next->posMapRight));
       idMobile = search_MobileName(listClusterEl[set].next->posMapRight);
       outInsLeft = outInsLeft - listMobileEl[idMobile].startPos;
       inInsLeft = inInsLeft - listMobileEl[idMobile].startPos;
       inInsRight = inInsRight - listMobileEl[idMobile].startPos;
-      outInsRight = outInsRight - listMobileEl[idMobile].startPos; 
+      outInsRight = outInsRight - listMobileEl[idMobile].startPos;
       if (R_Side == 0)
 	{
 	  outInsLeft=0;
@@ -1002,7 +1004,7 @@ int outputCluster(int set, FILE *fpOut)
 	}else if (F_Side==0)
 	{	inInsRight = listMobileEl[idMobile].endPos - listMobileEl[idMobile].startPos;
 	  outInsRight = listMobileEl[idMobile].endPos - listMobileEl[idMobile].startPos;
-			
+
 	}
       if (outInsLeft<0)
 	outInsLeft=0;
@@ -1021,15 +1023,28 @@ int outputCluster(int set, FILE *fpOut)
 
   if (listClusterEl[set].SVtype=='A')
     {
-	
-
+      struct strvar* var_example = new_strvar(11,21,39,19,DEL,0,3,3.1,1,100,NULL,1.1);
+      char * chr_name = malloc(sizeof(char[10]));
+      sprintf(chr_name, "%d", 1);
+      add_strvar(vars,chr_name,var_example);
+      free(chr_name);
       fprintf(fpOut,"Chr:%s Start_Outer:%i Start_Inner:%i End_Inner:%i End_Outer:%i SVtype:%c MobileName:%s StartLeftIns:%i EndLeftIns:%i StartRightIns:%i EndRightIns:%i sup:%i Sum_Weight:0 AvgEditDist:%f", listClusterEl[set].chroName, listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].SVtype, mobileName,outInsLeft, inInsLeft, inInsRight, outInsRight, supTotal,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ) );
     } else if (listClusterEl[set].SVtype=='B')
     {
+        struct strvar* var_example = new_strvar(11,21,39,19,DEL,0,3,3.1,1,100,NULL,1.1);
+      char * chr_name = malloc(sizeof(char[10]));
+      sprintf(chr_name, "%d", 1);
+      add_strvar(vars,chr_name,var_example);
+      free(chr_name);
       fprintf(fpOut,"Chr:%s Start_Outer:%i Start_Inner:%i End_Inner:%i End_Outer:%i SVtype:%c MobileName:%s StartLeftIns:%i EndLeftIns:%i StartRightIns:%i EndRightIns:%i sup:%i Sum_Weight:0 AvgEditDist:%f", listClusterEl[set].chroName, listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].SVtype, mobileName,outInsLeft, inInsLeft, inInsRight, outInsRight, supTotal,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ) );
     }
   else
     {
+        struct strvar* var_example = new_strvar(11,21,39,19,DEL,0,3,3.1,1,100,NULL,1.1);
+      char * chr_name = malloc(sizeof(char[10]));
+      sprintf(chr_name, "%d", 1);
+      add_strvar(vars,chr_name,var_example);
+      free(chr_name);
       fprintf(fpOut,"Chr:%s Start_Outer:%i Start_Inner:%i End_Inner:%i End_Outer:%i SVtype:%c sup:%i Sum_Weight:0 AvgEditDits:%f", listClusterEl[set].chroName, listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].SVtype, supTotal, avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ));
     }
   int countInd;
@@ -1066,9 +1081,9 @@ int markReadsCovered(int clusterId, int *countReads)
       readsToMark[count]=countReads[count];
     }
 
-  //This part will mark the reads covered and calculate the minimum and maximum length of deletion 
-	
-	
+  //This part will mark the reads covered and calculate the minimum and maximum length of deletion
+
+
 
   while(ptrRead!=NULL && totalReadRemove>0)
     {
@@ -1076,22 +1091,22 @@ int markReadsCovered(int clusterId, int *countReads)
 	{
 	  ptrClusterId=listReadEl[ptrRead->readId].next;
 	  listClusterEl[clusterId].indIdCount[ptrRead->indId]++;
-			
-			
-	  listClusterEl[clusterId].readMappingSelected=addToListOfReads(listClusterEl[clusterId].readMappingSelected, *ptrRead); 
-			
+
+
+	  listClusterEl[clusterId].readMappingSelected=addToListOfReads(listClusterEl[clusterId].readMappingSelected, *ptrRead);
+
 	  if (listClusterEl[clusterId].SVtype=='D' && minDelLength > ptrRead->posMapRight - ptrRead->posMapLeft - multiLibs[listReadEl[ptrRead->readId].libId].maxInstSize)
 	    {
 	      minDelLength=ptrRead->posMapRight - ptrRead->posMapLeft - multiLibs[listReadEl[ptrRead->readId].libId].maxInstSize;
-			
+
 	    }
-			
+
 	  if (listClusterEl[clusterId].SVtype=='D' && maxDelLength > ptrRead->posMapRight - ptrRead->posMapLeft - multiLibs[listReadEl[ptrRead->readId].libId].minInstSize)
 	    {
 	      maxDelLength=ptrRead->posMapRight - ptrRead->posMapLeft - multiLibs[listReadEl[ptrRead->readId].libId].minInstSize;
-			
+
 	    }
-	
+
 	  listReadEl[ptrRead->readId].readCovered=1;
 	  readsToMark[ptrRead->indId]--;
 	  while (ptrClusterId!=NULL)
@@ -1110,7 +1125,7 @@ int markReadsCovered(int clusterId, int *countReads)
       listClusterEl[clusterId].minDelLength=minDelLength;
       listClusterEl[clusterId].maxDelLength=maxDelLength;
     }
-	
+
 
 }
 
@@ -1129,19 +1144,19 @@ int bufferIsUseful()
 	  listClusterEl[listClusterInBuffer[count].clusterId].oldBestIsGood=1;
 	  listClusterInBuffer[count].score=listClusterEl[listClusterInBuffer[count].clusterId].oldBestScore;
 	}
-     
+
     }
- 
+
   for ( count=0; count<countInBuffer; count++)
     {
       if (bestWeight > listClusterEl[listClusterInBuffer[count].clusterId].oldBestScore)
 	{
 	  bestWeight=listClusterEl[listClusterInBuffer[count].clusterId].oldBestScore;
-	  bestWeightId=count;	
+	  bestWeightId=count;
 	}
-     
+
     }
- 
+
   if(bestWeight<=maxScoreInBuffer && bestWeight!=inf)
     return 1;
   else return 0;
@@ -1162,17 +1177,17 @@ int pickSet()
     {
       bestWeight=inf;
       bestWeightSet=-1;
-     
+
       if(!bufferIsUseful())
 	{
 	  emptyBuffer();
 	  int clusterCounter=0;
 	  for (clusterCounter=0; clusterCounter<sizeListClusterEl; clusterCounter++)
-	    {	
+	    {
 	      newWeight=calWeight(clusterCounter, countReads);
 	      addToBuffer(newWeight, clusterCounter);
 	      if (bestWeight > newWeight)
-		{	
+		{
 		  bestWeightSet = clusterCounter;
 		  int count=0;
 		  for ( count=0; count<multiIndCount; count++)
@@ -1183,7 +1198,7 @@ int pickSet()
 		}
 	    }
 
-			
+
 	}else{
 	bestWeightSet=bestFromBuffer();
 	bestWeight=listClusterEl[bestWeightSet].oldBestScore;
@@ -1193,7 +1208,7 @@ int pickSet()
 	    bestReads[count]=listClusterEl[bestWeightSet].bestReadToRemove[count];
 	  }
       }
-	
+
       if (bestWeight<inf)
 	{
 	  if (conflictResFlag == 0 || conflictsAny(bestWeightSet, bestReads)==-1)
@@ -1202,23 +1217,23 @@ int pickSet()
 
 	      {
 		markReadsCovered(bestWeightSet, bestReads);
-	
+
 		if (conflictResFlag==1)
 		  addToConflict(bestWeightSet, bestReads);
-	
+
 		numCallsRequested--;
 		listClusterEl[bestWeightSet].oldBestIsGood=0;
 	      }
 	    }
 	}
-      else 
+      else
 	{
 	  /*
 	    printf("aaaaaaa%f\n", bestWeight);
 	  */
 	  return 0;
 	}
-		
+
     }
 }
 
@@ -1227,7 +1242,8 @@ int pickSet()
 
 int outputPickedCluster(FILE *fpOut)
 {
-
+  printf("geldik, num chromosomes:%d\n", sizeListClusterEl);
+  struct strvar ** vars = init_vars(sizeListClusterEl);
   int totalSup=0;
   int count=0;
   for ( count=0; count<sizeListClusterEl; count++)
@@ -1240,10 +1256,13 @@ int outputPickedCluster(FILE *fpOut)
 	}
       if (totalSup>0)
 	{
-	  outputCluster(count, fpOut);
+	    outputCluster(vars, count, fpOut);
 	}
-			
+
     }
+    print_all(vars);
+    free_all(vars);
+    printf("bittii");
 }
 
 
@@ -1251,8 +1270,8 @@ int outputPickedCluster(FILE *fpOut)
 void readMobileElements(FILE *fp)
 {
   char nameM[50], nameC[50];
-  int pos1, pos2; 
-  
+  int pos1, pos2;
+
   while (fscanf(fp,"%s\t%i\t%i\t%s\n", nameC,&pos1, &pos2, nameM)!=EOF)
     {
       strcpy(listMobileEl[listMobileElSize].nameMobile, nameM);
@@ -1276,7 +1295,7 @@ int vh_setcover(bam_info **in_bams, parameters *params, char* outputread, char* 
   init(in_bams, num_bams, readFp, clusterFp, weightsFp, coverageFp);
   if (fpMobile!=NULL)
     readMobileElements(fpMobile);
-  pickSet();	
+  pickSet();
   outputPickedCluster(fpOut);
 }
 
