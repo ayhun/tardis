@@ -1023,27 +1023,28 @@ int outputCluster(struct strvar ** vars, int set, FILE *fpOut)
 
   if (listClusterEl[set].SVtype=='A')
     {
-      struct strvar* var_example = new_strvar(11,21,39,19,DEL,0,3,3.1,1,100,NULL,1.1);
+      struct strvar* var_example = new_strvar(listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].posEndSV ,getEnum(listClusterEl[set].SVtype),supTotal,-1,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ),listClusterEl[set].minDelLength,listClusterEl[set].maxDelLength,NULL,1.1);
       char * chr_name = malloc(sizeof(char[10]));
       sprintf(chr_name, "%d", 1);
-      add_strvar(vars,chr_name,var_example);
+      add_strvar(vars,listClusterEl[set].chroName,var_example);
       free(chr_name);
+
       fprintf(fpOut,"Chr:%s Start_Outer:%i Start_Inner:%i End_Inner:%i End_Outer:%i SVtype:%c MobileName:%s StartLeftIns:%i EndLeftIns:%i StartRightIns:%i EndRightIns:%i sup:%i Sum_Weight:0 AvgEditDist:%f", listClusterEl[set].chroName, listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].SVtype, mobileName,outInsLeft, inInsLeft, inInsRight, outInsRight, supTotal,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ) );
     } else if (listClusterEl[set].SVtype=='B')
     {
-        struct strvar* var_example = new_strvar(11,21,39,19,DEL,0,3,3.1,1,100,NULL,1.1);
+      struct strvar* var_example = new_strvar(listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].posEndSV ,getEnum(listClusterEl[set].SVtype),supTotal,-1,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ),listClusterEl[set].minDelLength,listClusterEl[set].maxDelLength,NULL,1.1);
       char * chr_name = malloc(sizeof(char[10]));
       sprintf(chr_name, "%d", 1);
-      add_strvar(vars,chr_name,var_example);
+      add_strvar(vars,listClusterEl[set].chroName,var_example);
       free(chr_name);
       fprintf(fpOut,"Chr:%s Start_Outer:%i Start_Inner:%i End_Inner:%i End_Outer:%i SVtype:%c MobileName:%s StartLeftIns:%i EndLeftIns:%i StartRightIns:%i EndRightIns:%i sup:%i Sum_Weight:0 AvgEditDist:%f", listClusterEl[set].chroName, listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].SVtype, mobileName,outInsLeft, inInsLeft, inInsRight, outInsRight, supTotal,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ) );
     }
   else
     {
-        struct strvar* var_example = new_strvar(11,21,39,19,DEL,0,3,3.1,1,100,NULL,1.1);
+      struct strvar* var_example = new_strvar(listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].posEndSV ,getEnum(listClusterEl[set].SVtype),supTotal,-1,avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ),listClusterEl[set].minDelLength,listClusterEl[set].maxDelLength,NULL,1.1);
       char * chr_name = malloc(sizeof(char[10]));
       sprintf(chr_name, "%d", 1);
-      add_strvar(vars,chr_name,var_example);
+      add_strvar(vars,listClusterEl[set].chroName,var_example);
       free(chr_name);
       fprintf(fpOut,"Chr:%s Start_Outer:%i Start_Inner:%i End_Inner:%i End_Outer:%i SVtype:%c sup:%i Sum_Weight:0 AvgEditDits:%f", listClusterEl[set].chroName, listClusterEl[set].posStartSV_Outer, listClusterEl[set].posStartSV, listClusterEl[set].posEndSV, listClusterEl[set].posEndSV_Outer, listClusterEl[set].SVtype, supTotal, avgEditDistReadSupportingCluster( listClusterEl[set].readMappingSelected  ));
     }
@@ -1260,9 +1261,9 @@ int outputPickedCluster(FILE *fpOut)
 	}
 
     }
+    printf("Uncomment the line below to see the content in the memory");
     print_all(vars);
     free_all(vars);
-    printf("bittii");
 }
 
 

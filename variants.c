@@ -135,7 +135,7 @@ void print_chr(struct strvar ** variations, char* chr_) {
     struct strvar* curr_strvar = variations[chr];
 
     while (curr_strvar != NULL) {
-        printf("Chr:%s Start_Outer:%i Start_Inner:%i End_Outer:%i End_Inner:%i SVtype:%s rp_sup:%i sr_sup:%i min svlen:%i max svlen:%i confidence:%f\n",
+        printf("Chr:%-11s Start_Outer:%-11i Start_Inner:%-11i End_Outer:%-11i End_Inner:%-11i SVtype:%-3s rp_sup:%-3i sr_sup:%-1i min svlen:%-6i max svlen:%-6i confidence:%f\n",
                 chr_, curr_strvar->outer_start, curr_strvar->inner_start,
                 curr_strvar->outer_end, curr_strvar->inner_end, svtypeToChar(curr_strvar->svtype), curr_strvar->rp_sup, curr_strvar->sr_sup,
                 curr_strvar->min_svlen, curr_strvar->max_svlen, curr_strvar->conf_score);
