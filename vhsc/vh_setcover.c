@@ -1261,8 +1261,8 @@ int outputPickedCluster(FILE *fpOut)
 	}
 
     }
-    printf("Uncomment the line below to see the content in the memory");
-    print_all(vars);
+    printf("Uncomment the line 1265 in \"vhsc/vh_setcover.c\" to print the content in the memory");
+    //print_all(vars);
     free_all(vars);
 }
 
